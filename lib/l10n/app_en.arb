@@ -128,6 +128,10 @@
   "settingsLanguageSystem": "System default",
   "settingsLanguageEn": "English",
   "settingsLanguageRu": "Русский",
+  "settingsSectionTheme": "Theme",
+  "settingsThemeSystem": "System default",
+  "settingsThemeLight": "Light",
+  "settingsThemeDark": "Dark",
 
   "settingsResetTitle": "Reset settings?",
   "settingsResetContent": "All values will revert to defaults.",

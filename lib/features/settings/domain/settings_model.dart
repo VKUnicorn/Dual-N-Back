@@ -1,3 +1,4 @@
+import 'package:dual_n_back/core/constants/app_theme_mode.dart';
 import 'package:dual_n_back/core/constants/audio_voice.dart';
 import 'package:dual_n_back/core/constants/grid_style.dart';
 import 'package:dual_n_back/core/constants/nback_defaults.dart';
@@ -31,6 +32,7 @@ class SettingsModel {
     required this.stimulusFadeMs,
     required this.notificationsEnabled,
     required this.notificationTimeMinutes,
+    required this.themeMode,
     this.localeCode,
   });
 
@@ -55,6 +57,7 @@ class SettingsModel {
         stimulusFadeMs: defaultStimulusFadeMs,
         notificationsEnabled: false,
         notificationTimeMinutes: defaultNotificationTimeMinutes,
+        themeMode: AppThemeMode.system,
       );
 
   /// Bounds and default for the daily-goal slider on the settings screen.
@@ -180,6 +183,10 @@ class SettingsModel {
   /// (09:00).
   final int notificationTimeMinutes;
 
+  /// App theme preference. Mapped to Flutter's `ThemeMode` in `app.dart`.
+  /// Default is [AppThemeMode.system] — follow the OS light/dark setting.
+  final AppThemeMode themeMode;
+
   /// Locale override. `null` means follow system locale.
   final String? localeCode;
 
@@ -203,6 +210,7 @@ class SettingsModel {
     int? stimulusFadeMs,
     bool? notificationsEnabled,
     int? notificationTimeMinutes,
+    AppThemeMode? themeMode,
     String? Function()? localeCode,
   }) {
     return SettingsModel(
@@ -227,6 +235,7 @@ class SettingsModel {
           notificationsEnabled ?? this.notificationsEnabled,
       notificationTimeMinutes:
           notificationTimeMinutes ?? this.notificationTimeMinutes,
+      themeMode: themeMode ?? this.themeMode,
       localeCode: localeCode != null ? localeCode() : this.localeCode,
     );
   }

@@ -1,3 +1,4 @@
+import 'package:dual_n_back/core/constants/app_theme_mode.dart';
 import 'package:dual_n_back/core/constants/audio_voice.dart';
 import 'package:dual_n_back/core/constants/grid_style.dart';
 import 'package:dual_n_back/features/game/domain/stimulus.dart';
@@ -34,6 +35,7 @@ class SettingsRepository {
   static const _kNotificationsEnabled = 'settings.notificationsEnabled';
   static const _kNotificationTimeMinutes =
       'settings.notificationTimeMinutes';
+  static const _kThemeMode = 'settings.themeMode';
   static const _kLocale = 'settings.localeCode';
 
   SettingsModel load() {
@@ -65,6 +67,7 @@ class SettingsRepository {
           defaults.notificationsEnabled,
       notificationTimeMinutes: _prefs.getInt(_kNotificationTimeMinutes) ??
           defaults.notificationTimeMinutes,
+      themeMode: _loadThemeMode() ?? defaults.themeMode,
       localeCode: _prefs.getString(_kLocale),
     );
   }
@@ -105,6 +108,7 @@ class SettingsRepository {
         _kNotificationTimeMinutes,
         model.notificationTimeMinutes,
       ),
+      _prefs.setString(_kThemeMode, model.themeMode.name),
       if (model.localeCode != null)
         _prefs.setString(_kLocale, model.localeCode!)
       else
@@ -133,6 +137,7 @@ class SettingsRepository {
       _prefs.remove(_kStimulusFadeMs),
       _prefs.remove(_kNotificationsEnabled),
       _prefs.remove(_kNotificationTimeMinutes),
+      _prefs.remove(_kThemeMode),
       _prefs.remove(_kLocale),
     ]);
   }
@@ -220,6 +225,15 @@ class SettingsRepository {
     if (name == null) return null;
     for (final voice in AudioVoice.values) {
       if (voice.name == name) return voice;
+    }
+    return null;
+  }
+
+  AppThemeMode? _loadThemeMode() {
+    final name = _prefs.getString(_kThemeMode);
+    if (name == null) return null;
+    for (final mode in AppThemeMode.values) {
+      if (mode.name == name) return mode;
     }
     return null;
   }

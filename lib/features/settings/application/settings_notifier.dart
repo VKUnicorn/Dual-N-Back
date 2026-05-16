@@ -1,3 +1,4 @@
+import 'package:dual_n_back/core/constants/app_theme_mode.dart';
 import 'package:dual_n_back/core/constants/audio_voice.dart';
 import 'package:dual_n_back/core/constants/grid_style.dart';
 import 'package:dual_n_back/core/constants/nback_defaults.dart';
@@ -167,6 +168,11 @@ class SettingsNotifier extends Notifier<SettingsModel> {
 
   Future<void> updateLocale(String? localeCode) async {
     state = state.copyWith(localeCode: () => localeCode);
+    await _repo.save(state);
+  }
+
+  Future<void> updateThemeMode(AppThemeMode mode) async {
+    state = state.copyWith(themeMode: mode);
     await _repo.save(state);
   }
 

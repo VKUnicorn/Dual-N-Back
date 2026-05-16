@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dual_n_back/core/constants/app_theme_mode.dart';
 import 'package:dual_n_back/core/notifications/notification_provider.dart';
 import 'package:dual_n_back/core/router.dart';
 import 'package:dual_n_back/core/theme/app_theme.dart';
@@ -20,12 +21,16 @@ class DualNBackApp extends ConsumerWidget {
     final localeCode = ref.watch(
       settingsProvider.select((s) => s.localeCode),
     );
+    final themeMode = ref.watch(
+      settingsProvider.select((s) => s.themeMode),
+    );
 
     return MaterialApp.router(
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
+      themeMode: _toFlutterThemeMode(themeMode),
       locale: localeCode != null ? Locale(localeCode) : null,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
@@ -34,6 +39,19 @@ class DualNBackApp extends ConsumerWidget {
         child: child ?? const SizedBox.shrink(),
       ),
     );
+  }
+
+  /// Maps our pure-Dart [AppThemeMode] to Flutter's [ThemeMode].
+  /// Kept here so the domain layer doesn't need to import `material.dart`.
+  ThemeMode _toFlutterThemeMode(AppThemeMode mode) {
+    switch (mode) {
+      case AppThemeMode.system:
+        return ThemeMode.system;
+      case AppThemeMode.light:
+        return ThemeMode.light;
+      case AppThemeMode.dark:
+        return ThemeMode.dark;
+    }
   }
 }
 

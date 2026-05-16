@@ -101,6 +101,10 @@
   "settingsLanguageSystem": "Системный",
   "settingsLanguageEn": "English",
   "settingsLanguageRu": "Русский",
+  "settingsSectionTheme": "Тема",
+  "settingsThemeSystem": "Системная",
+  "settingsThemeLight": "Светлая",
+  "settingsThemeDark": "Тёмная",
 
   "settingsResetTitle": "Сбросить настройки?",
   "settingsResetContent": "Все значения вернутся к значениям по умолчанию.",

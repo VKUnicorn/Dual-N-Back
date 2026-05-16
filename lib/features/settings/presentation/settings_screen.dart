@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dual_n_back/core/audio/audio_provider.dart';
+import 'package:dual_n_back/core/constants/app_theme_mode.dart';
 import 'package:dual_n_back/core/constants/audio_voice.dart';
 import 'package:dual_n_back/core/constants/grid_style.dart';
 import 'package:dual_n_back/core/constants/nback_defaults.dart';
@@ -45,6 +46,14 @@ class SettingsScreen extends ConsumerWidget {
             child: _LocalePicker(
               current: settings.localeCode,
               onChanged: (code) => unawaited(notifier.updateLocale(code)),
+            ),
+          ),
+          _Section(
+            title: l.settingsSectionTheme,
+            child: _ThemeModePicker(
+              current: settings.themeMode,
+              onChanged: (mode) =>
+                  unawaited(notifier.updateThemeMode(mode)),
             ),
           ),
           _Section(
@@ -912,6 +921,43 @@ class _LocalePicker extends StatelessWidget {
         expandedInsets: EdgeInsets.zero,
         dropdownMenuEntries: entries,
         onSelected: (v) => onChanged(v == null || v.isEmpty ? null : v),
+      ),
+    );
+  }
+}
+
+class _ThemeModePicker extends StatelessWidget {
+  const _ThemeModePicker({required this.current, required this.onChanged});
+
+  final AppThemeMode current;
+  final ValueChanged<AppThemeMode> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final entries = <DropdownMenuEntry<AppThemeMode>>[
+      DropdownMenuEntry(
+        value: AppThemeMode.system,
+        label: l.settingsThemeSystem,
+      ),
+      DropdownMenuEntry(
+        value: AppThemeMode.light,
+        label: l.settingsThemeLight,
+      ),
+      DropdownMenuEntry(
+        value: AppThemeMode.dark,
+        label: l.settingsThemeDark,
+      ),
+    ];
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: DropdownMenu<AppThemeMode>(
+        initialSelection: current,
+        expandedInsets: EdgeInsets.zero,
+        dropdownMenuEntries: entries,
+        onSelected: (v) {
+          if (v != null) onChanged(v);
+        },
       ),
     );
   }

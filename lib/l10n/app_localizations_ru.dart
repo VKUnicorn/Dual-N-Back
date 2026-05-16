@@ -330,6 +330,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsLanguageRu => 'Русский';
 
   @override
+  String get settingsSectionTheme => 'Тема';
+
+  @override
+  String get settingsThemeSystem => 'Системная';
+
+  @override
+  String get settingsThemeLight => 'Светлая';
+
+  @override
+  String get settingsThemeDark => 'Тёмная';
+
+  @override
   String get settingsResetTitle => 'Сбросить настройки?';
 
   @override
