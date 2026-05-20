@@ -34,48 +34,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get infoSectionWhatIsBody =>
-      'N-back is a working-memory task. A stream of stimuli appears one at a time; for each one you decide whether it matches the stimulus shown N steps earlier. Single N-back uses one channel (e.g. position), dual N-back uses two independent channels (typically position + audio), and quad N-back uses four. Each channel is judged independently — a match on position doesn\'t imply a match on audio.';
+      'N-back is an exercise for your working memory. Cues appear one at a time on the screen (a letter, a colour, a position in a grid, and so on), and your job is to notice whether the current cue matches the one shown N steps back. The bigger N is, the harder it is to keep the sequence in mind.\n\nYou can train one channel at a time (Single — e.g. position only), two together (Dual — the classic version, usually position + sound), or all four (Quad). Each channel is judged on its own: a match in position doesn\'t mean a match in sound.';
 
   @override
   String get infoSectionJaeggi => 'The Jaeggi study';
 
   @override
   String get infoSectionJaeggiBody =>
-      'Jaeggi et al. (2008) showed that ~19 days of dual N-back training transferred to gains in fluid intelligence (Gf), measured by Raven-style progressive matrices. The adaptive protocol they used drives this app\'s defaults: 20 scoring trials per session, 500 ms stimulus, 2500 ms ISI, 30% match probability, and adaptive N — increase when per-channel accuracy ≥ 80%, decrease when below 50%.';
+      'In 2008, researchers led by Jaeggi published a study showing that about 19 days of daily Dual N-back training improved fluid intelligence (Gf) — the ability to solve new, unfamiliar problems. N-back has been a popular \'brain trainer\' ever since.\n\nThe app\'s default settings come from that same study: 20 trials per session, each cue shown for 500 ms, 2500 ms pause between cues, matches appear about 30% of the time. If adaptive mode is on, the N level goes up when per-channel accuracy is ≥80% and down when it\'s below 50%.';
 
   @override
   String get infoSectionMetrics => 'Score metrics';
 
   @override
   String get infoMetricHits =>
-      'Hits — you pressed Match on a trial where the stimulus really did match the one N steps ago.';
+      'Hits — you pressed Match where there really was a match.';
 
   @override
   String get infoMetricMisses =>
-      'Misses — there was a real match, but you didn\'t press.';
+      'Misses — there was a match, but you didn\'t catch it.';
 
   @override
   String get infoMetricFalseAlarms =>
-      'False + (false alarms) — you pressed Match, but there was no real match.';
+      'False + (false alarm) — you pressed Match, but there wasn\'t actually one.';
 
   @override
   String get infoMetricCorrectRejections =>
-      'Correct − (correct rejections) — there was no match and you correctly didn\'t press.';
+      'Correct − (correct rejection) — there was no match, and you correctly didn\'t press.';
 
   @override
   String get infoMetricAccuracy =>
-      'Accuracy = hits / (hits + misses + false alarms). Penalises both missed matches and wrong presses.';
+      'Accuracy — the share of your decisions that were right. Computed as hits ÷ (hits + misses + false alarms). It drops both from missed matches and from wrong presses.';
 
   @override
   String get infoMetricDPrime =>
-      'd′ (d-prime) — sensitivity index from signal-detection theory: z(hit rate) − z(false-alarm rate). Higher means you separate signal from noise better, independent of any tendency to press too often or too rarely.';
+      'd′ (d-prime) — shows how well you tell real matches apart from non-matches. The higher it is, the more clearly you \'see\' the matches. It\'s a more honest measure than accuracy: you can\'t fool it by just pressing more or less often.';
 
   @override
   String get infoSectionTips => 'Practice tips';
 
   @override
   String get infoSectionTipsBody =>
-      '• Train daily — short, focused sessions beat sporadic long ones.\n• Don\'t try to verbalise the sequence; let it sit in working memory.\n• Plateaus are normal — d′ keeps improving even after accuracy stalls.\n• Switch off the Jaeggi adaptive mode if you want to train at a fixed N.';
+      '• Train every day — a short daily session beats rare long ones.\n• Don\'t try to say the letters or positions out loud — let your memory do the work.\n• If your score stays flat for a few days, that\'s normal — the brain doesn\'t learn in a straight line. Just keep going.\n• Want N to adjust to your progress automatically? Turn on the Jaeggi adaptive mode in settings.';
 
   @override
   String get channelPosition => 'Position';
