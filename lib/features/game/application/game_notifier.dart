@@ -269,15 +269,19 @@ class GameNotifier extends Notifier<GameSession> {
   /// Cancels timers; the current trial / countdown value is preserved
   /// in state so [resume] can restart from there.
   void pause() {
-    final s = state;
-    if (s.status != GameStatus.running &&
-        s.status != GameStatus.countdown) {
+    final currentStatus = state.status;
+    if (currentStatus != GameStatus.running &&
+        currentStatus != GameStatus.countdown) {
       return;
     }
     _cancelTimers();
     _clearFeedback();
-    _resumeTo = s.status;
-    state = s.copyWith(
+    _resumeTo = currentStatus;
+    // Build the next state off the LIVE [state] so the empty
+    // channelFeedback that _clearFeedback just wrote survives — using
+    // an earlier snapshot would clobber it with the pre-clear value
+    // and the green/red/orange flash would stay stuck through resume.
+    state = state.copyWith(
       status: GameStatus.paused,
       stimulusVisible: false,
     );

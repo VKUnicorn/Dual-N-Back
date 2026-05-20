@@ -491,7 +491,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsIsi.
   ///
   /// In en, this message translates to:
-  /// **'Interval (ISI)'**
+  /// **'Inter-stimulus interval (ISI)'**
   String get settingsIsi;
 
   /// No description provided for @settingsMs.

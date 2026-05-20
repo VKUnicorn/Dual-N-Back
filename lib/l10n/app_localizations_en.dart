@@ -231,7 +231,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsStimulusFade => 'Stimulus fade-in/out';
 
   @override
-  String get settingsIsi => 'Interval (ISI)';
+  String get settingsIsi => 'Inter-stimulus interval (ISI)';
 
   @override
   String settingsMs(int ms) {

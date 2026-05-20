@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dual_n_back/core/audio/feedback_kind.dart';
 import 'package:dual_n_back/core/constants/feedback_colors.dart';
 import 'package:dual_n_back/features/game/application/game_notifier.dart';
@@ -50,7 +52,7 @@ String sessionVariantTitle(int channelCount, int n) {
 /// Result returned by the pause dialog.
 enum _PauseChoice { resume, home }
 
-class GameScreen extends ConsumerWidget {
+class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key});
 
   /// Whether [status] is one of the active session phases where pausing
@@ -63,9 +65,51 @@ class GameScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<GameScreen> createState() => _GameScreenState();
+}
+
+class _GameScreenState extends ConsumerState<GameScreen> {
+  late final AppLifecycleListener _lifecycleListener;
+
+  @override
+  void initState() {
+    super.initState();
+    // Auto-pause an in-progress session if the app gets minimised /
+    // backgrounded. Listening to `onHide` (transitioning out of
+    // visible) catches Android home-button, recents, and incoming
+    // calls without firing on transient inactive states like a
+    // notification shade pull-down on top of the foreground app.
+    // The notifier's `pause()` is a no-op outside running/countdown,
+    // so we don't need to gate the call ourselves.
+    _lifecycleListener = AppLifecycleListener(
+      onHide: _autoPause,
+      onPause: _autoPause,
+    );
+  }
+
+  @override
+  void dispose() {
+    _lifecycleListener.dispose();
+    super.dispose();
+  }
+
+  void _autoPause() {
+    if (!mounted) return;
+    final status = ref.read(gameNotifierProvider).status;
+    // Only intercept active mid-flight states. If the user is already
+    // sitting on the pause overlay (or anywhere outside running/
+    // countdown), don't stack another dialog on top of whatever they
+    // already had open.
+    if (status != GameStatus.running && status != GameStatus.countdown) {
+      return;
+    }
+    unawaited(_handleInterrupt(context));
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final session = ref.watch(gameNotifierProvider);
-    final inSession = _isActiveSession(session.status);
+    final inSession = GameScreen._isActiveSession(session.status);
     final l = AppLocalizations.of(context);
 
     final onResults = session.status == GameStatus.finished;
@@ -81,7 +125,7 @@ class GameScreen extends ConsumerWidget {
           if (context.mounted) context.pop();
           return;
         }
-        await _handleInterrupt(context, ref);
+        await _handleInterrupt(context);
       },
       child: Scaffold(
         appBar: AppBar(
@@ -98,7 +142,7 @@ class GameScreen extends ConsumerWidget {
               IconButton(
                 icon: const Icon(Icons.pause),
                 tooltip: l.pauseTooltip,
-                onPressed: () => _handleInterrupt(context, ref),
+                onPressed: () => _handleInterrupt(context),
               ),
           ],
         ),
@@ -121,7 +165,7 @@ class GameScreen extends ConsumerWidget {
 
   /// Pauses the session (if applicable) and shows the pause dialog.
   /// Resumes or navigates home based on the user's choice.
-  Future<void> _handleInterrupt(BuildContext context, WidgetRef ref) async {
+  Future<void> _handleInterrupt(BuildContext context) async {
     final notifier = ref.read(gameNotifierProvider.notifier);
     final l = AppLocalizations.of(context);
     notifier.pause();

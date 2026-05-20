@@ -232,7 +232,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsStimulusFade => 'Время появления стимула';
 
   @override
-  String get settingsIsi => 'Интервал (ISI)';
+  String get settingsIsi => 'Интервал между стимулами (ISI)';
 
   @override
   String settingsMs(int ms) {
@@ -283,7 +283,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get settingsFeedbackVisualMiss =>
-      'Визуальная отдача цвета кнопок при пропуске совпадения';
+      'Визуальная отдача цвета кнопок при ошибочном пропуске совпадения';
 
   @override
   String get settingsFeedbackAudioMiss =>

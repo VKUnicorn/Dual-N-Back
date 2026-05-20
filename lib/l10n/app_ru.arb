@@ -71,7 +71,7 @@
   "settingsTrialsPerSession": "Trial'ов в сессии",
   "settingsStimulusDuration": "Длительность стимула",
   "settingsStimulusFade": "Время появления стимула",
-  "settingsIsi": "Интервал (ISI)",
+  "settingsIsi": "Интервал между стимулами (ISI)",
   "settingsMs": "{ms} мс",
   "settingsSectionGridStyle": "Стили сетки",
   "settingsGridStyleTile": "Плитка",

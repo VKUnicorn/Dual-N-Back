@@ -92,7 +92,7 @@
   "settingsTrialsPerSession": "Trials per session",
   "settingsStimulusDuration": "Stimulus duration",
   "settingsStimulusFade": "Stimulus fade-in/out",
-  "settingsIsi": "Interval (ISI)",
+  "settingsIsi": "Inter-stimulus interval (ISI)",
   "settingsMs": "{ms} ms",
   "@settingsMs": {
     "placeholders": {"ms": {"type": "int"}}
