@@ -409,7 +409,7 @@ class _NewlyEarnedSection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          l.resultAchievementsUnlockedTitle,
+          l.resultAchievementsUnlockedTitle(achievements.length),
           textAlign: TextAlign.center,
           style: theme.textTheme.titleSmall?.copyWith(
             color: theme.colorScheme.primary,

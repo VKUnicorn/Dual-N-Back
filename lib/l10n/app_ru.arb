@@ -164,7 +164,7 @@
   "achievementsTitle": "Достижения",
   "achProgressLabel": "{current} / {target}",
   "achEarnedBadge": "Получено",
-  "resultAchievementsUnlockedTitle": "Получены достижения!",
+  "resultAchievementsUnlockedTitle": "{count, plural, one{Открыто достижение!} few{Открыто {count} достижения!} many{Открыто {count} достижений!} other{Открыто {count} достижения!}}",
 
   "achGroupMilestones": "Вехи",
   "achGroupPerformance": "Результативность",

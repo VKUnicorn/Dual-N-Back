@@ -568,7 +568,17 @@ class AppLocalizationsRu extends AppLocalizations {
   String get achEarnedBadge => 'Получено';
 
   @override
-  String get resultAchievementsUnlockedTitle => 'Получены достижения!';
+  String resultAchievementsUnlockedTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Открыто $count достижения!',
+      many: 'Открыто $count достижений!',
+      few: 'Открыто $count достижения!',
+      one: 'Открыто достижение!',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get achGroupMilestones => 'Вехи';

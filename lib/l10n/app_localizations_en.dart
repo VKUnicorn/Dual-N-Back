@@ -558,7 +558,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get achEarnedBadge => 'Earned';
 
   @override
-  String get resultAchievementsUnlockedTitle => 'Achievements unlocked!';
+  String resultAchievementsUnlockedTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count achievements unlocked!',
+      one: 'Achievement unlocked!',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get achGroupMilestones => 'Milestones';

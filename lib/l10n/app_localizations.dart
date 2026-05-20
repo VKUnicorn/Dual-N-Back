@@ -1031,8 +1031,8 @@ abstract class AppLocalizations {
   /// No description provided for @resultAchievementsUnlockedTitle.
   ///
   /// In en, this message translates to:
-  /// **'Achievements unlocked!'**
-  String get resultAchievementsUnlockedTitle;
+  /// **'{count, plural, one{Achievement unlocked!} other{{count} achievements unlocked!}}'**
+  String resultAchievementsUnlockedTitle(int count);
 
   /// No description provided for @achGroupMilestones.
   ///

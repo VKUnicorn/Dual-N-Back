@@ -230,7 +230,10 @@
     "placeholders": {"current": {"type": "int"}, "target": {"type": "int"}}
   },
   "achEarnedBadge": "Earned",
-  "resultAchievementsUnlockedTitle": "Achievements unlocked!",
+  "resultAchievementsUnlockedTitle": "{count, plural, one{Achievement unlocked!} other{{count} achievements unlocked!}}",
+  "@resultAchievementsUnlockedTitle": {
+    "placeholders": {"count": {"type": "int"}}
+  },
 
   "achGroupMilestones": "Milestones",
   "achGroupPerformance": "Performance",
