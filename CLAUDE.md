@@ -39,10 +39,14 @@ needed.
 - **Persistence:**
   - `shared_preferences` for user settings.
   - `drift` (+ `drift_flutter`, `sqlite3_flutter_libs`) for session history.
-- **Audio:** `audioplayers` in `PlayerMode.lowLatency` (SoundPool on
-  Android — chosen specifically because `just_audio` glitched on short
-  clips). MP3 letter assets live in `assets/audio/{female,male}/{a-z}.mp3`
-  — full alphabet for each voice variant.
+- **Audio:** `audioplayers`. Letter playback uses `PlayerMode.lowLatency`
+  (SoundPool on Android — chosen specifically because `just_audio`
+  glitched on short clips). Response-feedback playback uses the default
+  `MediaPlayer` mode + a 3-player pool per kind (see "Audio assets"
+  below). MP3 letter assets live in `assets/audio/{female,male}/{a-z}.mp3`
+  — full alphabet for each voice variant. Response-feedback assets live
+  directly under `assets/audio/{correct,incorrect,missed}.mp3`
+  (voice-independent).
 - **Charts:** `fl_chart`.
 - **Localization:** Flutter gen_l10n (ARB → `AppLocalizations`).
 - **Lints:** `very_good_analysis`.
@@ -111,6 +115,45 @@ the "Close" button — so leaving the screen always clears the finished
 session state. The `_AdjustmentBadge` ("level up/down/hold") is only
 shown when `settings.adaptiveMode == true`; otherwise N never changes
 between sessions and the badge would be misleading.
+
+`GameScreen` is a `ConsumerStatefulWidget` that owns an
+`AppLifecycleListener` (both `onHide` and `onPause` callbacks). When the
+app is minimised mid-session the listener calls `_handleInterrupt` —
+the same flow as tapping the pause button or back gesture — so the user
+returns to the pause dialog. The handler self-gates on `running` /
+`countdown` only, so it never stacks a second dialog if the user is
+already on the pause overlay.
+
+## Response feedback
+
+After each press / miss the matching channel button briefly flashes in
+one of three colours (constants in `lib/core/constants/feedback_colors.dart`)
+and a short SFX fires:
+
+| Event              | Colour    | SFX             |
+| ------------------ | --------- | --------------- |
+| Correct press      | `#97CD99` | `correct.mp3`   |
+| False-alarm press  | `#E2807D` | `incorrect.mp3` |
+| Missed match       | `#E8C069` | `missed.mp3`    |
+
+Per-event toggles (visual / audio × press / miss = 4 booleans) live in
+`SettingsModel.feedback*` and surface as the "Feedback" / "Отдача"
+section in settings, all defaulting to `true`.
+
+Visual state lives in `GameSession.channelFeedback`
+(`Map<ChannelType, FeedbackKind>`) and is cleared by per-channel timers
+in `GameNotifier._emitFeedback` after 500 ms. Two important footguns:
+
+1. After mutating `state.channelFeedback` via `_emitFeedback`, any
+   follow-up `copyWith` in the same method must read from the **live**
+   `state` (not a snapshot captured earlier), or the freshly written
+   feedback gets clobbered. This bit us in `_advance` (miss detection
+   right before trial advance) and `pause` (clear-feedback before
+   status flip). Search both functions for the "LIVE [state]" comment.
+2. Miss detection in `_advance` runs across all active channels but
+   plays `missed.mp3` only once per advance (`playAudio: !played`).
+   Multi-channel sessions would otherwise stack overlapping `missed`
+   plays and the visual flash on every missed channel still lands.
 
 ## Common commands
 
@@ -184,9 +227,38 @@ see the `_start` helper in `game_notifier_test.dart`.
 
 ## Audio assets
 
-`AudioPlayersAudioService.preload()` tries to load each active letter and
-silently no-ops missing files — the app must run without those files
-(the README in `assets/audio/` documents this).
+`AudioPlayersAudioService.preload()` tries to load each active letter
+plus the three feedback clips and silently no-ops missing files — the
+app must run without those files (the README in `assets/audio/`
+documents this). `preload()` also calls `_ensureGlobalAudioContext()`
+first to configure `AudioContext` with `AndroidAudioFocus.none` +
+`mixWithOthers` — without this, MediaPlayer-backed feedback grabs
+`AUDIOFOCUS_GAIN` and ducks the SoundPool letter audio (or vice versa,
+depending on timing). Letter audio and feedback are decoupled
+deliberately:
+
+- **Letter audio**: `PlayerMode.lowLatency` (SoundPool). One player per
+  letter, cached by name. `stop+resume` to restart from frame 0.
+- **Feedback audio**: default `MediaPlayer` mode + a **pool of 3
+  players per `FeedbackKind`** with round-robin selection. Each play
+  uses `seek(0)+resume` (NOT `stop`), so:
+  - Two channels missing the same trial fire two overlapping plays on
+    different pool slots instead of the second cutting the first.
+  - `stop+resume` on MediaPlayer releases the prepared state and the
+    next play has to re-prepare — that was the "every other press is
+    silent" symptom we hit. `seek(0)` keeps the player prepared.
+  Putting feedback on SoundPool instead caused a different bug:
+  audioplayers' SoundPool wrapper latches its internal `isPlaying`
+  flag after the first `resume()` and ignores subsequent calls until
+  `stop()` (which also kills the active stream). MediaPlayer + the
+  pool is the working compromise — **don't fold feedback back into
+  lowLatency.**
+
+`audioServiceProvider` fires `unawaited(service.preload())` the moment
+the service is constructed. Without this, a user who opens the
+settings screen before ever entering the game screen would only
+trigger AudioService creation lazily and the first letter preview tap
+would cost ~1 s of UI lag. Don't remove that eager-trigger.
 
 The **active letter set is user-configurable** via the settings screen
 (grid under "Letters" / "Буквы"). It's persisted in
@@ -253,6 +325,29 @@ Locale auto-selects from the system; there's no in-app switcher.
   `BuildContext`, `Theme`, `ref`, etc. belongs in `application` or
   `presentation`.
 
+## Accuracy formulas
+
+Both the result screen and the per-session tile in statistics display
+overall accuracy with the **same** formula:
+`sum(hits) / sum(hits + misses + falseAlarms)` pooled across channels
+(correct rejections are excluded). See
+`SessionScore.overallAccuracy` (result screen) and
+`overallAccuracy(scores)` in `lib/features/statistics/application/stats_metrics.dart`
+(statistics tile). The stats formula uses each channel's persisted
+`accuracy` snapshot weighted by engaged decisions — algebraically
+equivalent to `sum(hits) / sum(engaged)`. If you touch either formula,
+update both so the two screens never disagree on the same session.
+
+## Build / release
+
+`pubspec.yaml` carries the current version (e.g. `1.0.1+2`). Release
+APKs are produced with `flutter build apk --release --split-per-abi`,
+which emits three files in `build/app/outputs/flutter-apk/`:
+`app-arm64-v8a-release.apk`, `app-armeabi-v7a-release.apk`,
+`app-x86_64-release.apk`. The same directory contains a `rename.bat`
+helper that asks for a version string and renames each APK to
+`dual-n-back-{ver}-{abi}.apk` (plus removes any leftover `*.sha1`).
+
 ## Plan and progress
 
 The original phased plan is in
@@ -273,10 +368,17 @@ loosely; current state (read `git log` for details):
 - ✅ Streak counter (consecutive days the daily goal was met) on the home
   AppBar leading slot.
 - ✅ Information screen (`/info`) — N-back / Jaeggi / metrics reference.
+  Body text rewritten in plain language (2026-05).
 - ✅ Result-screen back button mirrors "Close" (reset + pop).
 - ✅ App display name "Dual N-Back" (Android `android:label`).
 - ✅ Achievements (`/achievements`) — 33 monotonic rules across 5 groups
   (Milestones / Performance / Consistency / Resilience / Exploration),
   derived purely from session history (no extra DB table). Result screen
   shows newly-earned ones via a before/after diff in `_evaluateAndPersist`.
+  Title pluralizes when multiple achievements unlock in one session.
+- ✅ Response feedback (visual + audio) for correct press / false alarm
+  / miss, 4 independent toggles in settings.
+- ✅ Auto-pause on app minimise (`AppLifecycleListener` in `GameScreen`).
+- ✅ Stats session tile redesign: "N{n}" large text + accuracy bubble
+  in the leading slot, trial count in subtitle (no more "→ N{newN}").
 - ⬜ iOS port (deferred until macOS access).

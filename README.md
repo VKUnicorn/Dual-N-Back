@@ -20,6 +20,7 @@ A Flutter mobile app for training working memory with the N-back task — single
 - Jaeggi adaptive N support: auto-increase at ≥80% per-channel accuracy, auto-decrease at <50%.
 - Customizable timings (stimulus duration, fade, ISI), match probability, N range.
 - Audio channel with female/male voice and a configurable letter set
+- Optional response feedback per channel: green flash and sound on a hit, red flash and sound on a false alarm, yellow flash and sound when a real match is missed
 - Per-session history with charts (accuracy, max N, d′, per-channel accuracy, activity heatmap, N distribution).
 - Daily session goal with streak counter and rest-day support.
 - 42 monotonic achievements across 5 groups (Milestones, Performance, Consistency, Resilience, Exploration).
