@@ -14,17 +14,21 @@ import 'package:dual_n_back/features/statistics/domain/stats_period.dart';
 /// keeps already-saved sessions displaying the value they had when
 /// finished — newer sessions naturally show the newer formula.
 ///
-/// Channels are pooled by weighting each accuracy by its total decision
-/// count, so a session with one heavy and one light channel doesn't
-/// over-weight the smaller one.
+/// Channels are pooled by weighting each accuracy by its *engaged*
+/// decision count (hits + misses + falseAlarms — same as
+/// `ChannelScore.engagedDecisions` in the domain model). This makes
+/// the pooled value mathematically identical to
+/// `SessionScore.overallAccuracy` on the result screen
+/// (`sum(hits) / sum(engaged)`), so the statistics tile and the
+/// just-finished result page never disagree on the same session.
 double overallAccuracy(List<ChannelScore> scores) {
   if (scores.isEmpty) return 0;
   var weightedSum = 0.0;
   var weight = 0;
   for (final s in scores) {
-    final total = s.hits + s.misses + s.falseAlarms + s.correctRejections;
-    weightedSum += s.accuracy * total;
-    weight += total;
+    final engaged = s.hits + s.misses + s.falseAlarms;
+    weightedSum += s.accuracy * engaged;
+    weight += engaged;
   }
   if (weight == 0) return 0;
   return weightedSum / weight;

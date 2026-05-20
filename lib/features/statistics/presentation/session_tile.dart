@@ -38,27 +38,58 @@ class SessionTile extends ConsumerWidget {
         // expands cleanly inside the Card.
         shape: const Border(),
         collapsedShape: const Border(),
-        leading: CircleAvatar(
-          backgroundColor: accColor.withValues(alpha: 0.18),
-          child: Text(
-            'N${session.n}',
-            style: TextStyle(
-              color: accColor,
-              fontWeight: FontWeight.w700,
-              fontSize: 12,
+        // "N{n}" + accuracy bubble packed into the leading slot so the
+        // title row stays a normal-height single line of text — that
+        // keeps the trials subtitle from getting pushed down by a
+        // tall title Row, and centers the bubble vertically against
+        // the title+subtitle pair instead of riding the title row.
+        // mainAxisSize.min so the leading box is just wide enough for
+        // both elements; ListTile centers it vertically by default.
+        leading: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'N${session.n}',
+              style: TextStyle(
+                color: accColor,
+                fontWeight: FontWeight.w700,
+                fontSize: 24,
+              ),
             ),
-          ),
+            const SizedBox(width: 8),
+            // Overall-accuracy bubble, mirroring the result-screen gauge
+            // colour scheme. Same formula as SessionScore.overallAccuracy
+            // (`sum(hits) / sum(engaged)`) — see stats_metrics.dart.
+            Container(
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: accColor.withValues(alpha: 0.18),
+              ),
+              child: Text(
+                '${(overallAcc * 100).round()}%',
+                style: TextStyle(
+                  color: accColor,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 11,
+                ),
+              ),
+            ),
+          ],
         ),
         title: Text(
           _dateFmt.format(session.startedAt),
           style: theme.textTheme.bodyLarge,
         ),
         subtitle: Text(
-          '${(overallAcc * 100).toStringAsFixed(0)}% '
           // Show *scored* trials only — warm-ups aren't part of the
-          // accuracy/d′ calculation displayed alongside.
-          '· ${l.statisticsTrialCountSuffix(_scoredTrials(session))} · '
-          '→ N${session.newN}',
+          // accuracy/d′ calculation. The "→ N{newN}" hint was removed
+          // by request; the new accuracy bubble in the leading row
+          // replaces the textual "{acc}% ·" prefix the subtitle used
+          // to carry.
+          l.statisticsTrialCountSuffix(_scoredTrials(session)),
           style: theme.textTheme.bodySmall,
         ),
         children: [
