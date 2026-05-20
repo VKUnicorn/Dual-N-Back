@@ -1,9 +1,12 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:dual_n_back/core/audio/feedback_kind.dart';
 import 'package:dual_n_back/core/constants/audio_voice.dart';
 import 'package:dual_n_back/core/constants/nback_defaults.dart';
 import 'package:flutter/foundation.dart';
+
+export 'package:dual_n_back/core/audio/feedback_kind.dart';
 
 /// Plays N-back audio stimuli (one short clip per letter).
 ///
@@ -38,6 +41,10 @@ abstract class AudioService {
   /// hasn't been seen before; existing cached players are reused, so
   /// toggling a single letter on/off does not disturb the others.
   Future<void> setLetters(List<String> letters);
+
+  /// Plays the response-feedback clip for [kind]. No-op if the
+  /// corresponding asset under `assets/audio/{kind}.mp3` is unavailable.
+  Future<void> playFeedback(FeedbackKind kind);
 
   Future<void> dispose();
 }
@@ -83,6 +90,33 @@ class AudioPlayersAudioService implements AudioService {
   /// Cache is cleared only on voice change or [dispose].
   final Map<String, AudioPlayer?> _cache = {};
 
+  /// Response-feedback player pool, keyed by [FeedbackKind]. For each
+  /// kind we keep [_feedbackPoolSize] MediaPlayer instances and
+  /// round-robin through them on each play, so two rapid same-kind
+  /// triggers (e.g. user makes two false-alarm presses on the same
+  /// trial in a Quad session) land on different players and actually
+  /// overlap instead of the second `seek(0)+resume` cutting the first
+  /// off mid-clip.
+  ///
+  /// Feedback uses the default `MediaPlayer` mode rather than
+  /// [PlayerMode.lowLatency]. SoundPool via audioplayers latches its
+  /// internal "playing" flag after the first `resume()` and ignores
+  /// subsequent calls until `stop()` (which also kills the active
+  /// stream) — the symptom is each clip plays exactly once and then
+  /// goes silent. MediaPlayer + `seek(0) + resume()` re-triggers
+  /// reliably. The global AudioContext from
+  /// [_ensureGlobalAudioContext] makes MediaPlayer skip the audio-
+  /// focus request that would otherwise duck the SoundPool letter
+  /// audio when a feedback clip plays.
+  final Map<FeedbackKind, List<AudioPlayer?>> _feedbackPool = {};
+  final Map<FeedbackKind, int> _feedbackPoolIndex = {};
+
+  /// Number of MediaPlayer instances kept per [FeedbackKind]. 3 covers
+  /// Tri/Quad-back worst-case bursts (multiple channels press wrong /
+  /// miss within the same trial) without the round-robin wrapping back
+  /// to a still-playing player.
+  static const int _feedbackPoolSize = 3;
+
   /// Per-letter inflight load futures. Lets concurrent callers (e.g. a
   /// game-trial play and a settings-screen preview of the same letter)
   /// share a single load instead of racing two `setSource` calls.
@@ -100,9 +134,48 @@ class AudioPlayersAudioService implements AudioService {
 
   @override
   Future<void> preload() async {
+    // Configure the global audio context before any player is created.
+    // Without this, feedback and letter audio compete for AUDIOFOCUS_GAIN
+    // — playing `missed.mp3` would duck the next trial's letter audio
+    // (or vice versa) to inaudibility. Game-SFX usage + AudioFocus.none
+    // tells Android we don't need exclusive focus; both streams mix.
+    await _ensureGlobalAudioContext();
     // Kick off loads for the active set in parallel; missing files are
-    // logged inside [_loadPlayer] and become null entries.
-    await Future.wait(_letters.map(_ensureLoaded));
+    // logged inside [_loadPlayer] and become null entries. Feedback
+    // clips are tiny but unavoidably suffer a ~hundreds-ms first-play
+    // cost on Android if loaded lazily (the SoundPool stream prepare
+    // happens on the audio thread) — preload them up front so the very
+    // first hit/false-alarm/miss flash is as snappy as later ones.
+    await Future.wait<Object?>([
+      ..._letters.map(_ensureLoaded),
+      ...FeedbackKind.values.map(_ensureFeedbackLoaded),
+    ]);
+  }
+
+  /// Set the global audioplayers context once per process. Subsequent
+  /// calls are no-ops. Failures are swallowed — the worst case is the
+  /// platform default context, which only matters on Android.
+  bool _audioContextConfigured = false;
+  Future<void> _ensureGlobalAudioContext() async {
+    if (_audioContextConfigured) return;
+    _audioContextConfigured = true;
+    try {
+      await AudioPlayer.global.setAudioContext(
+        AudioContext(
+          iOS: AudioContextIOS(
+            category: AVAudioSessionCategory.ambient,
+            options: const {AVAudioSessionOptions.mixWithOthers},
+          ),
+          android: const AudioContextAndroid(
+            contentType: AndroidContentType.sonification,
+            usageType: AndroidUsageType.assistanceSonification,
+            audioFocus: AndroidAudioFocus.none,
+          ),
+        ),
+      );
+    } on Object catch (e) {
+      debugPrint('AudioService: setAudioContext failed: $e');
+    }
   }
 
   /// Returns a player for [letter], loading it on first request and
@@ -213,6 +286,56 @@ class AudioPlayersAudioService implements AudioService {
     }
   }
 
+  @override
+  Future<void> playFeedback(FeedbackKind kind) async {
+    final pool = await _ensureFeedbackLoaded(kind);
+    if (pool.isEmpty) return;
+    // Round-robin so back-to-back same-kind triggers land on different
+    // players and the second doesn't cut off the first via seek(0).
+    final i = _feedbackPoolIndex[kind] ?? 0;
+    _feedbackPoolIndex[kind] = (i + 1) % pool.length;
+    final player = pool[i];
+    if (player == null) return;
+    try {
+      await player.setVolume(_volume);
+      await player.seek(Duration.zero);
+      await player.resume();
+    } on Object catch (e) {
+      debugPrint('AudioService: feedback play failed for "${kind.name}": $e');
+    }
+  }
+
+  /// Returns the loaded pool for [kind], creating it on first request.
+  /// Within a pool the players load sequentially to avoid concurrent
+  /// `setSource` calls on the same asset; pools for different kinds
+  /// can still load in parallel through [preload].
+  Future<List<AudioPlayer?>> _ensureFeedbackLoaded(FeedbackKind kind) async {
+    final cached = _feedbackPool[kind];
+    if (cached != null) return cached;
+    final players = <AudioPlayer?>[];
+    for (var i = 0; i < _feedbackPoolSize; i++) {
+      players.add(await _loadFeedbackPlayer(kind));
+    }
+    _feedbackPool[kind] = players;
+    _feedbackPoolIndex[kind] = 0;
+    return players;
+  }
+
+  Future<AudioPlayer?> _loadFeedbackPlayer(FeedbackKind kind) async {
+    final player = AudioPlayer();
+    try {
+      // Default mode (MediaPlayer). We intentionally do NOT call
+      // setPlayerMode(lowLatency) — see _feedbackPool docstring.
+      await player.setReleaseMode(ReleaseMode.stop);
+      await player.setSource(AssetSource('audio/${kind.name}.mp3'));
+      return player;
+    } on Object catch (e) {
+      debugPrint('AudioService: missing feedback asset "${kind.name}": $e');
+      await _safeDispose(player);
+      return null;
+    }
+  }
+
   Future<void> _safeDispose(AudioPlayer? player) async {
     if (player == null) return;
     try {
@@ -225,9 +348,17 @@ class AudioPlayersAudioService implements AudioService {
   @override
   Future<void> dispose() async {
     final stale = List<AudioPlayer?>.from(_cache.values);
+    final staleFeedback = [
+      for (final pool in _feedbackPool.values) ...pool,
+    ];
     _cache.clear();
     _loading.clear();
+    _feedbackPool.clear();
+    _feedbackPoolIndex.clear();
     for (final player in stale) {
+      await _safeDispose(player);
+    }
+    for (final player in staleFeedback) {
       await _safeDispose(player);
     }
   }
@@ -238,6 +369,7 @@ class SilentAudioService implements AudioService {
   int playedCount = 0;
   final List<int> playedLetters = [];
   final List<String> playedPreviewLetters = [];
+  final List<FeedbackKind> playedFeedback = [];
   AudioVoice voice = AudioVoice.female;
   List<String> letters = List.unmodifiable(NBackDefaults.audioLetters);
 
@@ -266,6 +398,11 @@ class SilentAudioService implements AudioService {
   @override
   Future<void> setLetters(List<String> letters) async {
     this.letters = List.unmodifiable(letters);
+  }
+
+  @override
+  Future<void> playFeedback(FeedbackKind kind) async {
+    playedFeedback.add(kind);
   }
 
   @override

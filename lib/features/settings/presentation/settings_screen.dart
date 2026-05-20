@@ -286,6 +286,41 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           _Section(
+            title: l.settingsSectionFeedback,
+            child: Column(
+              children: [
+                SwitchListTile(
+                  title: Text(l.settingsFeedbackVisualPress),
+                  value: settings.feedbackVisualOnPress,
+                  onChanged: (v) => unawaited(
+                    notifier.updateFeedbackVisualOnPress(enabled: v),
+                  ),
+                ),
+                SwitchListTile(
+                  title: Text(l.settingsFeedbackAudioPress),
+                  value: settings.feedbackAudioOnPress,
+                  onChanged: (v) => unawaited(
+                    notifier.updateFeedbackAudioOnPress(enabled: v),
+                  ),
+                ),
+                SwitchListTile(
+                  title: Text(l.settingsFeedbackVisualMiss),
+                  value: settings.feedbackVisualOnMiss,
+                  onChanged: (v) => unawaited(
+                    notifier.updateFeedbackVisualOnMiss(enabled: v),
+                  ),
+                ),
+                SwitchListTile(
+                  title: Text(l.settingsFeedbackAudioMiss),
+                  value: settings.feedbackAudioOnMiss,
+                  onChanged: (v) => unawaited(
+                    notifier.updateFeedbackAudioOnMiss(enabled: v),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          _Section(
             title: l.settingsSectionDailyGoal,
             child: Column(
               children: [

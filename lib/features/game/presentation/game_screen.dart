@@ -1,3 +1,5 @@
+import 'package:dual_n_back/core/audio/feedback_kind.dart';
+import 'package:dual_n_back/core/constants/feedback_colors.dart';
 import 'package:dual_n_back/features/game/application/game_notifier.dart';
 import 'package:dual_n_back/features/game/domain/game_session.dart';
 import 'package:dual_n_back/features/game/domain/stimulus.dart';
@@ -492,6 +494,7 @@ class _MatchButtons extends ConsumerWidget {
               channel: channel,
               locked: session.lockedChannels.contains(channel),
               disabled: disabled,
+              feedback: session.channelFeedback[channel],
               onPressed: () => notifier.registerMatch(channel),
             )
           else
@@ -506,25 +509,55 @@ class _ChannelMatchButton extends StatelessWidget {
     required this.channel,
     required this.locked,
     required this.disabled,
+    required this.feedback,
     required this.onPressed,
   });
 
   final ChannelType channel;
   final bool locked;
   final bool disabled;
+
+  /// When non-null, paints the button with the corresponding feedback
+  /// colour for the duration of the flash. Cleared by the notifier after
+  /// 500 ms.
+  final FeedbackKind? feedback;
+
   final VoidCallback onPressed;
+
+  Color? _feedbackColor() => switch (feedback) {
+        FeedbackKind.correct => FeedbackColors.correct,
+        FeedbackKind.incorrect => FeedbackColors.incorrect,
+        FeedbackKind.missed => FeedbackColors.missed,
+        null => null,
+      };
 
   @override
   Widget build(BuildContext context) {
     final canPress = !locked && !disabled;
+    final flash = _feedbackColor();
+    // Feedback flash overrides the tonal background AND forces the
+    // foreground (icon + label) to a high-contrast colour so the label
+    // stays legible on the orange/green/red wash regardless of theme.
+    final style = flash == null
+        ? FilledButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: const EdgeInsets.all(8),
+          )
+        : FilledButton.styleFrom(
+            backgroundColor: flash,
+            foregroundColor: Colors.black87,
+            disabledBackgroundColor: flash,
+            disabledForegroundColor: Colors.black87,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: const EdgeInsets.all(8),
+          );
     return FilledButton.tonal(
       onPressed: canPress ? onPressed : null,
-      style: FilledButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        padding: const EdgeInsets.all(8),
-      ),
+      style: style,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -535,5 +568,4 @@ class _ChannelMatchButton extends StatelessWidget {
       ),
     );
   }
-
 }

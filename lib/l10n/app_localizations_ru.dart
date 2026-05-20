@@ -271,6 +271,25 @@ class AppLocalizationsRu extends AppLocalizations {
       'Рекомендуется выбрать восемь букв, минимум четыре.';
 
   @override
+  String get settingsSectionFeedback => 'Отдача';
+
+  @override
+  String get settingsFeedbackVisualPress =>
+      'Визуальная отдача цвета кнопок при совпадениях';
+
+  @override
+  String get settingsFeedbackAudioPress =>
+      'Звуковая отдача цвета кнопок при ошибке совпадения';
+
+  @override
+  String get settingsFeedbackVisualMiss =>
+      'Визуальная отдача цвета кнопок при пропуске совпадения';
+
+  @override
+  String get settingsFeedbackAudioMiss =>
+      'Звуковая отдача при ошибочном пропуске совпадения';
+
+  @override
   String get settingsSectionDailyGoal => 'Дневная цель сессий';
 
   @override

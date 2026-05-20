@@ -1,3 +1,4 @@
+import 'package:dual_n_back/core/audio/feedback_kind.dart';
 import 'package:dual_n_back/features/game/domain/response_evaluator.dart';
 import 'package:dual_n_back/features/game/domain/stimulus.dart';
 import 'package:dual_n_back/features/game/domain/trial.dart';
@@ -36,6 +37,7 @@ class GameSession {
     this.finalScore,
     this.newN,
     this.newlyEarnedAchievements = const [],
+    this.channelFeedback = const {},
   });
 
   /// Initial state before any session has been started.
@@ -86,6 +88,13 @@ class GameSession {
   /// this as a "newly earned" strip.
   final List<String> newlyEarnedAchievements;
 
+  /// Active per-channel response-feedback flashes. The notifier writes a
+  /// [FeedbackKind] here when the user presses (hit / false alarm) or
+  /// when a missed signal is detected at trial advance, and clears the
+  /// entry after the flash duration. Visually consumed by the match
+  /// buttons; empty during pause / idle.
+  final Map<ChannelType, FeedbackKind> channelFeedback;
+
   Trial? get currentTrial =>
       status == GameStatus.running && currentTrialIndex < trials.length
           ? trials[currentTrialIndex]
@@ -117,6 +126,7 @@ class GameSession {
     SessionScore? finalScore,
     int? newN,
     List<String>? newlyEarnedAchievements,
+    Map<ChannelType, FeedbackKind>? channelFeedback,
   }) {
     return GameSession(
       status: status ?? this.status,
@@ -133,6 +143,7 @@ class GameSession {
       newN: newN ?? this.newN,
       newlyEarnedAchievements:
           newlyEarnedAchievements ?? this.newlyEarnedAchievements,
+      channelFeedback: channelFeedback ?? this.channelFeedback,
     );
   }
 }

@@ -270,6 +270,24 @@ class AppLocalizationsEn extends AppLocalizations {
       'Recommended to pick eight letters, minimum four.';
 
   @override
+  String get settingsSectionFeedback => 'Feedback';
+
+  @override
+  String get settingsFeedbackVisualPress =>
+      'Visual button-colour feedback on match presses';
+
+  @override
+  String get settingsFeedbackAudioPress =>
+      'Audio feedback on incorrect match press';
+
+  @override
+  String get settingsFeedbackVisualMiss =>
+      'Visual button-colour feedback on missed matches';
+
+  @override
+  String get settingsFeedbackAudioMiss => 'Audio feedback on missed match';
+
+  @override
   String get settingsSectionDailyGoal => 'Daily session goal';
 
   @override

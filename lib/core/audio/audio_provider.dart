@@ -15,6 +15,14 @@ final audioServiceProvider = Provider<AudioService>((ref) {
     voice: initialSettings.audioVoice,
     letters: initialSettings.audioLetters,
   );
+  // Kick off preload + warm-up the moment the service is constructed.
+  // Without this, a user who opens settings before ever entering the
+  // game screen would only trigger AudioService creation here — but
+  // letter players would still load lazily on the first preview tap,
+  // costing ~1 s of UI lag. Firing preload now means the audio
+  // pipeline (codecs, SoundPool, MediaPlayer warm-up) is primed by
+  // the time any UI surface needs it.
+  unawaited(service.preload());
   ref
     ..onDispose(service.dispose)
     ..listen(

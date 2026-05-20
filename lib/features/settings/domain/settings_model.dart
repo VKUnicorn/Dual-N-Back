@@ -33,6 +33,10 @@ class SettingsModel {
     required this.notificationsEnabled,
     required this.notificationTimeMinutes,
     required this.themeMode,
+    required this.feedbackVisualOnPress,
+    required this.feedbackAudioOnPress,
+    required this.feedbackVisualOnMiss,
+    required this.feedbackAudioOnMiss,
     this.localeCode,
   });
 
@@ -58,6 +62,10 @@ class SettingsModel {
         notificationsEnabled: false,
         notificationTimeMinutes: defaultNotificationTimeMinutes,
         themeMode: AppThemeMode.system,
+        feedbackVisualOnPress: true,
+        feedbackAudioOnPress: true,
+        feedbackVisualOnMiss: true,
+        feedbackAudioOnMiss: true,
       );
 
   /// Bounds and default for the daily-goal slider on the settings screen.
@@ -190,6 +198,23 @@ class SettingsModel {
   /// Locale override. `null` means follow system locale.
   final String? localeCode;
 
+  /// When true, the match button briefly flashes green on a correct press
+  /// and red on a false-alarm press. Default true.
+  final bool feedbackVisualOnPress;
+
+  /// When true, a short SFX is played on every match-button press —
+  /// `correct.mp3` on a hit, `incorrect.mp3` on a false alarm.
+  /// Default true.
+  final bool feedbackAudioOnPress;
+
+  /// When true, the match button of a missed channel briefly flashes
+  /// orange when the trial advances. Default true.
+  final bool feedbackVisualOnMiss;
+
+  /// When true, `missed.mp3` is played when the trial advances and a
+  /// signal was present but no press was made. Default true.
+  final bool feedbackAudioOnMiss;
+
   SettingsModel copyWith({
     Set<ChannelType>? defaultChannels,
     List<ChannelType>? channelLayout,
@@ -211,6 +236,10 @@ class SettingsModel {
     bool? notificationsEnabled,
     int? notificationTimeMinutes,
     AppThemeMode? themeMode,
+    bool? feedbackVisualOnPress,
+    bool? feedbackAudioOnPress,
+    bool? feedbackVisualOnMiss,
+    bool? feedbackAudioOnMiss,
     String? Function()? localeCode,
   }) {
     return SettingsModel(
@@ -236,6 +265,14 @@ class SettingsModel {
       notificationTimeMinutes:
           notificationTimeMinutes ?? this.notificationTimeMinutes,
       themeMode: themeMode ?? this.themeMode,
+      feedbackVisualOnPress:
+          feedbackVisualOnPress ?? this.feedbackVisualOnPress,
+      feedbackAudioOnPress:
+          feedbackAudioOnPress ?? this.feedbackAudioOnPress,
+      feedbackVisualOnMiss:
+          feedbackVisualOnMiss ?? this.feedbackVisualOnMiss,
+      feedbackAudioOnMiss:
+          feedbackAudioOnMiss ?? this.feedbackAudioOnMiss,
       localeCode: localeCode != null ? localeCode() : this.localeCode,
     );
   }

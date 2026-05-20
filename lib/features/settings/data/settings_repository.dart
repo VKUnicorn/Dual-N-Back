@@ -37,6 +37,10 @@ class SettingsRepository {
       'settings.notificationTimeMinutes';
   static const _kThemeMode = 'settings.themeMode';
   static const _kLocale = 'settings.localeCode';
+  static const _kFeedbackVisualOnPress = 'settings.feedbackVisualOnPress';
+  static const _kFeedbackAudioOnPress = 'settings.feedbackAudioOnPress';
+  static const _kFeedbackVisualOnMiss = 'settings.feedbackVisualOnMiss';
+  static const _kFeedbackAudioOnMiss = 'settings.feedbackAudioOnMiss';
 
   SettingsModel load() {
     final defaults = SettingsModel.defaults();
@@ -68,6 +72,14 @@ class SettingsRepository {
       notificationTimeMinutes: _prefs.getInt(_kNotificationTimeMinutes) ??
           defaults.notificationTimeMinutes,
       themeMode: _loadThemeMode() ?? defaults.themeMode,
+      feedbackVisualOnPress: _prefs.getBool(_kFeedbackVisualOnPress) ??
+          defaults.feedbackVisualOnPress,
+      feedbackAudioOnPress: _prefs.getBool(_kFeedbackAudioOnPress) ??
+          defaults.feedbackAudioOnPress,
+      feedbackVisualOnMiss: _prefs.getBool(_kFeedbackVisualOnMiss) ??
+          defaults.feedbackVisualOnMiss,
+      feedbackAudioOnMiss: _prefs.getBool(_kFeedbackAudioOnMiss) ??
+          defaults.feedbackAudioOnMiss,
       localeCode: _prefs.getString(_kLocale),
     );
   }
@@ -109,6 +121,10 @@ class SettingsRepository {
         model.notificationTimeMinutes,
       ),
       _prefs.setString(_kThemeMode, model.themeMode.name),
+      _prefs.setBool(_kFeedbackVisualOnPress, model.feedbackVisualOnPress),
+      _prefs.setBool(_kFeedbackAudioOnPress, model.feedbackAudioOnPress),
+      _prefs.setBool(_kFeedbackVisualOnMiss, model.feedbackVisualOnMiss),
+      _prefs.setBool(_kFeedbackAudioOnMiss, model.feedbackAudioOnMiss),
       if (model.localeCode != null)
         _prefs.setString(_kLocale, model.localeCode!)
       else
@@ -138,6 +154,10 @@ class SettingsRepository {
       _prefs.remove(_kNotificationsEnabled),
       _prefs.remove(_kNotificationTimeMinutes),
       _prefs.remove(_kThemeMode),
+      _prefs.remove(_kFeedbackVisualOnPress),
+      _prefs.remove(_kFeedbackAudioOnPress),
+      _prefs.remove(_kFeedbackVisualOnMiss),
+      _prefs.remove(_kFeedbackAudioOnMiss),
       _prefs.remove(_kLocale),
     ]);
   }

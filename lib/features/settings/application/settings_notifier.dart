@@ -176,6 +176,26 @@ class SettingsNotifier extends Notifier<SettingsModel> {
     await _repo.save(state);
   }
 
+  Future<void> updateFeedbackVisualOnPress({required bool enabled}) async {
+    state = state.copyWith(feedbackVisualOnPress: enabled);
+    await _repo.save(state);
+  }
+
+  Future<void> updateFeedbackAudioOnPress({required bool enabled}) async {
+    state = state.copyWith(feedbackAudioOnPress: enabled);
+    await _repo.save(state);
+  }
+
+  Future<void> updateFeedbackVisualOnMiss({required bool enabled}) async {
+    state = state.copyWith(feedbackVisualOnMiss: enabled);
+    await _repo.save(state);
+  }
+
+  Future<void> updateFeedbackAudioOnMiss({required bool enabled}) async {
+    state = state.copyWith(feedbackAudioOnMiss: enabled);
+    await _repo.save(state);
+  }
+
   Future<void> resetToDefaults() async {
     state = SettingsModel.defaults();
     await _repo.clear();

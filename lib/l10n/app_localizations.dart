@@ -560,6 +560,36 @@ abstract class AppLocalizations {
   /// **'Recommended to pick eight letters, minimum four.'**
   String get settingsLettersHint;
 
+  /// No description provided for @settingsSectionFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Feedback'**
+  String get settingsSectionFeedback;
+
+  /// No description provided for @settingsFeedbackVisualPress.
+  ///
+  /// In en, this message translates to:
+  /// **'Visual button-colour feedback on match presses'**
+  String get settingsFeedbackVisualPress;
+
+  /// No description provided for @settingsFeedbackAudioPress.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio feedback on incorrect match press'**
+  String get settingsFeedbackAudioPress;
+
+  /// No description provided for @settingsFeedbackVisualMiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Visual button-colour feedback on missed matches'**
+  String get settingsFeedbackVisualMiss;
+
+  /// No description provided for @settingsFeedbackAudioMiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio feedback on missed match'**
+  String get settingsFeedbackAudioMiss;
+
   /// No description provided for @settingsSectionDailyGoal.
   ///
   /// In en, this message translates to:

@@ -67,6 +67,13 @@ class GameNotifier extends Notifier<GameSession> {
   Timer? _stimulusTimer;
   Timer? _trialTimer;
 
+  /// Per-channel timers that clear the response-feedback flash after
+  /// [_feedbackDuration] elapses. Reset on pause / abort / reset.
+  final Map<ChannelType, Timer> _feedbackTimers = {};
+
+  /// Duration of the post-press / post-miss button flash.
+  static const Duration _feedbackDuration = Duration(milliseconds: 500);
+
   /// Status to restore when [resume] is called. Set on [pause].
   GameStatus? _resumeTo;
 
@@ -94,7 +101,13 @@ class GameNotifier extends Notifier<GameSession> {
 
   @override
   GameSession build() {
-    ref.onDispose(_cancelTimers);
+    ref.onDispose(() {
+      _cancelTimers();
+      for (final t in _feedbackTimers.values) {
+        t.cancel();
+      }
+      _feedbackTimers.clear();
+    });
     // Best-effort preload; missing files are logged and ignored.
     unawaited(_audio.preload());
     return GameSession.idle();
@@ -227,6 +240,10 @@ class GameNotifier extends Notifier<GameSession> {
     if (s.status != GameStatus.running) return;
     if (!s.activeChannels.contains(channel)) return;
     if (s.lockedChannels.contains(channel)) return;
+    // Warm-up trials (index < n) have no n-back reference yet, so a press
+    // there is neither a hit nor a false alarm — record the press without
+    // emitting feedback.
+    final isWarmup = s.currentTrialIndex < s.n;
 
     final updated = {
       for (final entry in s.responses.entries)
@@ -238,6 +255,14 @@ class GameNotifier extends Notifier<GameSession> {
       responses: updated,
       lockedChannels: {...s.lockedChannels, channel},
     );
+
+    if (!isWarmup) {
+      final wasMatch = s.trials[s.currentTrialIndex].isMatchOn(channel);
+      _emitFeedback(
+        channel,
+        wasMatch ? FeedbackKind.correct : FeedbackKind.incorrect,
+      );
+    }
   }
 
   /// Pauses an active session. No-op outside running/countdown.
@@ -250,6 +275,7 @@ class GameNotifier extends Notifier<GameSession> {
       return;
     }
     _cancelTimers();
+    _clearFeedback();
     _resumeTo = s.status;
     state = s.copyWith(
       status: GameStatus.paused,
@@ -290,6 +316,7 @@ class GameNotifier extends Notifier<GameSession> {
   /// Cancels the running session without scoring.
   void abort() {
     _cancelTimers();
+    _clearFeedback();
     _resumeTo = null;
     _pendingFirstStimulus = false;
     state = GameSession.idle().copyWith(status: GameStatus.aborted);
@@ -298,6 +325,7 @@ class GameNotifier extends Notifier<GameSession> {
   /// Returns to the idle (pre-session) state from any non-running state.
   void reset() {
     _cancelTimers();
+    _clearFeedback();
     _resumeTo = null;
     _pendingFirstStimulus = false;
     state = GameSession.idle();
@@ -318,13 +346,40 @@ class GameNotifier extends Notifier<GameSession> {
     final s = state;
     if (s.status != GameStatus.running) return;
 
+    // Detect misses on the just-completed trial before advancing.
+    // Warm-up trials don't have an n-back reference, so we skip them.
+    // Audio plays at most once per advance even if multiple channels
+    // missed (the visual orange flash still lands on every missed
+    // channel) — a stack of overlapping `missed.mp3` plays sounds messy
+    // and adds nothing the user can parse.
+    if (s.currentTrialIndex >= s.n) {
+      final trial = s.trials[s.currentTrialIndex];
+      var playedMissAudio = false;
+      for (final channel in s.activeChannels) {
+        final pressed =
+            s.responses[channel]?.contains(s.currentTrialIndex) ?? false;
+        if (trial.isMatchOn(channel) && !pressed) {
+          _emitFeedback(
+            channel,
+            FeedbackKind.missed,
+            playAudio: !playedMissAudio,
+          );
+          playedMissAudio = true;
+        }
+      }
+    }
+
     final next = s.currentTrialIndex + 1;
     if (next >= s.trials.length) {
       _finish();
       return;
     }
 
-    state = s.copyWith(
+    // Build the next state off the LIVE [state] rather than the snapshot
+    // `s` captured before miss detection — otherwise the channelFeedback
+    // entries that _emitFeedback just wrote get clobbered here and the
+    // orange flash never reaches the UI.
+    state = state.copyWith(
       currentTrialIndex: next,
       stimulusVisible: true,
       lockedChannels: const {},
@@ -487,5 +542,70 @@ class GameNotifier extends Notifier<GameSession> {
     _stimulusTimer = null;
     _trialTimer?.cancel();
     _trialTimer = null;
+  }
+
+  /// Emits a response-feedback event for [channel]. Honours the user's
+  /// per-event audio / visual toggles (so a fully-disabled feedback is
+  /// a free no-op). Audio side fires-and-forgets; visual side writes
+  /// to [GameSession.channelFeedback] and arms a one-shot timer that
+  /// clears the entry after [_feedbackDuration].
+  void _emitFeedback(
+    ChannelType channel,
+    FeedbackKind kind, {
+    bool playAudio = true,
+  }) {
+    final settings = _settingsOrNull();
+    final isPress =
+        kind == FeedbackKind.correct || kind == FeedbackKind.incorrect;
+    final audioEnabled = settings != null &&
+        (isPress
+            ? settings.feedbackAudioOnPress
+            : settings.feedbackAudioOnMiss);
+    final visualEnabled = settings != null &&
+        (isPress
+            ? settings.feedbackVisualOnPress
+            : settings.feedbackVisualOnMiss);
+
+    if (playAudio && audioEnabled) {
+      unawaited(_audio.playFeedback(kind));
+    }
+    if (!visualEnabled) return;
+
+    final next = Map<ChannelType, FeedbackKind>.from(state.channelFeedback);
+    next[channel] = kind;
+    state = state.copyWith(channelFeedback: next);
+
+    _feedbackTimers[channel]?.cancel();
+    _feedbackTimers[channel] = Timer(_feedbackDuration, () {
+      _feedbackTimers.remove(channel);
+      final current = state.channelFeedback;
+      if (current[channel] != kind) return;
+      final cleared = Map<ChannelType, FeedbackKind>.from(current)
+        ..remove(channel);
+      state = state.copyWith(channelFeedback: cleared);
+    });
+  }
+
+  /// Cancels every active feedback timer and clears any visible flashes.
+  void _clearFeedback() {
+    for (final t in _feedbackTimers.values) {
+      t.cancel();
+    }
+    _feedbackTimers.clear();
+    if (state.channelFeedback.isNotEmpty) {
+      state = state.copyWith(channelFeedback: const {});
+    }
+  }
+
+  /// Best-effort settings read for the feedback path. Returns null in
+  /// test contexts where [settingsProvider] isn't overridden — callers
+  /// treat null as "all feedback disabled" so tests using the default
+  /// container don't pull SharedPreferences into the test setup.
+  SettingsModel? _settingsOrNull() {
+    try {
+      return ref.read(settingsProvider);
+    } on Object {
+      return null;
+    }
   }
 }
