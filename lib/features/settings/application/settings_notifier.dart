@@ -114,6 +114,11 @@ class SettingsNotifier extends Notifier<SettingsModel> {
     await _repo.save(state);
   }
 
+  Future<void> updateAllowCenterPosition({required bool enabled}) async {
+    state = state.copyWith(allowCenterPosition: enabled);
+    await _repo.save(state);
+  }
+
   Future<void> updateDailyGoalSessions(int sessions) async {
     final clamped = sessions.clamp(
       SettingsModel.minDailyGoalSessions,

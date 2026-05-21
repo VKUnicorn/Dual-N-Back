@@ -88,6 +88,20 @@ class SettingsScreen extends ConsumerWidget {
                     notifier.updateShowFixationCross(enabled: v),
                   ),
                 ),
+                SwitchListTile(
+                  title: Text(l.settingsAllowCenterPosition),
+                  value: settings.allowCenterPosition,
+                  onChanged: (v) => unawaited(
+                    notifier.updateAllowCenterPosition(enabled: v),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                  child: Text(
+                    l.settingsAllowCenterPositionHint,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
               ],
             ),
           ),

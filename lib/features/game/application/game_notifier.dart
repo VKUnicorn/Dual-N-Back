@@ -154,7 +154,7 @@ class GameNotifier extends Notifier<GameSession> {
       trialCount: trialCount,
       activeChannels: activeChannels,
       matchProbability: _config.matchProbability,
-      cardinalityOverrides: _audioCardinalityOverride(),
+      cardinalityOverrides: _channelCardinalityOverrides(),
     );
 
     state = GameSession(
@@ -519,15 +519,26 @@ class GameNotifier extends Notifier<GameSession> {
     }
   }
 
-  /// Lets the audio channel honour the user's selected letter set rather
-  /// than the static [NBackDefaults.audioLetters] length. Empty map (→ no
-  /// overrides) when settings aren't available, e.g. in tests that don't
-  /// override [settingsProvider].
-  Map<ChannelType, int> _audioCardinalityOverride() {
+  /// Per-channel cardinality overrides driven by user settings:
+  /// - audio: honour the active letter set (vs. the static Jaeggi default)
+  /// - position: 9 cells (incl. center) when `allowCenterPosition` is on,
+  ///   otherwise the default of 8 (center excluded) is used.
+  ///
+  /// Returns an empty map when settings aren't available (tests that
+  /// don't override [settingsProvider]) so the generator falls back to
+  /// each channel's static [ChannelType.cardinality].
+  Map<ChannelType, int> _channelCardinalityOverrides() {
     try {
-      final letters = ref.read(settingsProvider).audioLetters;
-      if (letters.isEmpty) return const {};
-      return {ChannelType.audio: letters.length};
+      final settings = ref.read(settingsProvider);
+      final out = <ChannelType, int>{};
+      if (settings.audioLetters.isNotEmpty) {
+        out[ChannelType.audio] = settings.audioLetters.length;
+      }
+      if (settings.allowCenterPosition) {
+        out[ChannelType.position] =
+            NBackDefaults.gridSize * NBackDefaults.gridSize;
+      }
+      return out;
     } on Object {
       return const {};
     }

@@ -46,9 +46,14 @@ const double kShapeSizeFactor = 0.92;
 /// Fraction of the cell that the fixation "+" fills.
 const double kFixationSizeFactor = 0.8;
 
-/// Maps a position-channel value (0..7, "eight different locations") to a
-/// concrete cell index in the 3×3 grid, skipping the center.
-int positionToGridCell(int position) {
+/// Maps a position-channel value to a concrete cell index in the 3×3 grid.
+///
+/// When [centerAllowed] is false (default Jaeggi behaviour) the input range
+/// is 0..7 mapped to the 8 non-center cells (the center is skipped).
+/// When [centerAllowed] is true the input range is 0..8 and the mapping is
+/// the identity — the center cell is a valid target.
+int positionToGridCell(int position, {bool centerAllowed = false}) {
+  if (centerAllowed) return position;
   return position < kCenterCellIndex ? position : position + 1;
 }
 
@@ -142,6 +147,7 @@ class NBackGrid extends StatelessWidget {
     required this.fadeDuration,
     this.style = GridStyle.tile,
     this.showFixation = true,
+    this.centerIsPositionTarget = false,
     super.key,
   });
 
@@ -168,6 +174,11 @@ class NBackGrid extends StatelessWidget {
   /// pre-session states (Play button visible, countdown) so it doesn't
   /// compete with the overlay.
   final bool showFixation;
+
+  /// When true, the center cell is a valid position-channel target —
+  /// stops the grid from special-casing it (no transparent shortcut in
+  /// tile mode, no exclusion in classic mode's highlight pass).
+  final bool centerIsPositionTarget;
 
   @override
   Widget build(BuildContext context) {
@@ -202,11 +213,14 @@ class NBackGrid extends StatelessWidget {
             final isActive = highlight && index == activeCellIndex;
             final isCenter = index == kCenterCellIndex;
 
-            // Center cell (when not currently the stimulus) is transparent
-            // — only the fixation "+" is shown, no surrounding box. When
-            // the fixation is hidden (pre-session / countdown), the cell
-            // renders nothing so it doesn't compete with the overlay.
-            if (isCenter && !isActive) {
+            // Center cell (when not currently the stimulus and not a
+            // valid position target) is transparent — only the fixation
+            // "+" is shown, no surrounding box. When the fixation is
+            // hidden (pre-session / countdown), the cell renders nothing
+            // so it doesn't compete with the overlay. When the center IS
+            // a position target we fall through and render it like any
+            // other cell so the player can see it as a stimulus slot.
+            if (isCenter && !isActive && !centerIsPositionTarget) {
               if (!showFixation) {
                 return const SizedBox.shrink();
               }
@@ -244,6 +258,45 @@ class NBackGrid extends StatelessWidget {
             // doesn't animate on first build, so the widget MUST be
             // mounted continuously.
             final showShapeHere = isActive && hasShapeChannel;
+            // Overlay the fixation "+" on the (idle) center tile when
+            // the center is a valid position target — without this the
+            // tile background would hide the cross that the original
+            // early-return path used to draw.
+            final showCenterFixation = isCenter &&
+                !isActive &&
+                centerIsPositionTarget &&
+                showFixation;
+
+            Widget? child;
+            if (hasShapeChannel) {
+              child = AnimatedOpacity(
+                opacity: showShapeHere ? 1 : 0,
+                duration: fadeDuration,
+                child: _shapeFor(shapeIndex!, stimulusColor),
+              );
+            }
+            if (showCenterFixation) {
+              final fixation = FractionallySizedBox(
+                widthFactor: kFixationSizeFactor,
+                heightFactor: kFixationSizeFactor,
+                child: FittedBox(
+                  child: Text(
+                    '+',
+                    style: TextStyle(
+                      color:
+                          scheme.onSurfaceVariant.withValues(alpha: 0.35),
+                      fontWeight: FontWeight.w300,
+                    ),
+                  ),
+                ),
+              );
+              child = child == null
+                  ? fixation
+                  : Stack(
+                      alignment: Alignment.center,
+                      children: [fixation, child],
+                    );
+            }
 
             return AnimatedContainer(
               duration: fadeDuration,
@@ -251,13 +304,7 @@ class NBackGrid extends StatelessWidget {
                 color: cellColor,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: hasShapeChannel
-                  ? AnimatedOpacity(
-                      opacity: showShapeHere ? 1 : 0,
-                      duration: fadeDuration,
-                      child: _shapeFor(shapeIndex!, stimulusColor),
-                    )
-                  : null,
+              child: child,
             );
           },
         ),
@@ -323,7 +370,8 @@ class NBackGrid extends StatelessWidget {
                 // mounting it once and keeping it mounted is what makes
                 // fade-in actually fire.
                 if (activeCellIndex != null &&
-                    activeCellIndex != kCenterCellIndex)
+                    (centerIsPositionTarget ||
+                        activeCellIndex != kCenterCellIndex))
                   Positioned(
                     left: (activeCellIndex! % NBackDefaults.gridSize) * cellW,
                     top: (activeCellIndex! ~/ NBackDefaults.gridSize) * cellH,

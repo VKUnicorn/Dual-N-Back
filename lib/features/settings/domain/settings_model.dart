@@ -28,6 +28,7 @@ class SettingsModel {
     required this.audioLetters,
     required this.gridStyle,
     required this.showFixationCross,
+    required this.allowCenterPosition,
     required this.dailyGoalSessions,
     required this.restDays,
     required this.stimulusFadeMs,
@@ -58,6 +59,7 @@ class SettingsModel {
         audioLetters: NBackDefaults.audioLetters,
         gridStyle: GridStyle.classic,
         showFixationCross: true,
+        allowCenterPosition: false,
         dailyGoalSessions: defaultDailyGoalSessions,
         restDays: <int>{},
         stimulusFadeMs: defaultStimulusFadeMs,
@@ -171,6 +173,11 @@ class SettingsModel {
   /// 3-2-1 countdown regardless of this flag.
   final bool showFixationCross;
 
+  /// When true, the position channel may target the center cell of the
+  /// 3×3 grid as a 9th option (vs. Jaeggi's 8 non-center locations).
+  /// Slightly bumps the difficulty of the position channel — opt-in.
+  final bool allowCenterPosition;
+
   /// Target number of completed sessions per day, shown as a progress
   /// counter on the home screen. Clamped to
   /// [[minDailyGoalSessions], [maxDailyGoalSessions]].
@@ -238,6 +245,7 @@ class SettingsModel {
     List<String>? audioLetters,
     GridStyle? gridStyle,
     bool? showFixationCross,
+    bool? allowCenterPosition,
     int? dailyGoalSessions,
     Set<int>? restDays,
     int? stimulusFadeMs,
@@ -266,6 +274,7 @@ class SettingsModel {
       audioLetters: audioLetters ?? this.audioLetters,
       gridStyle: gridStyle ?? this.gridStyle,
       showFixationCross: showFixationCross ?? this.showFixationCross,
+      allowCenterPosition: allowCenterPosition ?? this.allowCenterPosition,
       dailyGoalSessions: dailyGoalSessions ?? this.dailyGoalSessions,
       restDays: restDays ?? this.restDays,
       stimulusFadeMs: stimulusFadeMs ?? this.stimulusFadeMs,

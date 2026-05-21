@@ -252,6 +252,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsShowFixationCross => 'Показывать крест фиксации в центре';
 
   @override
+  String get settingsAllowCenterPosition =>
+      'Добавить девятый вариант стимула позиции в центре сетки';
+
+  @override
+  String get settingsAllowCenterPositionHint =>
+      'В оригинальном тесте Jaeggi стимул не появляется в центре, но вы можете включить это при необходимости. Это слегка увеличит сложность запоминания стимула позиции так как будет девять возможных вариантов, а не восемь.';
+
+  @override
   String get settingsSectionSound => 'Звук';
 
   @override

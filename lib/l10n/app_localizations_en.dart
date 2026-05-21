@@ -251,6 +251,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsShowFixationCross => 'Show fixation cross in the center';
 
   @override
+  String get settingsAllowCenterPosition =>
+      'Add a ninth position-stimulus variant in the center of the grid';
+
+  @override
+  String get settingsAllowCenterPositionHint =>
+      'In the original Jaeggi test the stimulus never appears in the center, but you can enable this if you want. It slightly increases position-channel difficulty since there will be nine possible cells instead of eight.';
+
+  @override
   String get settingsSectionSound => 'Sound';
 
   @override

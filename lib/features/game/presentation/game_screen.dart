@@ -311,8 +311,15 @@ class _RunningView extends ConsumerWidget {
         ? frame[ChannelType.shape]
         : null;
 
-    // Position values 0..7 map to the 8 non-center cells of the 3×3 grid.
-    final activeCell = position != null ? positionToGridCell(position) : null;
+    // Position values map to cell indices: 0..7 → 8 non-center cells by
+    // default (Jaeggi), 0..8 → all 9 cells when the user opted in via the
+    // `allowCenterPosition` setting.
+    final allowCenter = ref.watch(
+      settingsProvider.select((s) => s.allowCenterPosition),
+    );
+    final activeCell = position != null
+        ? positionToGridCell(position, centerAllowed: allowCenter)
+        : null;
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -338,6 +345,7 @@ class _RunningView extends ConsumerWidget {
                         ref.watch(settingsProvider).showFixationCross &&
                             session.status != GameStatus.preparing &&
                             session.status != GameStatus.countdown,
+                    centerIsPositionTarget: allowCenter,
                   )
                 : NBackSingleCell(
                     highlight: session.stimulusVisible && isRunning,
