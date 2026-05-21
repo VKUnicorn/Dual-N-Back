@@ -70,7 +70,7 @@ class SettingsModel {
 
   /// Bounds and default for the daily-goal slider on the settings screen.
   static const int minDailyGoalSessions = 1;
-  static const int maxDailyGoalSessions = 30;
+  static const int maxDailyGoalSessions = 60;
   static const int defaultDailyGoalSessions = 20;
 
   /// Maximum number of weekdays the user can mark as rest days. Capped at

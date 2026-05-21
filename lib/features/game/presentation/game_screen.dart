@@ -125,6 +125,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           if (context.mounted) context.pop();
           return;
         }
+        // Before the user hits Play, there's nothing to pause — skip
+        // the dialog and just go home, mirroring the natural mental
+        // model of "I never started, let me back out cleanly".
+        if (session.status == GameStatus.preparing) {
+          ref.read(gameNotifierProvider.notifier).reset();
+          if (context.mounted) context.pop();
+          return;
+        }
         await _handleInterrupt(context);
       },
       child: Scaffold(
