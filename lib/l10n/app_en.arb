@@ -151,6 +151,18 @@
   "statisticsClearTooltip": "Clear history",
   "statisticsClearTitle": "Clear history?",
   "statisticsClearContent": "This action can't be undone.",
+  "statisticsExportTooltip": "Export history to file",
+  "statisticsImportTooltip": "Import history from file",
+  "statisticsExportDialogTitle": "Save history backup",
+  "statisticsExportEmpty": "Nothing to export — history is empty.",
+  "statisticsExportSuccess": "Exported {count, plural, one{{count} session} other{{count} sessions}}.",
+  "@statisticsExportSuccess": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "statisticsExportError": "Export failed: {message}",
+  "@statisticsExportError": {
+    "placeholders": {"message": {"type": "String"}}
+  },
   "statisticsEmptyTitle": "No history yet",
   "statisticsEmptySubtitle": "Finish your first session — the results will appear here.",
   "statisticsSessionsCount": "Sessions ({count})",

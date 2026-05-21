@@ -794,6 +794,42 @@ abstract class AppLocalizations {
   /// **'This action can\'t be undone.'**
   String get statisticsClearContent;
 
+  /// No description provided for @statisticsExportTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Export history to file'**
+  String get statisticsExportTooltip;
+
+  /// No description provided for @statisticsImportTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Import history from file'**
+  String get statisticsImportTooltip;
+
+  /// No description provided for @statisticsExportDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save history backup'**
+  String get statisticsExportDialogTitle;
+
+  /// No description provided for @statisticsExportEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to export — history is empty.'**
+  String get statisticsExportEmpty;
+
+  /// No description provided for @statisticsExportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Exported {count, plural, one{{count} session} other{{count} sessions}}.'**
+  String statisticsExportSuccess(int count);
+
+  /// No description provided for @statisticsExportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {message}'**
+  String statisticsExportError(String message);
+
   /// No description provided for @statisticsEmptyTitle.
   ///
   /// In en, this message translates to:

@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:dual_n_back/features/game/domain/stimulus.dart';
 import 'package:dual_n_back/features/settings/application/settings_notifier.dart';
 import 'package:dual_n_back/features/statistics/application/statistics_provider.dart';
 import 'package:dual_n_back/features/statistics/application/stats_metrics.dart';
+import 'package:dual_n_back/features/statistics/data/statistics_backup_codec.dart';
 import 'package:dual_n_back/features/statistics/domain/saved_session.dart';
 import 'package:dual_n_back/features/statistics/domain/stats_period.dart';
 import 'package:dual_n_back/features/statistics/presentation/avg_accuracy_chart.dart';
@@ -18,7 +21,9 @@ import 'package:dual_n_back/features/statistics/presentation/period_header.dart'
 import 'package:dual_n_back/features/statistics/presentation/session_tile.dart';
 import 'package:dual_n_back/features/statistics/presentation/summary_card.dart';
 import 'package:dual_n_back/l10n/app_localizations.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -67,6 +72,18 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           onPressed: () => context.pop(),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.upload_file_outlined),
+            tooltip: l.statisticsExportTooltip,
+            onPressed: () => _exportHistory(context, ref),
+          ),
+          IconButton(
+            icon: const Icon(Icons.file_download_outlined),
+            tooltip: l.statisticsImportTooltip,
+            // Import is not implemented yet — left disabled so the icon is
+            // discoverable in the AppBar but can't be triggered.
+            onPressed: null,
+          ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
             tooltip: l.statisticsClearTooltip,
@@ -265,6 +282,49 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
         },
       ),
     );
+  }
+
+  /// Exports the full session history to a JSON file at a user-picked
+  /// location. Encodes via [StatisticsBackupCodec] and writes the bytes
+  /// through `flutter_file_dialog.saveFile` — the plugin's native
+  /// Android side actually writes via SAF (file_picker 12-beta returns a
+  /// SAF URI but then tries `File(path).writeAsBytes` on the Dart side,
+  /// which fails with "No such file or directory").
+  Future<void> _exportHistory(BuildContext context, WidgetRef ref) async {
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final repo = ref.read(statisticsRepositoryProvider);
+    final history = await repo.loadAll();
+    if (history.isEmpty) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l.statisticsExportEmpty)),
+      );
+      return;
+    }
+    final json = StatisticsBackupCodec.encode(history);
+    final bytes = Uint8List.fromList(utf8.encode(json));
+    final fileName =
+        'dual_n_back_${DateFormat('dd.MM.yyyy').format(DateTime.now())}'
+        '_statistics_backup.json';
+    try {
+      final path = await FlutterFileDialog.saveFile(
+        params: SaveFileDialogParams(
+          data: bytes,
+          fileName: fileName,
+          mimeTypesFilter: const ['application/json'],
+        ),
+      );
+      if (path == null) return; // user cancelled
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l.statisticsExportSuccess(history.length)),
+        ),
+      );
+    } on Object catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l.statisticsExportError(e.toString()))),
+      );
+    }
   }
 
   Future<void> _confirmClear(BuildContext context, WidgetRef ref) async {

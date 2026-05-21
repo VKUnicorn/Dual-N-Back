@@ -397,6 +397,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statisticsClearContent => 'This action can\'t be undone.';
 
   @override
+  String get statisticsExportTooltip => 'Export history to file';
+
+  @override
+  String get statisticsImportTooltip => 'Import history from file';
+
+  @override
+  String get statisticsExportDialogTitle => 'Save history backup';
+
+  @override
+  String get statisticsExportEmpty => 'Nothing to export — history is empty.';
+
+  @override
+  String statisticsExportSuccess(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sessions',
+      one: '$count session',
+    );
+    return 'Exported $_temp0.';
+  }
+
+  @override
+  String statisticsExportError(String message) {
+    return 'Export failed: $message';
+  }
+
+  @override
   String get statisticsEmptyTitle => 'No history yet';
 
   @override

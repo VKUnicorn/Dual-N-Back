@@ -400,6 +400,36 @@ class AppLocalizationsRu extends AppLocalizations {
   String get statisticsClearContent => 'Это действие нельзя отменить.';
 
   @override
+  String get statisticsExportTooltip => 'Экспорт истории в файл';
+
+  @override
+  String get statisticsImportTooltip => 'Импорт истории из файла';
+
+  @override
+  String get statisticsExportDialogTitle => 'Сохранить резервную копию';
+
+  @override
+  String get statisticsExportEmpty => 'Нечего экспортировать — история пуста.';
+
+  @override
+  String statisticsExportSuccess(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count сессии',
+      many: '$count сессий',
+      few: '$count сессии',
+      one: '$count сессия',
+    );
+    return 'Экспортировано $_temp0.';
+  }
+
+  @override
+  String statisticsExportError(String message) {
+    return 'Ошибка экспорта: $message';
+  }
+
+  @override
   String get statisticsEmptyTitle => 'История пока пуста';
 
   @override
