@@ -425,6 +425,45 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get statisticsImportTitle => 'Replace history?';
+
+  @override
+  String statisticsImportContent(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sessions',
+      one: '$count session',
+      zero: 'no sessions yet',
+    );
+    return 'All current sessions ($_temp0) will be permanently deleted and replaced with the sessions from the chosen file. This action can\'t be undone.';
+  }
+
+  @override
+  String get statisticsImportConfirm => 'Replace';
+
+  @override
+  String statisticsImportSuccess(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sessions',
+      one: '$count session',
+    );
+    return 'Imported $_temp0.';
+  }
+
+  @override
+  String statisticsImportFormatError(String message) {
+    return 'Backup file is invalid: $message';
+  }
+
+  @override
+  String statisticsImportError(String message) {
+    return 'Import failed: $message';
+  }
+
+  @override
   String get statisticsEmptyTitle => 'No history yet';
 
   @override

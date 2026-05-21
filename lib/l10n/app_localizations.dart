@@ -830,6 +830,42 @@ abstract class AppLocalizations {
   /// **'Export failed: {message}'**
   String statisticsExportError(String message);
 
+  /// No description provided for @statisticsImportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace history?'**
+  String get statisticsImportTitle;
+
+  /// No description provided for @statisticsImportContent.
+  ///
+  /// In en, this message translates to:
+  /// **'All current sessions ({count, plural, =0{no sessions yet} one{{count} session} other{{count} sessions}}) will be permanently deleted and replaced with the sessions from the chosen file. This action can\'t be undone.'**
+  String statisticsImportContent(int count);
+
+  /// No description provided for @statisticsImportConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get statisticsImportConfirm;
+
+  /// No description provided for @statisticsImportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported {count, plural, one{{count} session} other{{count} sessions}}.'**
+  String statisticsImportSuccess(int count);
+
+  /// No description provided for @statisticsImportFormatError.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup file is invalid: {message}'**
+  String statisticsImportFormatError(String message);
+
+  /// No description provided for @statisticsImportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Import failed: {message}'**
+  String statisticsImportError(String message);
+
   /// No description provided for @statisticsEmptyTitle.
   ///
   /// In en, this message translates to:

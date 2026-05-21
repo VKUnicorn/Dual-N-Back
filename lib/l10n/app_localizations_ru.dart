@@ -430,6 +430,49 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get statisticsImportTitle => 'Заменить историю?';
+
+  @override
+  String statisticsImportContent(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count сессии',
+      many: '$count сессий',
+      few: '$count сессии',
+      one: '$count сессия',
+      zero: 'пока нет ни одной',
+    );
+    return 'Все текущие сессии ($_temp0) будут безвозвратно удалены и заменены сессиями из выбранного файла. Это действие нельзя отменить.';
+  }
+
+  @override
+  String get statisticsImportConfirm => 'Заменить';
+
+  @override
+  String statisticsImportSuccess(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count сессии',
+      many: '$count сессий',
+      few: '$count сессии',
+      one: '$count сессия',
+    );
+    return 'Импортировано $_temp0.';
+  }
+
+  @override
+  String statisticsImportFormatError(String message) {
+    return 'Файл резервной копии повреждён: $message';
+  }
+
+  @override
+  String statisticsImportError(String message) {
+    return 'Ошибка импорта: $message';
+  }
+
+  @override
   String get statisticsEmptyTitle => 'История пока пуста';
 
   @override

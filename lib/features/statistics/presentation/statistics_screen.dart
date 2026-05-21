@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dual_n_back/features/game/domain/stimulus.dart';
 import 'package:dual_n_back/features/settings/application/settings_notifier.dart';
@@ -80,9 +81,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           IconButton(
             icon: const Icon(Icons.file_download_outlined),
             tooltip: l.statisticsImportTooltip,
-            // Import is not implemented yet — left disabled so the icon is
-            // discoverable in the AppBar but can't be triggered.
-            onPressed: null,
+            onPressed: () => _importHistory(context, ref),
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
@@ -323,6 +322,64 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     } on Object catch (e) {
       messenger.showSnackBar(
         SnackBar(content: Text(l.statisticsExportError(e.toString()))),
+      );
+    }
+  }
+
+  /// Imports a previously-exported backup file, replacing the entire
+  /// current history. Shows a warning dialog up front so the user knows
+  /// existing sessions will be deleted before the file picker is even
+  /// invoked.
+  Future<void> _importHistory(BuildContext context, WidgetRef ref) async {
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final repo = ref.read(statisticsRepositoryProvider);
+    final existingCount = (await repo.loadAll()).length;
+    if (!context.mounted) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l.statisticsImportTitle),
+        content: Text(l.statisticsImportContent(existingCount)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l.statisticsImportConfirm),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    try {
+      final path = await FlutterFileDialog.pickFile(
+        params: const OpenFileDialogParams(
+          fileExtensionsFilter: ['json'],
+          mimeTypesFilter: ['application/json'],
+        ),
+      );
+      if (path == null) return; // user cancelled
+      final source = await File(path).readAsString();
+      final seeds = StatisticsBackupCodec.decode(source);
+      await repo.clearAll();
+      await repo.bulkInsert(seeds);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l.statisticsImportSuccess(seeds.length)),
+        ),
+      );
+    } on BackupFormatException catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l.statisticsImportFormatError(e.message))),
+      );
+    } on Object catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l.statisticsImportError(e.toString()))),
       );
     }
   }
