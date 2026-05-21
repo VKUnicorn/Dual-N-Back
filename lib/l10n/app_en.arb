@@ -187,6 +187,7 @@
   "@statisticsSessionsCount": {
     "placeholders": {"count": {"type": "int"}}
   },
+  "statisticsPeriodDay": "Day",
   "statisticsPeriodWeek": "Week",
   "statisticsPeriodMonth": "Month",
   "statisticsPeriodYear": "Year",
@@ -214,6 +215,10 @@
   "statisticsSummaryBestSessionValue": "N{n} · {percent}% · {date}",
   "@statisticsSummaryBestSessionValue": {
     "placeholders": {"n": {"type": "int"}, "percent": {"type": "int"}, "date": {"type": "String"}}
+  },
+  "statisticsSummaryBestSessionValueShort": "N{n} · {percent}%",
+  "@statisticsSummaryBestSessionValueShort": {
+    "placeholders": {"n": {"type": "int"}, "percent": {"type": "int"}}
   },
   "statisticsSummaryTotalTrials": "Total trials",
   "statisticsSummaryTrainingTime": "Training time",

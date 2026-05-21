@@ -57,6 +57,9 @@ String bucketDateLabel(
       s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 
   switch (period) {
+    case StatsPeriod.day:
+      // Single-bucket period: tooltip just shows the date.
+      return capitalize(DateFormat.yMMMMd(locale).format(range.start));
     case StatsPeriod.week:
       final d = range.start.add(Duration(days: index));
       return capitalize(DateFormat.EEEE(locale).format(d));
@@ -99,6 +102,9 @@ AxisTitles bottomTitles(
   final locale = Localizations.localeOf(context).toString();
 
   switch (period) {
+    case StatsPeriod.day:
+      // Day-mode line charts are a single bucket, so no x-axis labels.
+      return const AxisTitles();
     case StatsPeriod.week:
       final fmt = DateFormat.E(locale);
       return AxisTitles(

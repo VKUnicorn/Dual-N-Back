@@ -41,7 +41,7 @@ class StatisticsScreen extends ConsumerStatefulWidget {
 }
 
 class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
-  StatsPeriod _period = StatsPeriod.week;
+  StatsPeriod _period = StatsPeriod.day;
   // `_anchor` is any moment inside the visible period; the visible range
   // is computed from it via [StatsPeriodMath.rangeFor].
   DateTime _anchor = DateTime.now();
@@ -187,44 +187,50 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                 child: ListView(
                   padding: const EdgeInsets.all(16),
                   children: [
-                    SummaryCard(summary: summary),
+                    SummaryCard(summary: summary, period: _period),
                     const SizedBox(height: 16),
                     HeatmapCard(
                       period: _period,
                       range: range,
                       sessions: inRange,
                     ),
-                    const SizedBox(height: 16),
-                    AvgAccuracyChart(
-                      period: _period,
-                      range: range,
-                      sessions: inRange,
-                      priorValue: priorAcc,
-                    ),
-                    const SizedBox(height: 16),
-                    DprimeChart(
-                      period: _period,
-                      range: range,
-                      sessions: inRange,
-                      priorValue: priorDp,
-                    ),
-                    const SizedBox(height: 16),
-                    if (activeChannelsList.isNotEmpty)
-                      PerChannelAccuracyChart(
+                    // Day mode collapses every multi-bucket line chart to
+                    // a single value — those values surface inside the
+                    // summary card instead, so the line charts are
+                    // hidden here.
+                    if (_period != StatsPeriod.day) ...[
+                      const SizedBox(height: 16),
+                      AvgAccuracyChart(
                         period: _period,
                         range: range,
                         sessions: inRange,
-                        activeChannels: activeChannelsList,
-                        priorValues: priorChannelAcc,
+                        priorValue: priorAcc,
                       ),
-                    if (activeChannelsList.isNotEmpty)
                       const SizedBox(height: 16),
-                    MaxNChart(
-                      period: _period,
-                      range: range,
-                      sessions: inRange,
-                      priorValue: priorMaxN,
-                    ),
+                      DprimeChart(
+                        period: _period,
+                        range: range,
+                        sessions: inRange,
+                        priorValue: priorDp,
+                      ),
+                      if (activeChannelsList.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        PerChannelAccuracyChart(
+                          period: _period,
+                          range: range,
+                          sessions: inRange,
+                          activeChannels: activeChannelsList,
+                          priorValues: priorChannelAcc,
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                      MaxNChart(
+                        period: _period,
+                        range: range,
+                        sessions: inRange,
+                        priorValue: priorMaxN,
+                      ),
+                    ],
                     const SizedBox(height: 16),
                     NDistributionChart(sessions: inRange),
                     const SizedBox(height: 24),

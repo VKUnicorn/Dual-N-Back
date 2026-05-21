@@ -42,7 +42,12 @@ class PeriodHeader extends StatelessWidget {
               width: double.infinity,
               child: SegmentedButton<StatsPeriod>(
                 expandedInsets: EdgeInsets.zero,
+                showSelectedIcon: false,
                 segments: [
+                  ButtonSegment(
+                    value: StatsPeriod.day,
+                    label: Text(l.statisticsPeriodDay),
+                  ),
                   ButtonSegment(
                     value: StatsPeriod.week,
                     label: Text(l.statisticsPeriodWeek),
@@ -93,6 +98,11 @@ class PeriodHeader extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context).toString();
     switch (period) {
+      case StatsPeriod.day:
+        // Always render an explicit, localised long date — better for
+        // screenshots than "Today" / "Yesterday" which lose meaning
+        // once the screenshot's calendar context is gone.
+        return DateFormat.yMMMMd(locale).format(anchor);
       case StatsPeriod.week:
         final delta = StatsPeriodMath.periodsBetween(
           StatsPeriod.week,

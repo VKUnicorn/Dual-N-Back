@@ -120,6 +120,11 @@ class PeriodSummary {
     required this.daysAchievedGoal,
     required this.totalDays,
     required this.dailyGoal,
+    required this.sessionsInPeriod,
+    required this.averageAccuracy,
+    required this.averageDPrime,
+    required this.perChannelAccuracy,
+    required this.maxN,
   });
 
   final SavedSession? bestSession;
@@ -129,6 +134,22 @@ class PeriodSummary {
   final int daysAchievedGoal;
   final int totalDays;
   final int dailyGoal;
+  final int sessionsInPeriod;
+
+  /// Pooled overall accuracy across every session in the period
+  /// (`sum(hits) / sum(engaged)`). 0..1.
+  final double averageAccuracy;
+
+  /// Pooled d′ across every channel-trial in the period, each channel
+  /// weighted by its total decisions — same pooling as the line chart.
+  final double averageDPrime;
+
+  /// Per-channel accuracy (0..1), pooled the same way per channel.
+  /// Channels that never appeared in the period are absent from the map.
+  final Map<ChannelType, double> perChannelAccuracy;
+
+  /// Highest N reached across any session in the period (0 if empty).
+  final int maxN;
 }
 
 PeriodSummary summarize(
@@ -142,9 +163,36 @@ PeriodSummary summarize(
   var bestScore = -1.0;
   var totalTrials = 0;
   var totalMs = 0;
+  var maxN = 0;
+  var accSum = 0.0;
+  var accWeight = 0;
+  var dpSum = 0.0;
+  var dpWeight = 0;
+  final perChannelAccSum = <ChannelType, double>{};
+  final perChannelAccWeight = <ChannelType, int>{};
   final perDay = <DateTime, int>{};
   for (final s in inRange) {
     final acc = overallAccuracy(s.scores);
+    if (s.session.n > maxN) maxN = s.session.n;
+    final engagedSum =
+        s.scores.fold<int>(0, (sum, sc) => sum + engagedTotal(sc));
+    if (engagedSum > 0) {
+      accSum += acc * engagedSum;
+      accWeight += engagedSum;
+    }
+    for (final score in s.scores) {
+      final w = engagedTotal(score);
+      if (w == 0) continue;
+      dpSum += score.dPrime * w;
+      dpWeight += w;
+      final ch = ChannelType.values.firstWhere(
+        (c) => c.name == score.channel,
+        orElse: () => ChannelType.position,
+      );
+      perChannelAccSum[ch] =
+          (perChannelAccSum[ch] ?? 0) + score.accuracy * w;
+      perChannelAccWeight[ch] = (perChannelAccWeight[ch] ?? 0) + w;
+    }
     // "Effective N": N weighted by accuracy. A flawless N=9 (score=9)
     // beats a 50%-N=10 (score=5), but a 91%-N=10 (≈9.1) just edges out a
     // perfect N=9. Tie-breakers favour the higher-N session (harder
@@ -187,6 +235,12 @@ PeriodSummary summarize(
   for (final entry in perDay.entries) {
     if (entry.value >= dailyGoal) achieved += 1;
   }
+  final perChannelAcc = <ChannelType, double>{};
+  for (final entry in perChannelAccSum.entries) {
+    final w = perChannelAccWeight[entry.key] ?? 0;
+    if (w == 0) continue;
+    perChannelAcc[entry.key] = entry.value / w;
+  }
   return PeriodSummary(
     bestSession: best,
     bestAccuracy: bestAcc < 0 ? 0 : bestAcc,
@@ -195,5 +249,10 @@ PeriodSummary summarize(
     daysAchievedGoal: achieved,
     totalDays: totalDays,
     dailyGoal: dailyGoal,
+    sessionsInPeriod: inRange.length,
+    averageAccuracy: accWeight == 0 ? 0 : accSum / accWeight,
+    averageDPrime: dpWeight == 0 ? 0 : dpSum / dpWeight,
+    perChannelAccuracy: perChannelAcc,
+    maxN: maxN,
   );
 }

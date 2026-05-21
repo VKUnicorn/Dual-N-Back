@@ -1,7 +1,7 @@
 import 'package:meta/meta.dart';
 
 /// Time-window mode for the statistics screen.
-enum StatsPeriod { week, month, year }
+enum StatsPeriod { day, week, month, year }
 
 /// Half-open `[start, end)` window covering one period.
 ///
@@ -17,11 +17,14 @@ class StatsRange {
   final DateTime end;
 
   /// Number of "buckets" the chart x-axis should display:
+  ///   day   → 1 (the whole day collapses to a single point)
   ///   week  → 7 days
   ///   month → days-in-month (28..31)
   ///   year  → 12 months
   int bucketCount(StatsPeriod period) {
     switch (period) {
+      case StatsPeriod.day:
+        return 1;
       case StatsPeriod.week:
         return 7;
       case StatsPeriod.month:
@@ -36,6 +39,8 @@ class StatsRange {
   int bucketIndexFor(StatsPeriod period, DateTime ts) {
     if (ts.isBefore(start) || !ts.isBefore(end)) return -1;
     switch (period) {
+      case StatsPeriod.day:
+        return 0;
       case StatsPeriod.week:
       case StatsPeriod.month:
         // Days since `start`, calendar-aware so DST doesn't shift buckets.
@@ -51,6 +56,9 @@ class StatsRange {
 /// Boundary helpers. All operations work in local time — the user's
 /// week starts on Monday and a "month"/"year" is the calendar one.
 class StatsPeriodMath {
+  /// Local midnight of the calendar day containing [d].
+  static DateTime startOfDay(DateTime d) => DateTime(d.year, d.month, d.day);
+
   /// Start of the ISO week (Monday) at midnight that contains [d].
   static DateTime startOfWeek(DateTime d) {
     final base = DateTime(d.year, d.month, d.day);
@@ -65,6 +73,9 @@ class StatsPeriodMath {
   /// Range that contains [anchor] for the given [period].
   static StatsRange rangeFor(StatsPeriod period, DateTime anchor) {
     switch (period) {
+      case StatsPeriod.day:
+        final s = startOfDay(anchor);
+        return StatsRange(start: s, end: s.add(const Duration(days: 1)));
       case StatsPeriod.week:
         final s = startOfWeek(anchor);
         return StatsRange(start: s, end: s.add(const Duration(days: 7)));
@@ -80,6 +91,8 @@ class StatsPeriodMath {
   /// Move [anchor] forward/backward by one whole period.
   static DateTime shift(StatsPeriod period, DateTime anchor, int delta) {
     switch (period) {
+      case StatsPeriod.day:
+        return startOfDay(anchor).add(Duration(days: delta));
       case StatsPeriod.week:
         return startOfWeek(anchor).add(Duration(days: 7 * delta));
       case StatsPeriod.month:
@@ -94,6 +107,8 @@ class StatsPeriodMath {
   /// distance between Mon-of-week-A and Wed-of-week-A is 0 weeks.
   static int periodsBetween(StatsPeriod period, DateTime a, DateTime b) {
     switch (period) {
+      case StatsPeriod.day:
+        return startOfDay(b).difference(startOfDay(a)).inDays;
       case StatsPeriod.week:
         final sa = startOfWeek(a);
         final sb = startOfWeek(b);

@@ -884,6 +884,12 @@ abstract class AppLocalizations {
   /// **'Sessions ({count})'**
   String statisticsSessionsCount(int count);
 
+  /// No description provided for @statisticsPeriodDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get statisticsPeriodDay;
+
   /// No description provided for @statisticsPeriodWeek.
   ///
   /// In en, this message translates to:
@@ -979,6 +985,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'N{n} · {percent}% · {date}'**
   String statisticsSummaryBestSessionValue(int n, int percent, String date);
+
+  /// No description provided for @statisticsSummaryBestSessionValueShort.
+  ///
+  /// In en, this message translates to:
+  /// **'N{n} · {percent}%'**
+  String statisticsSummaryBestSessionValueShort(int n, int percent);
 
   /// No description provided for @statisticsSummaryTotalTrials.
   ///

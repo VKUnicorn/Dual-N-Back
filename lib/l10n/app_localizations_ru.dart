@@ -485,6 +485,9 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get statisticsPeriodDay => 'День';
+
+  @override
   String get statisticsPeriodWeek => 'Неделя';
 
   @override
@@ -554,6 +557,11 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String statisticsSummaryBestSessionValue(int n, int percent, String date) {
     return 'N$n · $percent% · $date';
+  }
+
+  @override
+  String statisticsSummaryBestSessionValueShort(int n, int percent) {
+    return 'N$n · $percent%';
   }
 
   @override
