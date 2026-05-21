@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:dual_n_back/core/audio/feedback_kind.dart';
+import 'package:dual_n_back/core/audio/ui_sound.dart';
 import 'package:dual_n_back/core/constants/audio_voice.dart';
 import 'package:dual_n_back/core/constants/nback_defaults.dart';
 import 'package:flutter/foundation.dart';
 
 export 'package:dual_n_back/core/audio/feedback_kind.dart';
+export 'package:dual_n_back/core/audio/ui_sound.dart';
 
 /// Plays N-back audio stimuli (one short clip per letter).
 ///
@@ -45,6 +47,11 @@ abstract class AudioService {
   /// Plays the response-feedback clip for [kind]. No-op if the
   /// corresponding asset under `assets/audio/{kind}.mp3` is unavailable.
   Future<void> playFeedback(FeedbackKind kind);
+
+  /// Plays a one-shot UI cue (e.g. play-button press, end-of-session
+  /// victory/fail). No-op if the corresponding asset under
+  /// `assets/audio/{sound}.mp3` is unavailable.
+  Future<void> playUiSound(UiSound sound);
 
   Future<void> dispose();
 }
@@ -111,6 +118,11 @@ class AudioPlayersAudioService implements AudioService {
   final Map<FeedbackKind, List<AudioPlayer?>> _feedbackPool = {};
   final Map<FeedbackKind, int> _feedbackPoolIndex = {};
 
+  /// One MediaPlayer per [UiSound]. Unlike feedback clips, UI cues are
+  /// never expected to overlap (countdown gates `play.mp3`; the result
+  /// screen plays exactly one of victory/fail), so a pool would be wasted.
+  final Map<UiSound, AudioPlayer?> _uiSoundCache = {};
+
   /// Number of MediaPlayer instances kept per [FeedbackKind]. 3 covers
   /// Tri/Quad-back worst-case bursts (multiple channels press wrong /
   /// miss within the same trial) without the round-robin wrapping back
@@ -149,6 +161,7 @@ class AudioPlayersAudioService implements AudioService {
     await Future.wait<Object?>([
       ..._letters.map(_ensureLoaded),
       ...FeedbackKind.values.map(_ensureFeedbackLoaded),
+      ...UiSound.values.map(_ensureUiSoundLoaded),
     ]);
   }
 
@@ -336,6 +349,35 @@ class AudioPlayersAudioService implements AudioService {
     }
   }
 
+  @override
+  Future<void> playUiSound(UiSound sound) async {
+    final player = await _ensureUiSoundLoaded(sound);
+    if (player == null) return;
+    try {
+      await player.setVolume(_volume);
+      await player.seek(Duration.zero);
+      await player.resume();
+    } on Object catch (e) {
+      debugPrint('AudioService: ui-sound play failed for "${sound.name}": $e');
+    }
+  }
+
+  Future<AudioPlayer?> _ensureUiSoundLoaded(UiSound sound) async {
+    if (_uiSoundCache.containsKey(sound)) return _uiSoundCache[sound];
+    final player = AudioPlayer();
+    try {
+      await player.setReleaseMode(ReleaseMode.stop);
+      await player.setSource(AssetSource('audio/${sound.name}.mp3'));
+      _uiSoundCache[sound] = player;
+      return player;
+    } on Object catch (e) {
+      debugPrint('AudioService: missing ui-sound asset "${sound.name}": $e');
+      await _safeDispose(player);
+      _uiSoundCache[sound] = null;
+      return null;
+    }
+  }
+
   Future<void> _safeDispose(AudioPlayer? player) async {
     if (player == null) return;
     try {
@@ -351,14 +393,19 @@ class AudioPlayersAudioService implements AudioService {
     final staleFeedback = [
       for (final pool in _feedbackPool.values) ...pool,
     ];
+    final staleUiSounds = List<AudioPlayer?>.from(_uiSoundCache.values);
     _cache.clear();
     _loading.clear();
     _feedbackPool.clear();
     _feedbackPoolIndex.clear();
+    _uiSoundCache.clear();
     for (final player in stale) {
       await _safeDispose(player);
     }
     for (final player in staleFeedback) {
+      await _safeDispose(player);
+    }
+    for (final player in staleUiSounds) {
       await _safeDispose(player);
     }
   }
@@ -370,6 +417,7 @@ class SilentAudioService implements AudioService {
   final List<int> playedLetters = [];
   final List<String> playedPreviewLetters = [];
   final List<FeedbackKind> playedFeedback = [];
+  final List<UiSound> playedUiSounds = [];
   AudioVoice voice = AudioVoice.female;
   List<String> letters = List.unmodifiable(NBackDefaults.audioLetters);
 
@@ -403,6 +451,11 @@ class SilentAudioService implements AudioService {
   @override
   Future<void> playFeedback(FeedbackKind kind) async {
     playedFeedback.add(kind);
+  }
+
+  @override
+  Future<void> playUiSound(UiSound sound) async {
+    playedUiSounds.add(sound);
   }
 
   @override

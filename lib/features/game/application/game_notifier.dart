@@ -173,6 +173,7 @@ class GameNotifier extends Notifier<GameSession> {
   /// and then begins presenting stimuli. No-op outside [GameStatus.preparing].
   void play() {
     if (state.status != GameStatus.preparing) return;
+    unawaited(_audio.playUiSound(UiSound.play));
     _startCountdown(3);
   }
 

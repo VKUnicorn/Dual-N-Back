@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:confetti/confetti.dart';
+import 'package:dual_n_back/core/audio/audio_provider.dart';
+import 'package:dual_n_back/core/audio/audio_service.dart';
 import 'package:dual_n_back/core/constants/nback_defaults.dart';
 import 'package:dual_n_back/features/achievements/application/achievement.dart';
 import 'package:dual_n_back/features/achievements/application/achievements_provider.dart';
@@ -17,10 +20,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// Accuracy threshold above which the result screen fires a celebratory
-/// confetti burst. Tuned for the current accuracy formula
-/// (`hits / (hits + misses + falseAlarms)`) where >90% indicates a
-/// near-flawless session.
+/// confetti burst + `victory.mp3`. Tuned for the current accuracy
+/// formula (`hits / (hits + misses + falseAlarms)`) where >=90%
+/// indicates a near-flawless session.
 const double _celebrationAccuracy = 0.9;
+
+/// Accuracy threshold at or below which the result screen plays
+/// `fail.mp3`. Mirrors the celebration cutoff at the other extreme so
+/// the user gets explicit audio feedback for both very good and very
+/// poor sessions; middle-band sessions stay silent.
+const double _failAccuracy = 0.7;
 
 class SessionResultView extends ConsumerStatefulWidget {
   const SessionResultView({required this.session, super.key});
@@ -34,14 +43,14 @@ class SessionResultView extends ConsumerStatefulWidget {
 class _SessionResultViewState extends ConsumerState<SessionResultView> {
   late final ConfettiController _leftConfetti;
   late final ConfettiController _rightConfetti;
-  bool _celebrated = false;
+  bool _outcomeAnnounced = false;
 
   @override
   void initState() {
     super.initState();
     _leftConfetti = ConfettiController(duration: const Duration(seconds: 1));
     _rightConfetti = ConfettiController(duration: const Duration(seconds: 1));
-    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeCelebrate());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _announceOutcome());
   }
 
   @override
@@ -51,17 +60,25 @@ class _SessionResultViewState extends ConsumerState<SessionResultView> {
     super.dispose();
   }
 
-  /// Fires both confetti cannons once per result screen if the session
-  /// cleared the celebration threshold. Guarded by [_celebrated] so a
-  /// rebuild (e.g. theme/locale change) doesn't replay the burst.
-  void _maybeCelebrate() {
-    if (_celebrated) return;
+  /// Fires the appropriate end-of-session effects exactly once per
+  /// result screen: confetti + `victory.mp3` for >=90% accuracy,
+  /// `fail.mp3` for <=70%, silent middle band otherwise. Guarded by
+  /// [_outcomeAnnounced] so a rebuild (e.g. theme/locale change) doesn't
+  /// replay the burst or re-trigger the sound.
+  void _announceOutcome() {
+    if (_outcomeAnnounced) return;
     final score = widget.session.finalScore;
     if (score == null) return;
-    if (score.overallAccuracy < _celebrationAccuracy) return;
-    _celebrated = true;
-    _leftConfetti.play();
-    _rightConfetti.play();
+    final accuracy = score.overallAccuracy;
+    if (accuracy >= _celebrationAccuracy) {
+      _outcomeAnnounced = true;
+      _leftConfetti.play();
+      _rightConfetti.play();
+      unawaited(ref.read(audioServiceProvider).playUiSound(UiSound.victory));
+    } else if (accuracy <= _failAccuracy) {
+      _outcomeAnnounced = true;
+      unawaited(ref.read(audioServiceProvider).playUiSound(UiSound.fail));
+    }
   }
 
   @override
