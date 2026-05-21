@@ -29,6 +29,7 @@ class SettingsRepository {
   static const _kAudioVoice = 'settings.audioVoice';
   static const _kAudioLetters = 'settings.audioLetters';
   static const _kGridStyle = 'settings.gridStyle';
+  static const _kShowFixationCross = 'settings.showFixationCross';
   static const _kDailyGoal = 'settings.dailyGoalSessions';
   static const _kRestDays = 'settings.restDays';
   static const _kStimulusFadeMs = 'settings.stimulusFadeMs';
@@ -62,6 +63,8 @@ class SettingsRepository {
       audioVoice: _loadAudioVoice() ?? defaults.audioVoice,
       audioLetters: _loadAudioLetters() ?? defaults.audioLetters,
       gridStyle: _loadGridStyle() ?? defaults.gridStyle,
+      showFixationCross:
+          _prefs.getBool(_kShowFixationCross) ?? defaults.showFixationCross,
       dailyGoalSessions:
           _prefs.getInt(_kDailyGoal) ?? defaults.dailyGoalSessions,
       restDays: _loadRestDays() ?? defaults.restDays,
@@ -106,6 +109,7 @@ class SettingsRepository {
       _prefs.setString(_kAudioVoice, model.audioVoice.name),
       _prefs.setStringList(_kAudioLetters, model.audioLetters),
       _prefs.setString(_kGridStyle, model.gridStyle.name),
+      _prefs.setBool(_kShowFixationCross, model.showFixationCross),
       _prefs.setInt(_kDailyGoal, model.dailyGoalSessions),
       _prefs.setStringList(
         _kRestDays,
@@ -148,6 +152,7 @@ class SettingsRepository {
       _prefs.remove(_kAudioVoice),
       _prefs.remove(_kAudioLetters),
       _prefs.remove(_kGridStyle),
+      _prefs.remove(_kShowFixationCross),
       _prefs.remove(_kDailyGoal),
       _prefs.remove(_kRestDays),
       _prefs.remove(_kStimulusFadeMs),

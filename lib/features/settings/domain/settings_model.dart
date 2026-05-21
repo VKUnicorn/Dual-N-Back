@@ -27,6 +27,7 @@ class SettingsModel {
     required this.audioVoice,
     required this.audioLetters,
     required this.gridStyle,
+    required this.showFixationCross,
     required this.dailyGoalSessions,
     required this.restDays,
     required this.stimulusFadeMs,
@@ -56,6 +57,7 @@ class SettingsModel {
         audioVoice: AudioVoice.female,
         audioLetters: NBackDefaults.audioLetters,
         gridStyle: GridStyle.classic,
+        showFixationCross: true,
         dailyGoalSessions: defaultDailyGoalSessions,
         restDays: <int>{},
         stimulusFadeMs: defaultStimulusFadeMs,
@@ -164,6 +166,11 @@ class SettingsModel {
   /// Visual style of the in-game 3x3 grid.
   final GridStyle gridStyle;
 
+  /// When true, the central "+" fixation marker is drawn on the grid
+  /// during preparing / running / paused states. Hidden during the
+  /// 3-2-1 countdown regardless of this flag.
+  final bool showFixationCross;
+
   /// Target number of completed sessions per day, shown as a progress
   /// counter on the home screen. Clamped to
   /// [[minDailyGoalSessions], [maxDailyGoalSessions]].
@@ -230,6 +237,7 @@ class SettingsModel {
     AudioVoice? audioVoice,
     List<String>? audioLetters,
     GridStyle? gridStyle,
+    bool? showFixationCross,
     int? dailyGoalSessions,
     Set<int>? restDays,
     int? stimulusFadeMs,
@@ -257,6 +265,7 @@ class SettingsModel {
       audioVoice: audioVoice ?? this.audioVoice,
       audioLetters: audioLetters ?? this.audioLetters,
       gridStyle: gridStyle ?? this.gridStyle,
+      showFixationCross: showFixationCross ?? this.showFixationCross,
       dailyGoalSessions: dailyGoalSessions ?? this.dailyGoalSessions,
       restDays: restDays ?? this.restDays,
       stimulusFadeMs: stimulusFadeMs ?? this.stimulusFadeMs,

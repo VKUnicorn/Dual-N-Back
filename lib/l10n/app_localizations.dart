@@ -518,6 +518,12 @@ abstract class AppLocalizations {
   /// **'Classic'**
   String get settingsGridStyleClassic;
 
+  /// No description provided for @settingsShowFixationCross.
+  ///
+  /// In en, this message translates to:
+  /// **'Show fixation cross in the center'**
+  String get settingsShowFixationCross;
+
   /// No description provided for @settingsSectionSound.
   ///
   /// In en, this message translates to:

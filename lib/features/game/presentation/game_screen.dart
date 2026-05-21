@@ -334,8 +334,10 @@ class _RunningView extends ConsumerWidget {
                           ref.watch(settingsProvider).stimulusFadeMs,
                     ),
                     style: ref.watch(settingsProvider).gridStyle,
-                    showFixation: session.status != GameStatus.preparing &&
-                        session.status != GameStatus.countdown,
+                    showFixation:
+                        ref.watch(settingsProvider).showFixationCross &&
+                            session.status != GameStatus.preparing &&
+                            session.status != GameStatus.countdown,
                   )
                 : NBackSingleCell(
                     highlight: session.stimulusVisible && isRunning,

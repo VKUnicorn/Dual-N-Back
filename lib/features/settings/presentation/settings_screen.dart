@@ -58,23 +58,37 @@ class SettingsScreen extends ConsumerWidget {
           ),
           _Section(
             title: l.settingsSectionGridStyle,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              child: SegmentedButton<GridStyle>(
-                segments: [
-                  ButtonSegment(
-                    value: GridStyle.classic,
-                    label: Text(l.settingsGridStyleClassic),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  child: SegmentedButton<GridStyle>(
+                    expandedInsets: EdgeInsets.zero,
+                    segments: [
+                      ButtonSegment(
+                        value: GridStyle.classic,
+                        label: Text(l.settingsGridStyleClassic),
+                      ),
+                      ButtonSegment(
+                        value: GridStyle.tile,
+                        label: Text(l.settingsGridStyleTile),
+                      ),
+                    ],
+                    selected: {settings.gridStyle},
+                    onSelectionChanged: (next) =>
+                        unawaited(notifier.updateGridStyle(next.first)),
                   ),
-                  ButtonSegment(
-                    value: GridStyle.tile,
-                    label: Text(l.settingsGridStyleTile),
+                ),
+                SwitchListTile(
+                  title: Text(l.settingsShowFixationCross),
+                  value: settings.showFixationCross,
+                  onChanged: (v) => unawaited(
+                    notifier.updateShowFixationCross(enabled: v),
                   ),
-                ],
-                selected: {settings.gridStyle},
-                onSelectionChanged: (next) =>
-                    unawaited(notifier.updateGridStyle(next.first)),
-              ),
+                ),
+              ],
             ),
           ),
           _Section(

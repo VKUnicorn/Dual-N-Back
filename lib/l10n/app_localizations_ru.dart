@@ -249,6 +249,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsGridStyleClassic => 'Классический';
 
   @override
+  String get settingsShowFixationCross => 'Показывать крест фиксации в центре';
+
+  @override
   String get settingsSectionSound => 'Звук';
 
   @override

@@ -76,6 +76,7 @@
   "settingsSectionGridStyle": "Стили сетки",
   "settingsGridStyleTile": "Плитка",
   "settingsGridStyleClassic": "Классический",
+  "settingsShowFixationCross": "Показывать крест фиксации в центре",
   "settingsSectionSound": "Звук",
   "settingsVolume": "Громкость",
   "settingsVoice": "Голос",

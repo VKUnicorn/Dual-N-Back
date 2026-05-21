@@ -109,6 +109,11 @@ class SettingsNotifier extends Notifier<SettingsModel> {
     await _repo.save(state);
   }
 
+  Future<void> updateShowFixationCross({required bool enabled}) async {
+    state = state.copyWith(showFixationCross: enabled);
+    await _repo.save(state);
+  }
+
   Future<void> updateDailyGoalSessions(int sessions) async {
     final clamped = sessions.clamp(
       SettingsModel.minDailyGoalSessions,

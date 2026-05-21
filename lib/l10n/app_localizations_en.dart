@@ -248,6 +248,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsGridStyleClassic => 'Classic';
 
   @override
+  String get settingsShowFixationCross => 'Show fixation cross in the center';
+
+  @override
   String get settingsSectionSound => 'Sound';
 
   @override
