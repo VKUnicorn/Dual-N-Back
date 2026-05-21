@@ -222,7 +222,7 @@
   "achUntouchableTitle": "Неприкасаемый",
   "achUntouchableDesc": "Идеальная сессия (без ошибок) при N≥5",
   "achDprimeMasterTitle": "Мастер d′",
-  "achDprimeMasterDesc": "Достигни d′ > 3.0 за сессию",
+  "achDprimeMasterDesc": "Достигни d′ > 3.0 за сессию при N≥4",
 
   "achAwakenedNeuronTitle": "Пробуждённый нейрон",
   "achAwakenedNeuronDesc": "Заверши свою первую сессию",
@@ -232,6 +232,8 @@
   "achPillarSilverDesc": "Заверши 250 сессий",
   "achPillarGoldTitle": "Опора (золото)",
   "achPillarGoldDesc": "Заверши 500 сессий",
+  "achFirstDayTitle": "Первый день",
+  "achFirstDayDesc": "Достигни дневной цели",
   "achNascentRitualTitle": "Зарождающийся ритуал",
   "achNascentRitualDesc": "Достигай дневной цели 3 дня подряд",
   "achDailyRitualTitle": "Ежедневный ритуал",
@@ -251,13 +253,13 @@
   "achPersistentDesc": "Сыграй ещё 3 сессии в тот же день после неудачной",
 
   "achAudiophileTitle": "Аудиофил",
-  "achAudiophileDesc": "Звук >80%, но позиция <70% в одной сессии",
+  "achAudiophileDesc": "Звук >80%, но позиция <70% в одной сессии при N≥4",
   "achEagleEyeTitle": "Орлиный глаз",
-  "achEagleEyeDesc": "Позиция >80%, но звук <70% в одной сессии",
+  "achEagleEyeDesc": "Позиция >80%, но звук <70% в одной сессии при N≥4",
   "achSynchronizedTitle": "Синхронизация",
-  "achSynchronizedDesc": "Позиция и звук в пределах 5% (общая ≥60%)",
+  "achSynchronizedDesc": "Позиция и звук в пределах 5% при N≥4 (общая ≥60%)",
   "achDualMasterTitle": "Дуал-мастер",
-  "achDualMasterDesc": "Позиция и звук >85% в одной сессии (общая ≥60%)",
+  "achDualMasterDesc": "Позиция и звук >85% в одной сессии при N≥4 (общая ≥60%)",
   "achDualEliteTitle": "Дуал-элита",
-  "achDualEliteDesc": "Позиция и звук >90% в одной сессии (общая ≥60%)"
+  "achDualEliteDesc": "Позиция и звук >90% в одной сессии при N≥4 (общая ≥60%)"
 }

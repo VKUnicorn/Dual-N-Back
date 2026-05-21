@@ -323,7 +323,7 @@ List<Achievement> buildAchievementsCatalog() => [
         localizedTitle: (l) => l.achDprimeMasterTitle,
         localizedDescription: (l) => l.achDprimeMasterDesc,
         evaluate: (ctx) => AchievementProgress.binary(
-          earned: ctx.sessions.any((s) => s.maxDPrime > 3.0),
+          earned: ctx.sessions.any((s) => s.n >= 4 && s.maxDPrime > 3.0),
         ),
       ),
 
@@ -372,6 +372,19 @@ List<Achievement> buildAchievementsCatalog() => [
         evaluate: (ctx) => AchievementProgress.tracked(
           current: ctx.sessions.length,
           target: 500,
+        ),
+      ),
+      Achievement(
+        id: 'first_day',
+        group: AchievementGroup.consistency,
+        icon: Icons.stars_rounded,
+        tracksProgress: false,
+        localizedTitle: (l) => l.achFirstDayTitle,
+        localizedDescription: (l) => l.achFirstDayDesc,
+        evaluate: (ctx) => AchievementProgress.binary(
+          earned: AchievementHelpers.bestStreakEver(
+                ctx.sessions, ctx.dailyGoal, ctx.restDays,) >=
+              1,
         ),
       ),
       Achievement(
@@ -500,6 +513,7 @@ List<Achievement> buildAchievementsCatalog() => [
         localizedDescription: (l) => l.achAudiophileDesc,
         evaluate: (ctx) => AchievementProgress.binary(
           earned: ctx.sessions.any((s) {
+            if (s.n < 4) return false;
             final pos = s.perChannel[ChannelType.position];
             final aud = s.perChannel[ChannelType.audio];
             if (pos == null || aud == null) return false;
@@ -516,6 +530,7 @@ List<Achievement> buildAchievementsCatalog() => [
         localizedDescription: (l) => l.achEagleEyeDesc,
         evaluate: (ctx) => AchievementProgress.binary(
           earned: ctx.sessions.any((s) {
+            if (s.n < 4) return false;
             final pos = s.perChannel[ChannelType.position];
             final aud = s.perChannel[ChannelType.audio];
             if (pos == null || aud == null) return false;
@@ -532,6 +547,7 @@ List<Achievement> buildAchievementsCatalog() => [
         localizedDescription: (l) => l.achSynchronizedDesc,
         evaluate: (ctx) => AchievementProgress.binary(
           earned: ctx.sessions.any((s) {
+            if (s.n < 4) return false;
             final pos = s.perChannel[ChannelType.position];
             final aud = s.perChannel[ChannelType.audio];
             if (pos == null || aud == null) return false;
@@ -549,6 +565,7 @@ List<Achievement> buildAchievementsCatalog() => [
         localizedDescription: (l) => l.achDualMasterDesc,
         evaluate: (ctx) => AchievementProgress.binary(
           earned: ctx.sessions.any((s) {
+            if (s.n < 4) return false;
             final pos = s.perChannel[ChannelType.position];
             final aud = s.perChannel[ChannelType.audio];
             if (pos == null || aud == null) return false;
@@ -567,6 +584,7 @@ List<Achievement> buildAchievementsCatalog() => [
         localizedDescription: (l) => l.achDualEliteDesc,
         evaluate: (ctx) => AchievementProgress.binary(
           earned: ctx.sessions.any((s) {
+            if (s.n < 4) return false;
             final pos = s.perChannel[ChannelType.position];
             final aud = s.perChannel[ChannelType.audio];
             if (pos == null || aud == null) return false;

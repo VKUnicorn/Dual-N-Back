@@ -1361,7 +1361,7 @@ abstract class AppLocalizations {
   /// No description provided for @achDprimeMasterDesc.
   ///
   /// In en, this message translates to:
-  /// **'Reach d′ > 3.0 in a session'**
+  /// **'Reach d′ > 3.0 in a session at N≥4'**
   String get achDprimeMasterDesc;
 
   /// No description provided for @achAwakenedNeuronTitle.
@@ -1411,6 +1411,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Complete 500 sessions'**
   String get achPillarGoldDesc;
+
+  /// No description provided for @achFirstDayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'First Day'**
+  String get achFirstDayTitle;
+
+  /// No description provided for @achFirstDayDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Hit the daily goal'**
+  String get achFirstDayDesc;
 
   /// No description provided for @achNascentRitualTitle.
   ///
@@ -1517,7 +1529,7 @@ abstract class AppLocalizations {
   /// No description provided for @achAudiophileDesc.
   ///
   /// In en, this message translates to:
-  /// **'Audio >80% but Position <70% in one session'**
+  /// **'Audio >80% but Position <70% in one session at N≥4'**
   String get achAudiophileDesc;
 
   /// No description provided for @achEagleEyeTitle.
@@ -1529,7 +1541,7 @@ abstract class AppLocalizations {
   /// No description provided for @achEagleEyeDesc.
   ///
   /// In en, this message translates to:
-  /// **'Position >80% but Audio <70% in one session'**
+  /// **'Position >80% but Audio <70% in one session at N≥4'**
   String get achEagleEyeDesc;
 
   /// No description provided for @achSynchronizedTitle.
@@ -1541,7 +1553,7 @@ abstract class AppLocalizations {
   /// No description provided for @achSynchronizedDesc.
   ///
   /// In en, this message translates to:
-  /// **'Position and Audio within 5% (overall ≥60%)'**
+  /// **'Position and Audio within 5% at N≥4 (overall ≥60%)'**
   String get achSynchronizedDesc;
 
   /// No description provided for @achDualMasterTitle.
@@ -1553,7 +1565,7 @@ abstract class AppLocalizations {
   /// No description provided for @achDualMasterDesc.
   ///
   /// In en, this message translates to:
-  /// **'Position and Audio >85% in one session (overall ≥60%)'**
+  /// **'Position and Audio >85% in one session at N≥4 (overall ≥60%)'**
   String get achDualMasterDesc;
 
   /// No description provided for @achDualEliteTitle.
@@ -1565,7 +1577,7 @@ abstract class AppLocalizations {
   /// No description provided for @achDualEliteDesc.
   ///
   /// In en, this message translates to:
-  /// **'Position and Audio >90% in one session (overall ≥60%)'**
+  /// **'Position and Audio >90% in one session at N≥4 (overall ≥60%)'**
   String get achDualEliteDesc;
 }
 

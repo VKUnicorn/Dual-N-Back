@@ -731,7 +731,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get achDprimeMasterTitle => 'd′ Master';
 
   @override
-  String get achDprimeMasterDesc => 'Reach d′ > 3.0 in a session';
+  String get achDprimeMasterDesc => 'Reach d′ > 3.0 in a session at N≥4';
 
   @override
   String get achAwakenedNeuronTitle => 'Awakened Neuron';
@@ -756,6 +756,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get achPillarGoldDesc => 'Complete 500 sessions';
+
+  @override
+  String get achFirstDayTitle => 'First Day';
+
+  @override
+  String get achFirstDayDesc => 'Hit the daily goal';
 
   @override
   String get achNascentRitualTitle => 'Nascent Ritual';
@@ -811,32 +817,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get achAudiophileTitle => 'Audiophile';
 
   @override
-  String get achAudiophileDesc => 'Audio >80% but Position <70% in one session';
+  String get achAudiophileDesc =>
+      'Audio >80% but Position <70% in one session at N≥4';
 
   @override
   String get achEagleEyeTitle => 'Eagle Eye';
 
   @override
-  String get achEagleEyeDesc => 'Position >80% but Audio <70% in one session';
+  String get achEagleEyeDesc =>
+      'Position >80% but Audio <70% in one session at N≥4';
 
   @override
   String get achSynchronizedTitle => 'Synchronized';
 
   @override
   String get achSynchronizedDesc =>
-      'Position and Audio within 5% (overall ≥60%)';
+      'Position and Audio within 5% at N≥4 (overall ≥60%)';
 
   @override
   String get achDualMasterTitle => 'Dual Master';
 
   @override
   String get achDualMasterDesc =>
-      'Position and Audio >85% in one session (overall ≥60%)';
+      'Position and Audio >85% in one session at N≥4 (overall ≥60%)';
 
   @override
   String get achDualEliteTitle => 'Dual Elite';
 
   @override
   String get achDualEliteDesc =>
-      'Position and Audio >90% in one session (overall ≥60%)';
+      'Position and Audio >90% in one session at N≥4 (overall ≥60%)';
 }

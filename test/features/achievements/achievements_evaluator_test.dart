@@ -262,6 +262,7 @@ void main() {
 
     test('dprime_master requires max(channels.dPrime) > 3.0', () {
       final s = _session(
+        n: 4,
         startedAt: DateTime(2026, 5, 7, 10),
         perChannel: {
           ChannelType.position: const EvalChannelScore(
@@ -337,6 +338,7 @@ void main() {
   group('Exploration', () {
     test('audiophile requires position+audio with audio>80, position<70', () {
       final s = _session(
+        n: 4,
         startedAt: DateTime(2026, 5, 7, 10),
         activeChannels: {ChannelType.position, ChannelType.audio},
         perChannel: {
@@ -366,6 +368,7 @@ void main() {
 
     test('dual_master requires both >85 with overall>=60%', () {
       final s = _session(
+        n: 4,
         startedAt: DateTime(2026, 5, 7, 10),
         activeChannels: {ChannelType.position, ChannelType.audio},
         perChannel: {

@@ -743,7 +743,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get achDprimeMasterTitle => 'Мастер d′';
 
   @override
-  String get achDprimeMasterDesc => 'Достигни d′ > 3.0 за сессию';
+  String get achDprimeMasterDesc => 'Достигни d′ > 3.0 за сессию при N≥4';
 
   @override
   String get achAwakenedNeuronTitle => 'Пробуждённый нейрон';
@@ -768,6 +768,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get achPillarGoldDesc => 'Заверши 500 сессий';
+
+  @override
+  String get achFirstDayTitle => 'Первый день';
+
+  @override
+  String get achFirstDayDesc => 'Достигни дневной цели';
 
   @override
   String get achNascentRitualTitle => 'Зарождающийся ритуал';
@@ -823,31 +829,34 @@ class AppLocalizationsRu extends AppLocalizations {
   String get achAudiophileTitle => 'Аудиофил';
 
   @override
-  String get achAudiophileDesc => 'Звук >80%, но позиция <70% в одной сессии';
+  String get achAudiophileDesc =>
+      'Звук >80%, но позиция <70% в одной сессии при N≥4';
 
   @override
   String get achEagleEyeTitle => 'Орлиный глаз';
 
   @override
-  String get achEagleEyeDesc => 'Позиция >80%, но звук <70% в одной сессии';
+  String get achEagleEyeDesc =>
+      'Позиция >80%, но звук <70% в одной сессии при N≥4';
 
   @override
   String get achSynchronizedTitle => 'Синхронизация';
 
   @override
-  String get achSynchronizedDesc => 'Позиция и звук в пределах 5% (общая ≥60%)';
+  String get achSynchronizedDesc =>
+      'Позиция и звук в пределах 5% при N≥4 (общая ≥60%)';
 
   @override
   String get achDualMasterTitle => 'Дуал-мастер';
 
   @override
   String get achDualMasterDesc =>
-      'Позиция и звук >85% в одной сессии (общая ≥60%)';
+      'Позиция и звук >85% в одной сессии при N≥4 (общая ≥60%)';
 
   @override
   String get achDualEliteTitle => 'Дуал-элита';
 
   @override
   String get achDualEliteDesc =>
-      'Позиция и звук >90% в одной сессии (общая ≥60%)';
+      'Позиция и звук >90% в одной сессии при N≥4 (общая ≥60%)';
 }

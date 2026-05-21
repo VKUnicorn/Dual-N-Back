@@ -291,7 +291,7 @@
   "achUntouchableTitle": "Untouchable",
   "achUntouchableDesc": "Perfect session (no errors) at N≥5",
   "achDprimeMasterTitle": "d′ Master",
-  "achDprimeMasterDesc": "Reach d′ > 3.0 in a session",
+  "achDprimeMasterDesc": "Reach d′ > 3.0 in a session at N≥4",
 
   "achAwakenedNeuronTitle": "Awakened Neuron",
   "achAwakenedNeuronDesc": "Complete your first session",
@@ -301,6 +301,8 @@
   "achPillarSilverDesc": "Complete 250 sessions",
   "achPillarGoldTitle": "Pillar (Gold)",
   "achPillarGoldDesc": "Complete 500 sessions",
+  "achFirstDayTitle": "First Day",
+  "achFirstDayDesc": "Hit the daily goal",
   "achNascentRitualTitle": "Nascent Ritual",
   "achNascentRitualDesc": "Hit the daily goal 3 days in a row",
   "achDailyRitualTitle": "Daily Ritual",
@@ -320,13 +322,13 @@
   "achPersistentDesc": "Play 3 more sessions the same day after a failed one",
 
   "achAudiophileTitle": "Audiophile",
-  "achAudiophileDesc": "Audio >80% but Position <70% in one session",
+  "achAudiophileDesc": "Audio >80% but Position <70% in one session at N≥4",
   "achEagleEyeTitle": "Eagle Eye",
-  "achEagleEyeDesc": "Position >80% but Audio <70% in one session",
+  "achEagleEyeDesc": "Position >80% but Audio <70% in one session at N≥4",
   "achSynchronizedTitle": "Synchronized",
-  "achSynchronizedDesc": "Position and Audio within 5% (overall ≥60%)",
+  "achSynchronizedDesc": "Position and Audio within 5% at N≥4 (overall ≥60%)",
   "achDualMasterTitle": "Dual Master",
-  "achDualMasterDesc": "Position and Audio >85% in one session (overall ≥60%)",
+  "achDualMasterDesc": "Position and Audio >85% in one session at N≥4 (overall ≥60%)",
   "achDualEliteTitle": "Dual Elite",
-  "achDualEliteDesc": "Position and Audio >90% in one session (overall ≥60%)"
+  "achDualEliteDesc": "Position and Audio >90% in one session at N≥4 (overall ≥60%)"
 }
