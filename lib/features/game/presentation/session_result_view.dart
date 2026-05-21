@@ -14,6 +14,7 @@ import 'package:dual_n_back/features/game/domain/response_evaluator.dart';
 import 'package:dual_n_back/features/game/domain/stimulus.dart';
 import 'package:dual_n_back/features/game/presentation/game_screen.dart';
 import 'package:dual_n_back/features/settings/application/settings_notifier.dart';
+import 'package:dual_n_back/features/statistics/application/statistics_provider.dart';
 import 'package:dual_n_back/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -92,6 +93,16 @@ class _SessionResultViewState extends ConsumerState<SessionResultView> {
     final adaptiveMode = ref.watch(
       settingsProvider.select((s) => s.adaptiveMode),
     );
+    // The just-finished session is already persisted by the time this
+    // screen builds, so `sessionsTodayCountProvider` reflects it. Show
+    // the daily-goal banner on every result screen after the goal is
+    // hit (not just the threshold-crossing session) — it's a quick
+    // positive confirmation that today's quota is in the bag.
+    final dailyGoal = ref.watch(
+      settingsProvider.select((s) => s.dailyGoalSessions),
+    );
+    final sessionsToday = ref.watch(sessionsTodayCountProvider);
+    final dailyGoalReached = dailyGoal > 0 && sessionsToday >= dailyGoal;
 
     return Stack(
       children: [
@@ -116,6 +127,18 @@ class _SessionResultViewState extends ConsumerState<SessionResultView> {
                   currentN: session.n,
                   newN: newN,
                   adjustment: adjustment,
+                ),
+              ],
+              if (dailyGoalReached) ...[
+                const SizedBox(height: 16),
+                Text(
+                  l.resultDailyGoalReached,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.4,
+                  ),
                 ),
               ],
               if (session.newlyEarnedAchievements.isNotEmpty) ...[

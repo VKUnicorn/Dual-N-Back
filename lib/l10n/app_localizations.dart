@@ -1028,6 +1028,12 @@ abstract class AppLocalizations {
   /// **'Earned'**
   String get achEarnedBadge;
 
+  /// No description provided for @resultDailyGoalReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily goal reached!'**
+  String get resultDailyGoalReached;
+
   /// No description provided for @resultAchievementsUnlockedTitle.
   ///
   /// In en, this message translates to:

@@ -568,6 +568,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get achEarnedBadge => 'Получено';
 
   @override
+  String get resultDailyGoalReached => 'Дневная цель достигнута!';
+
+  @override
   String resultAchievementsUnlockedTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

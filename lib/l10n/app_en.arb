@@ -230,6 +230,7 @@
     "placeholders": {"current": {"type": "int"}, "target": {"type": "int"}}
   },
   "achEarnedBadge": "Earned",
+  "resultDailyGoalReached": "Daily goal reached!",
   "resultAchievementsUnlockedTitle": "{count, plural, one{Achievement unlocked!} other{{count} achievements unlocked!}}",
   "@resultAchievementsUnlockedTitle": {
     "placeholders": {"count": {"type": "int"}}
