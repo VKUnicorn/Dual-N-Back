@@ -155,8 +155,9 @@ class PeriodSummary {
 PeriodSummary summarize(
   StatsRange range,
   List<SavedSession> inRange,
-  int dailyGoal,
-) {
+  int dailyGoal, {
+  Set<int> restDays = const <int>{},
+}) {
   SavedSession? best;
   var bestAcc = -1.0;
   var bestN = -1;
@@ -225,15 +226,24 @@ PeriodSummary summarize(
   // raw difference is already the correct day count when the period is
   // entirely in the past. For an in-progress period we clamp to the day
   // *after* today (so today itself counts).
+  //
+  // Rest days (weekdays configured in settings) are dropped from BOTH
+  // the numerator and the denominator — matches how the streak provider
+  // treats them as transparent, so e.g. a rest-day "no play" doesn't
+  // shave the weekly rate.
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
   final tomorrow = today.add(const Duration(days: 1));
   final endExclusive = range.end.isAfter(tomorrow) ? tomorrow : range.end;
-  var totalDays = endExclusive.difference(range.start).inDays;
-  if (totalDays < 0) totalDays = 0;
+  var totalDays = 0;
   var achieved = 0;
-  for (final entry in perDay.entries) {
-    if (entry.value >= dailyGoal) achieved += 1;
+  var cursor = range.start;
+  while (cursor.isBefore(endExclusive)) {
+    if (!restDays.contains(cursor.weekday)) {
+      totalDays += 1;
+      if ((perDay[cursor] ?? 0) >= dailyGoal) achieved += 1;
+    }
+    cursor = cursor.add(const Duration(days: 1));
   }
   final perChannelAcc = <ChannelType, double>{};
   for (final entry in perChannelAccSum.entries) {

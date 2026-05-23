@@ -171,7 +171,15 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           final dailyGoal = ref.watch(
             settingsProvider.select((s) => s.dailyGoalSessions),
           );
-          final summary = summarize(range, inRange, dailyGoal);
+          final restDays = ref.watch(
+            settingsProvider.select((s) => s.restDays),
+          );
+          final summary = summarize(
+            range,
+            inRange,
+            dailyGoal,
+            restDays: restDays,
+          );
 
           return Column(
             children: [
