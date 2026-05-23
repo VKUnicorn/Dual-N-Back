@@ -225,6 +225,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsMatchProbability => 'Channel match probability';
 
   @override
+  String get settingsMatchProbabilityHint =>
+      '30% matches the original Jaeggi 2008 protocol — roughly 6 targets per channel per 20-trial block.';
+
+  @override
   String settingsPercent(int value) {
     return '$value%';
   }

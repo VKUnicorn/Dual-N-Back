@@ -90,6 +90,7 @@
   "settingsAdaptive": "Adaptive mode (Jaeggi)",
   "settingsAdaptiveSubtitle": "Increase N at ≥80% accuracy, decrease at <50%",
   "settingsMatchProbability": "Channel match probability",
+  "settingsMatchProbabilityHint": "30% matches the original Jaeggi 2008 protocol — roughly 6 targets per channel per 20-trial block.",
   "settingsPercent": "{value}%",
   "@settingsPercent": {
     "placeholders": {"value": {"type": "int"}}

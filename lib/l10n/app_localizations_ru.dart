@@ -226,6 +226,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsMatchProbability => 'Вероятность совпадения канала';
 
   @override
+  String get settingsMatchProbabilityHint =>
+      '30% соответствует оригинальному протоколу Jaeggi 2008 — около 6 совпадений на канал из 20 трайлов в сессии.';
+
+  @override
   String settingsPercent(int value) {
     return '$value%';
   }

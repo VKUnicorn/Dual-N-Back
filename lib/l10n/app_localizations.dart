@@ -476,6 +476,12 @@ abstract class AppLocalizations {
   /// **'Channel match probability'**
   String get settingsMatchProbability;
 
+  /// No description provided for @settingsMatchProbabilityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'30% matches the original Jaeggi 2008 protocol — roughly 6 targets per channel per 20-trial block.'**
+  String get settingsMatchProbabilityHint;
+
   /// No description provided for @settingsPercent.
   ///
   /// In en, this message translates to:

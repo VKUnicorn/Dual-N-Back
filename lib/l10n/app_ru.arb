@@ -69,6 +69,7 @@
   "settingsAdaptive": "Адаптивный режим (Jaeggi)",
   "settingsAdaptiveSubtitle": "Повышать N при ≥80% точности, понижать при <50%",
   "settingsMatchProbability": "Вероятность совпадения канала",
+  "settingsMatchProbabilityHint": "30% соответствует оригинальному протоколу Jaeggi 2008 — около 6 совпадений на канал из 20 трайлов в сессии.",
   "settingsPercent": "{value}%",
   "settingsTrialsPerSession": "Trial'ов в сессии",
   "settingsStimulusDuration": "Длительность стимула",

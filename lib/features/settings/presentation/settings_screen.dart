@@ -252,6 +252,13 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   onChanged: notifier.updateMatchProbability,
                 ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                  child: Text(
+                    l.settingsMatchProbabilityHint,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
                 SwitchListTile(
                   title: Text(l.settingsAdaptive),
                   subtitle: Text(l.settingsAdaptiveSubtitle),
