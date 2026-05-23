@@ -10,6 +10,7 @@ import 'package:dual_n_back/features/game/presentation/session_result_view.dart'
 import 'package:dual_n_back/features/settings/application/settings_notifier.dart';
 import 'package:dual_n_back/l10n/app_localizations.dart';
 import 'package:dual_n_back/shared/widgets/channel_selection_grid.dart';
+import 'package:dual_n_back/shared/widgets/daily_goal_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -152,6 +153,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 tooltip: l.pauseTooltip,
                 onPressed: () => _handleInterrupt(context),
               ),
+            // Mirror the home-screen daily-goal pill on the result
+            // screen so the player can see today's running total without
+            // backing out — same widget, same styling, same tooltip.
+            if (onResults) const DailyGoalBadge(),
           ],
         ),
         body: SafeArea(
