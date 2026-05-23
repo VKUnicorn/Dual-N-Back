@@ -339,6 +339,18 @@ List<Achievement> buildAchievementsCatalog() => [
             AchievementProgress.binary(earned: ctx.sessions.isNotEmpty),
       ),
       Achievement(
+        id: 'foundation',
+        group: AchievementGroup.consistency,
+        icon: Icons.stars_rounded,
+        tracksProgress: true,
+        localizedTitle: (l) => l.achFoundationTitle,
+        localizedDescription: (l) => l.achFoundationDesc,
+        evaluate: (ctx) => AchievementProgress.tracked(
+          current: ctx.sessions.length,
+          target: 50,
+        ),
+      ),
+      Achievement(
         id: 'pillar_bronze',
         group: AchievementGroup.consistency,
         icon: Icons.stars_rounded,

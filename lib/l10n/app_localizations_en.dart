@@ -837,6 +837,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get achAwakenedNeuronDesc => 'Complete your first session';
 
   @override
+  String get achFoundationTitle => 'Foundation';
+
+  @override
+  String get achFoundationDesc => 'Complete 50 sessions';
+
+  @override
   String get achPillarBronzeTitle => 'Pillar (Bronze)';
 
   @override

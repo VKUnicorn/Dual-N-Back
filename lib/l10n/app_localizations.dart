@@ -1496,6 +1496,18 @@ abstract class AppLocalizations {
   /// **'Complete your first session'**
   String get achAwakenedNeuronDesc;
 
+  /// No description provided for @achFoundationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Foundation'**
+  String get achFoundationTitle;
+
+  /// No description provided for @achFoundationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 50 sessions'**
+  String get achFoundationDesc;
+
   /// No description provided for @achPillarBronzeTitle.
   ///
   /// In en, this message translates to:

@@ -339,6 +339,8 @@
 
   "achAwakenedNeuronTitle": "Awakened Neuron",
   "achAwakenedNeuronDesc": "Complete your first session",
+  "achFoundationTitle": "Foundation",
+  "achFoundationDesc": "Complete 50 sessions",
   "achPillarBronzeTitle": "Pillar (Bronze)",
   "achPillarBronzeDesc": "Complete 100 sessions",
   "achPillarSilverTitle": "Pillar (Silver)",

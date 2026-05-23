@@ -855,6 +855,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get achAwakenedNeuronDesc => 'Заверши свою первую сессию';
 
   @override
+  String get achFoundationTitle => 'Фундамент';
+
+  @override
+  String get achFoundationDesc => 'Заверши 50 сессий';
+
+  @override
   String get achPillarBronzeTitle => 'Опора (бронза)';
 
   @override

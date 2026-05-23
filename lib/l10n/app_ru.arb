@@ -246,6 +246,8 @@
 
   "achAwakenedNeuronTitle": "Пробуждённый нейрон",
   "achAwakenedNeuronDesc": "Заверши свою первую сессию",
+  "achFoundationTitle": "Фундамент",
+  "achFoundationDesc": "Заверши 50 сессий",
   "achPillarBronzeTitle": "Опора (бронза)",
   "achPillarBronzeDesc": "Заверши 100 сессий",
   "achPillarSilverTitle": "Опора (серебро)",
