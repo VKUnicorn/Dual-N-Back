@@ -12,6 +12,7 @@ import 'package:dual_n_back/features/settings/application/settings_notifier.dart
 import 'package:dual_n_back/l10n/app_localizations.dart';
 import 'package:dual_n_back/shared/widgets/channel_selection_grid.dart';
 import 'package:dual_n_back/shared/widgets/daily_goal_badge.dart';
+import 'package:dual_n_back/shared/widgets/estimated_duration_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -271,6 +272,16 @@ class _StartViewState extends ConsumerState<_StartView> {
             divisions: settings.maxN - settings.minN,
             label: 'N = $n',
             onChanged: (v) => setState(() => _n = v.round()),
+          ),
+          // Reacts to the N slider above — N changes the warm-up count
+          // and therefore the projected wall-clock duration of the
+          // upcoming session. The outer column already has 24 px
+          // padding; pass `EdgeInsets.zero` so the tile aligns with
+          // the label / slider above instead of double-indenting.
+          EstimatedDurationTile(
+            ms: (n + settings.trialsPerSession) *
+                (settings.stimulusDurationMs + settings.isiMs),
+            padding: const EdgeInsets.symmetric(vertical: 12),
           ),
           const SizedBox(height: 24),
           // System-volume warning, shown only when the audio channel is

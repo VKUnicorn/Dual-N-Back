@@ -102,6 +102,15 @@
   "@settingsMs": {
     "placeholders": {"ms": {"type": "int"}}
   },
+  "settingsEstimatedDuration": "Estimated session duration",
+  "settingsSeconds": "{seconds}s",
+  "@settingsSeconds": {
+    "placeholders": {"seconds": {"type": "int"}}
+  },
+  "settingsMinutesSeconds": "{minutes}m {seconds}s",
+  "@settingsMinutesSeconds": {
+    "placeholders": {"minutes": {"type": "int"}, "seconds": {"type": "int"}}
+  },
   "settingsSectionGridStyle": "Grid style",
   "settingsGridStyleTile": "Tile",
   "settingsGridStyleClassic": "Classic",

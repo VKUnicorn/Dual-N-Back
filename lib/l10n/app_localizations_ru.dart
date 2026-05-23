@@ -248,6 +248,19 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get settingsEstimatedDuration => 'Расчётная длительность сессии';
+
+  @override
+  String settingsSeconds(int seconds) {
+    return '$seconds сек';
+  }
+
+  @override
+  String settingsMinutesSeconds(int minutes, int seconds) {
+    return '$minutes мин $seconds сек';
+  }
+
+  @override
   String get settingsSectionGridStyle => 'Стили сетки';
 
   @override

@@ -9,6 +9,7 @@ import 'package:dual_n_back/features/settings/application/settings_notifier.dart
 import 'package:dual_n_back/features/settings/domain/settings_model.dart';
 import 'package:dual_n_back/l10n/app_localizations.dart';
 import 'package:dual_n_back/shared/widgets/channel_layout_editor.dart';
+import 'package:dual_n_back/shared/widgets/estimated_duration_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -309,6 +310,14 @@ class SettingsScreen extends ConsumerWidget {
                   divisions: 18,
                   display: l.settingsMs(settings.isiMs),
                   onChanged: (v) => notifier.updateIsi(v.round()),
+                ),
+                EstimatedDurationTile(
+                  // Total trials per session = warm-up (N) + scored trials.
+                  // Each trial occupies `stimulusDurationMs + isiMs` of
+                  // wall-clock time — same pooling the statistics summary
+                  // uses (`totalTrials * (stimulusDurationMs + isiMs)`).
+                  ms: (settings.initialN + settings.trialsPerSession) *
+                      (settings.stimulusDurationMs + settings.isiMs),
                 ),
               ],
             ),

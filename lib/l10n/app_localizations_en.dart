@@ -247,6 +247,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settingsEstimatedDuration => 'Estimated session duration';
+
+  @override
+  String settingsSeconds(int seconds) {
+    return '${seconds}s';
+  }
+
+  @override
+  String settingsMinutesSeconds(int minutes, int seconds) {
+    return '${minutes}m ${seconds}s';
+  }
+
+  @override
   String get settingsSectionGridStyle => 'Grid style';
 
   @override

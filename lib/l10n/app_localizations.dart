@@ -512,6 +512,24 @@ abstract class AppLocalizations {
   /// **'{ms} ms'**
   String settingsMs(int ms);
 
+  /// No description provided for @settingsEstimatedDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated session duration'**
+  String get settingsEstimatedDuration;
+
+  /// No description provided for @settingsSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds}s'**
+  String settingsSeconds(int seconds);
+
+  /// No description provided for @settingsMinutesSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m {seconds}s'**
+  String settingsMinutesSeconds(int minutes, int seconds);
+
   /// No description provided for @settingsSectionGridStyle.
   ///
   /// In en, this message translates to:
