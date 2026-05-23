@@ -154,10 +154,11 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 tooltip: l.pauseTooltip,
                 onPressed: () => _handleInterrupt(context),
               ),
-            // Mirror the home-screen daily-goal pill on the result
-            // screen so the player can see today's running total without
-            // backing out — same widget, same styling, same tooltip.
-            if (onResults) const DailyGoalBadge(),
+            // Mirror the home-screen daily-goal pill outside of active
+            // play (start view + result screen) so the player can see
+            // today's running total without backing out. Hidden during
+            // running/paused so it doesn't compete with the in-grid HUD.
+            if (!inSession) const DailyGoalBadge(),
           ],
         ),
         body: SafeArea(
