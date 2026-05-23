@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:dual_n_back/features/statistics/application/stats_metrics.dart';
 import 'package:dual_n_back/features/statistics/domain/saved_session.dart';
 import 'package:dual_n_back/features/statistics/domain/stats_period.dart';
+import 'package:dual_n_back/features/statistics/presentation/accuracy_color.dart';
 import 'package:dual_n_back/features/statistics/presentation/chart_card.dart';
 import 'package:dual_n_back/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -367,7 +368,7 @@ class _HeatmapCardState extends State<HeatmapCard> {
     double size,
   ) {
     final acc = overallAccuracy(session.scores);
-    final accColor = _accuracyColor(theme, acc);
+    final accColor = accuracyTierColor(theme, acc);
     final accPercent = (acc * 100).round();
     final isSelected = _selectedDaySession == index;
     return GestureDetector(
@@ -412,14 +413,6 @@ class _HeatmapCardState extends State<HeatmapCard> {
   List<SavedSession> _sessionsOldestFirst() {
     return List<SavedSession>.from(widget.sessions)
       ..sort((a, b) => a.session.startedAt.compareTo(b.session.startedAt));
-  }
-
-  /// Same thresholds as the accuracy bubble in `session_tile.dart` so
-  /// the colour scheme stays consistent across the screen.
-  Color _accuracyColor(ThemeData theme, double accuracy) {
-    if (accuracy >= 0.8) return theme.colorScheme.primary;
-    if (accuracy < 0.5) return theme.colorScheme.error;
-    return theme.colorScheme.tertiary;
   }
 
   void _onTapDaySession(int index) {

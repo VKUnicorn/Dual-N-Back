@@ -4,6 +4,7 @@ import 'package:dual_n_back/features/statistics/application/statistics_provider.
 import 'package:dual_n_back/features/statistics/application/stats_metrics.dart';
 import 'package:dual_n_back/features/statistics/data/database.dart';
 import 'package:dual_n_back/features/statistics/domain/saved_session.dart';
+import 'package:dual_n_back/features/statistics/presentation/accuracy_color.dart';
 import 'package:dual_n_back/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,11 +23,7 @@ class SessionTile extends ConsumerWidget {
     final theme = Theme.of(context);
     final session = saved.session;
     final overallAcc = overallAccuracy(saved.scores);
-    final accColor = overallAcc >= 0.8
-        ? theme.colorScheme.primary
-        : (overallAcc < 0.5
-            ? theme.colorScheme.error
-            : theme.colorScheme.tertiary);
+    final accColor = accuracyTierColor(theme, overallAcc);
 
     final l = AppLocalizations.of(context);
 
