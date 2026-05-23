@@ -111,6 +111,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get gameStartHintNoChannels => 'Выбери хотя бы один канал';
 
   @override
+  String get gameSoundOffWarning => 'На телефоне выключен звук';
+
+  @override
+  String gameSoundLowWarning(int percent) {
+    return 'Тихая громкость звука: $percent%';
+  }
+
+  @override
   String get pauseTooltip => 'Пауза';
 
   @override

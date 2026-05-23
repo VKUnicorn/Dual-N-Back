@@ -111,6 +111,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gameStartHintNoChannels => 'Pick at least one channel';
 
   @override
+  String get gameSoundOffWarning => 'Phone sound is off';
+
+  @override
+  String gameSoundLowWarning(int percent) {
+    return 'Low sound volume: $percent%';
+  }
+
+  @override
   String get pauseTooltip => 'Pause';
 
   @override

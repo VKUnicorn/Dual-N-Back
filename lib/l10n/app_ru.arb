@@ -33,6 +33,8 @@
   "gameLevelLabel": "Уровень N: {n}",
   "gameStartButton": "Старт",
   "gameStartHintNoChannels": "Выбери хотя бы один канал",
+  "gameSoundOffWarning": "На телефоне выключен звук",
+  "gameSoundLowWarning": "Тихая громкость звука: {percent}%",
 
   "pauseTooltip": "Пауза",
   "pauseDialogTitle": "Пауза",

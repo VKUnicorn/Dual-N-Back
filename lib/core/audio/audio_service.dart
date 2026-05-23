@@ -181,7 +181,12 @@ class AudioPlayersAudioService implements AudioService {
           ),
           android: const AudioContextAndroid(
             contentType: AndroidContentType.sonification,
-            usageType: AndroidUsageType.assistanceSonification,
+            // `game` routes through STREAM_MUSIC so the user's media
+            // volume slider actually controls our SFX. The previous
+            // choice (`assistanceSonification`) routed to STREAM_SYSTEM,
+            // which on most Android devices ignores the media slider —
+            // setting media to 0 left the cues at full volume.
+            usageType: AndroidUsageType.game,
             audioFocus: AndroidAudioFocus.none,
           ),
         ),

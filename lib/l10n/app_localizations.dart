@@ -278,6 +278,18 @@ abstract class AppLocalizations {
   /// **'Pick at least one channel'**
   String get gameStartHintNoChannels;
 
+  /// No description provided for @gameSoundOffWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone sound is off'**
+  String get gameSoundOffWarning;
+
+  /// No description provided for @gameSoundLowWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Low sound volume: {percent}%'**
+  String gameSoundLowWarning(int percent);
+
   /// No description provided for @pauseTooltip.
   ///
   /// In en, this message translates to:

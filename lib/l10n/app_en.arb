@@ -36,6 +36,11 @@
   },
   "gameStartButton": "Start",
   "gameStartHintNoChannels": "Pick at least one channel",
+  "gameSoundOffWarning": "Phone sound is off",
+  "gameSoundLowWarning": "Low sound volume: {percent}%",
+  "@gameSoundLowWarning": {
+    "placeholders": {"percent": {"type": "int"}}
+  },
 
   "pauseTooltip": "Pause",
   "pauseDialogTitle": "Paused",

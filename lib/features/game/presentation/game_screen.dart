@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dual_n_back/core/audio/feedback_kind.dart';
+import 'package:dual_n_back/core/audio/media_volume_provider.dart';
 import 'package:dual_n_back/core/constants/feedback_colors.dart';
 import 'package:dual_n_back/features/game/application/game_notifier.dart';
 import 'package:dual_n_back/features/game/domain/game_session.dart';
@@ -271,6 +272,11 @@ class _StartViewState extends ConsumerState<_StartView> {
             onChanged: (v) => setState(() => _n = v.round()),
           ),
           const SizedBox(height: 24),
+          // System-volume warning, shown only when the audio channel is
+          // active — silent media volume would render the audio stimulus
+          // inaudible and silently sabotage the session.
+          if (active.contains(ChannelType.audio))
+            _VolumeWarning(theme: theme),
           FilledButton.icon(
             onPressed: canStart
                 ? () {
@@ -285,6 +291,43 @@ class _StartViewState extends ConsumerState<_StartView> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Threshold at and below which the start screen flags the media
+/// volume as "quiet". 0 reads as "muted" and is handled separately.
+const double _lowVolumeThreshold = 0.3;
+
+class _VolumeWarning extends ConsumerWidget {
+  const _VolumeWarning({required this.theme});
+
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final volume = ref.watch(mediaVolumeProvider).value;
+    // Silent failure → hide the warning entirely. Better to show nothing
+    // than a stale or confusing message.
+    if (volume == null) return const SizedBox.shrink();
+    String? text;
+    if (volume <= 0.0) {
+      text = l.gameSoundOffWarning;
+    } else if (volume <= _lowVolumeThreshold) {
+      text = l.gameSoundLowWarning((volume * 100).round());
+    }
+    if (text == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: theme.colorScheme.error,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
