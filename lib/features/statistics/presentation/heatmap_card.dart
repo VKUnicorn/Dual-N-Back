@@ -321,12 +321,14 @@ class _HeatmapCardState extends State<HeatmapCard> {
     }
     return LayoutBuilder(
       builder: (context, constraints) {
-        const gap = 6.0;
-        const minCellWidth = 52.0;
-        var cols = (constraints.maxWidth / (minCellWidth + gap)).floor();
-        if (cols < 1) cols = 1;
-        if (cols > ordered.length) cols = ordered.length;
-        final cellSize = (constraints.maxWidth - gap * (cols - 1)) / cols;
+        // Mirror the week / month calendar grid so day-mode tiles render
+        // at the same fixed size regardless of how many sessions the
+        // user has played — 7 columns, 4 px gap, cellSize derived from
+        // the available width identically to `_buildWeekOrMonth`.
+        const gap = 4.0;
+        const cols = 7;
+        final cellSize =
+            (constraints.maxWidth - (cols - 1) * gap) / cols;
         final rows = (ordered.length / cols).ceil();
         return Column(
           children: [
