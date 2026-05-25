@@ -80,6 +80,35 @@ class SettingsNotifier extends Notifier<SettingsModel> {
     await _repo.save(state);
   }
 
+  /// Updates the per-channel accuracy thresholds used by adaptive mode.
+  /// Both values are snapped to [SettingsModel.accuracyThresholdStep]
+  /// and clamped to `[minAccuracyThreshold, maxAccuracyThreshold]`. If
+  /// the resulting gap shrinks below
+  /// [SettingsModel.minAccuracyThresholdGap], [regress] is pushed down
+  /// to preserve `regress + minGap <= advance`.
+  Future<void> updateAdaptiveThresholds({
+    required double regress,
+    required double advance,
+  }) async {
+    const step = SettingsModel.accuracyThresholdStep;
+    const lo = SettingsModel.minAccuracyThreshold;
+    const hi = SettingsModel.maxAccuracyThreshold;
+    const minGap = SettingsModel.minAccuracyThresholdGap;
+
+    double snap(double v) => ((v.clamp(lo, hi) / step).round() * step)
+        .clamp(lo, hi);
+    final snappedAdvance = snap(advance);
+    var snappedRegress = snap(regress);
+    if (snappedAdvance - snappedRegress < minGap) {
+      snappedRegress = (snappedAdvance - minGap).clamp(lo, hi);
+    }
+    state = state.copyWith(
+      advanceThreshold: snappedAdvance,
+      regressThreshold: snappedRegress,
+    );
+    await _repo.save(state);
+  }
+
   Future<void> updateVolume(double volume) async {
     state = state.copyWith(volume: volume);
     await _repo.save(state);
@@ -226,6 +255,8 @@ class SettingsNotifier extends Notifier<SettingsModel> {
       maxN: NBackDefaults.initialMaxN,
       matchProbability: NBackDefaults.matchProbability,
       adaptiveMode: false,
+      advanceThreshold: NBackDefaults.advanceThreshold,
+      regressThreshold: NBackDefaults.regressThreshold,
     );
     await _repo.save(state);
   }

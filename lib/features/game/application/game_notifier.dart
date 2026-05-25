@@ -90,7 +90,12 @@ class GameNotifier extends Notifier<GameSession> {
         trialDuration: Duration(milliseconds: s.isiMs),
         matchProbability: s.matchProbability,
         trialsPerSession: s.trialsPerSession,
-        adaptiveN: AdaptiveN(minN: s.minN, maxN: s.maxN),
+        adaptiveN: AdaptiveN(
+          minN: s.minN,
+          maxN: s.maxN,
+          advanceThreshold: s.advanceThreshold,
+          regressThreshold: s.regressThreshold,
+        ),
       );
     } on Object {
       return const GameNotifierConfig();

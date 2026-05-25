@@ -25,6 +25,8 @@ class SettingsRepository {
   static const _kIsiMs = 'settings.isiMs';
   static const _kMatchProbability = 'settings.matchProbability';
   static const _kAdaptive = 'settings.adaptiveMode';
+  static const _kAdvanceThreshold = 'settings.advanceThreshold';
+  static const _kRegressThreshold = 'settings.regressThreshold';
   static const _kVolume = 'settings.volume';
   static const _kAudioVoice = 'settings.audioVoice';
   static const _kAudioLetters = 'settings.audioLetters';
@@ -60,6 +62,10 @@ class SettingsRepository {
       matchProbability: _prefs.getDouble(_kMatchProbability) ??
           defaults.matchProbability,
       adaptiveMode: _prefs.getBool(_kAdaptive) ?? defaults.adaptiveMode,
+      advanceThreshold: _prefs.getDouble(_kAdvanceThreshold) ??
+          defaults.advanceThreshold,
+      regressThreshold: _prefs.getDouble(_kRegressThreshold) ??
+          defaults.regressThreshold,
       volume: _prefs.getDouble(_kVolume) ?? defaults.volume,
       audioVoice: _loadAudioVoice() ?? defaults.audioVoice,
       audioLetters: _loadAudioLetters() ?? defaults.audioLetters,
@@ -108,6 +114,8 @@ class SettingsRepository {
       _prefs.setInt(_kIsiMs, model.isiMs),
       _prefs.setDouble(_kMatchProbability, model.matchProbability),
       _prefs.setBool(_kAdaptive, model.adaptiveMode),
+      _prefs.setDouble(_kAdvanceThreshold, model.advanceThreshold),
+      _prefs.setDouble(_kRegressThreshold, model.regressThreshold),
       _prefs.setDouble(_kVolume, model.volume),
       _prefs.setString(_kAudioVoice, model.audioVoice.name),
       _prefs.setStringList(_kAudioLetters, model.audioLetters),
@@ -152,6 +160,8 @@ class SettingsRepository {
       _prefs.remove(_kIsiMs),
       _prefs.remove(_kMatchProbability),
       _prefs.remove(_kAdaptive),
+      _prefs.remove(_kAdvanceThreshold),
+      _prefs.remove(_kRegressThreshold),
       _prefs.remove(_kVolume),
       _prefs.remove(_kAudioVoice),
       _prefs.remove(_kAudioLetters),

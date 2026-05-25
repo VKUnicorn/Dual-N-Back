@@ -23,6 +23,8 @@ class SettingsModel {
     required this.isiMs,
     required this.matchProbability,
     required this.adaptiveMode,
+    required this.advanceThreshold,
+    required this.regressThreshold,
     required this.volume,
     required this.audioVoice,
     required this.audioLetters,
@@ -54,6 +56,8 @@ class SettingsModel {
         isiMs: NBackDefaults.isiMs,
         matchProbability: NBackDefaults.matchProbability,
         adaptiveMode: false,
+        advanceThreshold: NBackDefaults.advanceThreshold,
+        regressThreshold: NBackDefaults.regressThreshold,
         volume: 1,
         audioVoice: AudioVoice.female,
         audioLetters: NBackDefaults.audioLetters,
@@ -90,6 +94,17 @@ class SettingsModel {
   static const int maxStimulusFadeMs = 200;
   static const int stimulusFadeStepMs = 10;
   static const int defaultStimulusFadeMs = 50;
+
+  /// Bounds for the adaptive-mode accuracy thresholds (per-channel
+  /// min-accuracy at which N moves up or down after a session). Both
+  /// thresholds are stored as fractions in `[minAccuracyThreshold,
+  /// maxAccuracyThreshold]` and snap to multiples of
+  /// [accuracyThresholdStep]. The notifier enforces
+  /// `regressThreshold + minAccuracyThresholdGap <= advanceThreshold`.
+  static const double minAccuracyThreshold = 0.10;
+  static const double maxAccuracyThreshold = 1;
+  static const double accuracyThresholdStep = 0.05;
+  static const double minAccuracyThresholdGap = 0.05;
 
   /// Default time-of-day for the "time to train" notification, expressed
   /// as minutes from midnight. 540 = 09:00 — chosen as a workable morning
@@ -152,6 +167,19 @@ class SettingsModel {
 
   /// Whether N auto-adjusts after each session (Jaeggi protocol).
   final bool adaptiveMode;
+
+  /// Per-channel min accuracy at which N goes up after a session.
+  /// Stored as a fraction in `[0, 1]`; default is
+  /// [NBackDefaults.advanceThreshold] (0.80, Jaeggi protocol). Only
+  /// consulted when [adaptiveMode] is true.
+  final double advanceThreshold;
+
+  /// Per-channel min accuracy at which N goes down after a session.
+  /// Stored as a fraction in `[0, 1]`; default is
+  /// [NBackDefaults.regressThreshold] (0.50, Jaeggi protocol). Only
+  /// consulted when [adaptiveMode] is true. Always strictly less than
+  /// [advanceThreshold] (enforced by the notifier).
+  final double regressThreshold;
 
   /// Sound volume (0.0 — silent, 1.0 — max).
   final double volume;
@@ -240,6 +268,8 @@ class SettingsModel {
     int? isiMs,
     double? matchProbability,
     bool? adaptiveMode,
+    double? advanceThreshold,
+    double? regressThreshold,
     double? volume,
     AudioVoice? audioVoice,
     List<String>? audioLetters,
@@ -269,6 +299,8 @@ class SettingsModel {
       isiMs: isiMs ?? this.isiMs,
       matchProbability: matchProbability ?? this.matchProbability,
       adaptiveMode: adaptiveMode ?? this.adaptiveMode,
+      advanceThreshold: advanceThreshold ?? this.advanceThreshold,
+      regressThreshold: regressThreshold ?? this.regressThreshold,
       volume: volume ?? this.volume,
       audioVoice: audioVoice ?? this.audioVoice,
       audioLetters: audioLetters ?? this.audioLetters,

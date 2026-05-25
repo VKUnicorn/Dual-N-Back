@@ -261,10 +261,37 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 SwitchListTile(
                   title: Text(l.settingsAdaptive),
-                  subtitle: Text(l.settingsAdaptiveSubtitle),
+                  subtitle: Text(
+                    l.settingsAdaptiveSubtitle(
+                      (settings.advanceThreshold * 100).round(),
+                      (settings.regressThreshold * 100).round(),
+                    ),
+                  ),
                   value: settings.adaptiveMode,
                   onChanged: (v) =>
                       notifier.updateAdaptiveMode(enabled: v),
+                ),
+                _RangeSliderTile(
+                  label: l.settingsAdaptiveThresholds,
+                  start: settings.regressThreshold,
+                  end: settings.advanceThreshold,
+                  min: SettingsModel.minAccuracyThreshold,
+                  max: SettingsModel.maxAccuracyThreshold,
+                  divisions: ((SettingsModel.maxAccuracyThreshold -
+                              SettingsModel.minAccuracyThreshold) /
+                          SettingsModel.accuracyThresholdStep)
+                      .round(),
+                  minGap: SettingsModel.minAccuracyThresholdGap,
+                  enabled: settings.adaptiveMode,
+                  display: l.settingsAdaptiveThresholdsValue(
+                    (settings.regressThreshold * 100).round(),
+                    (settings.advanceThreshold * 100).round(),
+                  ),
+                  onChanged: (start, end) =>
+                      notifier.updateAdaptiveThresholds(
+                    regress: start,
+                    advance: end,
+                  ),
                 ),
               ],
             ),
@@ -667,6 +694,9 @@ class _RangeSliderTile extends StatelessWidget {
     required this.max,
     required this.display,
     required this.onChanged,
+    this.divisions,
+    this.minGap = 1,
+    this.enabled = true,
   });
 
   final String label;
@@ -677,9 +707,31 @@ class _RangeSliderTile extends StatelessWidget {
   final String display;
   final void Function(double start, double end) onChanged;
 
+  /// Optional number of discrete steps on the slider. Defaults to one
+  /// step per integer unit (`(max - min).round()`), matching the
+  /// integer N-range tile. Pass an explicit value when the underlying
+  /// units are fractional (e.g. percentages stored as 0..1).
+  final int? divisions;
+
+  /// Minimum allowed distance between the two handles, in the slider's
+  /// own units. Defaults to 1 (the previous integer-N behaviour).
+  final double minGap;
+
+  /// When false, the slider is non-interactive and label/value are
+  /// rendered in a muted colour. Used to "grey out" the tile when a
+  /// related toggle (e.g. adaptive mode) is off.
+  final bool enabled;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final mutedLabel = theme.textTheme.bodyLarge?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+    );
+    final mutedValue = theme.textTheme.bodyLarge?.copyWith(
+      color: theme.colorScheme.primary.withValues(alpha: 0.5),
+      fontWeight: FontWeight.w600,
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Column(
@@ -688,13 +740,18 @@ class _RangeSliderTile extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label, style: theme.textTheme.bodyLarge),
+              Text(
+                label,
+                style: enabled ? theme.textTheme.bodyLarge : mutedLabel,
+              ),
               Text(
                 display,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: enabled
+                    ? theme.textTheme.bodyLarge?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      )
+                    : mutedValue,
               ),
             ],
           ),
@@ -705,11 +762,13 @@ class _RangeSliderTile extends StatelessWidget {
             ),
             min: min,
             max: max,
-            divisions: (max - min).round(),
-            onChanged: (range) {
-              if (range.end - range.start < 1) return;
-              onChanged(range.start, range.end);
-            },
+            divisions: divisions ?? (max - min).round(),
+            onChanged: enabled
+                ? (range) {
+                    if (range.end - range.start < minGap) return;
+                    onChanged(range.start, range.end);
+                  }
+                : null,
           ),
         ],
       ),

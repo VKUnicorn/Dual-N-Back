@@ -28,10 +28,10 @@ class NBackDefaults {
   static const double matchProbability = 0.3;
 
   /// Threshold to increase N (per-channel min accuracy).
-  static const double advanceThreshold = 0.8;
+  static const double advanceThreshold = 0.9;
 
   /// Threshold to decrease N (per-channel min accuracy).
-  static const double regressThreshold = 0.5;
+  static const double regressThreshold = 0.7;
 
   /// Audio letters used as stimuli (Jaeggi protocol).
   static const List<String> audioLetters = ['c', 'h', 'k', 'l', 'q', 'r', 'p', 't'];

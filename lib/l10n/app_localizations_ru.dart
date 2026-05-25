@@ -216,11 +216,20 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get settingsAdaptive => 'Адаптивный режим (Jaeggi)';
+  String get settingsAdaptive => 'Адаптивный режим';
 
   @override
-  String get settingsAdaptiveSubtitle =>
-      'Повышать N при ≥80% точности, понижать при <50%';
+  String settingsAdaptiveSubtitle(int advance, int regress) {
+    return 'Повышать N при ≥$advance% точности, понижать при <$regress%';
+  }
+
+  @override
+  String get settingsAdaptiveThresholds => 'Пороги точности';
+
+  @override
+  String settingsAdaptiveThresholdsValue(int regress, int advance) {
+    return '$regress% / $advance%';
+  }
 
   @override
   String get settingsMatchProbability => 'Вероятность совпадения канала';

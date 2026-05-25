@@ -215,11 +215,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get settingsAdaptive => 'Adaptive mode (Jaeggi)';
+  String get settingsAdaptive => 'Adaptive mode';
 
   @override
-  String get settingsAdaptiveSubtitle =>
-      'Increase N at ≥80% accuracy, decrease at <50%';
+  String settingsAdaptiveSubtitle(int advance, int regress) {
+    return 'Increase N at ≥$advance% accuracy, decrease at <$regress%';
+  }
+
+  @override
+  String get settingsAdaptiveThresholds => 'Accuracy thresholds';
+
+  @override
+  String settingsAdaptiveThresholdsValue(int regress, int advance) {
+    return '$regress% / $advance%';
+  }
 
   @override
   String get settingsMatchProbability => 'Channel match probability';

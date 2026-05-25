@@ -461,14 +461,26 @@ abstract class AppLocalizations {
   /// No description provided for @settingsAdaptive.
   ///
   /// In en, this message translates to:
-  /// **'Adaptive mode (Jaeggi)'**
+  /// **'Adaptive mode'**
   String get settingsAdaptive;
 
   /// No description provided for @settingsAdaptiveSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Increase N at ≥80% accuracy, decrease at <50%'**
-  String get settingsAdaptiveSubtitle;
+  /// **'Increase N at ≥{advance}% accuracy, decrease at <{regress}%'**
+  String settingsAdaptiveSubtitle(int advance, int regress);
+
+  /// No description provided for @settingsAdaptiveThresholds.
+  ///
+  /// In en, this message translates to:
+  /// **'Accuracy thresholds'**
+  String get settingsAdaptiveThresholds;
+
+  /// No description provided for @settingsAdaptiveThresholdsValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{regress}% / {advance}%'**
+  String settingsAdaptiveThresholdsValue(int regress, int advance);
 
   /// No description provided for @settingsMatchProbability.
   ///
