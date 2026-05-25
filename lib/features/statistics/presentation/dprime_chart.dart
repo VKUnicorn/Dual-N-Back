@@ -66,6 +66,7 @@ class _DprimeChartState extends State<DprimeChart> {
     final barData = LineChartBarData(
       spots: spots,
       isCurved: true,
+      curveSmoothness: kLineCurveSmoothness,
       color: theme.colorScheme.primary,
       barWidth: 3,
       dotData: FlDotData(

@@ -61,6 +61,7 @@ class _AvgAccuracyChartState extends State<AvgAccuracyChart> {
     final barData = LineChartBarData(
       spots: spots,
       isCurved: true,
+      curveSmoothness: kLineCurveSmoothness,
       color: theme.colorScheme.secondary,
       barWidth: 3,
       dotData: FlDotData(

@@ -3,6 +3,11 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+/// Curvature for every `isCurved: true` line in the statistics charts.
+/// fl_chart's default is 0.35; we use half of that for a calmer look
+/// that still smooths the polyline.
+const double kLineCurveSmoothness = 0.12;
+
 /// Tap-to-toggle tooltip behaviour shared by every line chart.
 ///
 /// fl_chart's default touch handling shows the tooltip while the finger

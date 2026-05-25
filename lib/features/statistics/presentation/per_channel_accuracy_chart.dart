@@ -89,6 +89,7 @@ class _PerChannelAccuracyChartState extends State<PerChannelAccuracyChart> {
         LineChartBarData(
           spots: perChannelSpots[ch]!,
           isCurved: true,
+          curveSmoothness: kLineCurveSmoothness,
           color: _colorFor(theme, ch),
           barWidth: 2.5,
           dotData: FlDotData(
