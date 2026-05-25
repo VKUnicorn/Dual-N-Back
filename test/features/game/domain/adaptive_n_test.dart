@@ -24,7 +24,16 @@ SessionScore _scoreWithMinAccuracy(double accuracy) {
 
 void main() {
   group('AdaptiveN', () {
-    const adaptive = AdaptiveN();
+    // Pin thresholds for the algorithm-level tests so they stay
+    // meaningful regardless of the production defaults in
+    // [NBackDefaults]. The Jaeggi 0.8/0.5 pair is the canonical
+    // reference and keeps the hand-picked accuracy fixtures below
+    // (0.4 / 0.5 / 0.65 / 0.80 / 0.85) on the same side of the rails
+    // they were originally written against.
+    const adaptive = AdaptiveN(
+      advanceThreshold: 0.8,
+      regressThreshold: 0.5,
+    );
 
     test('advances when accuracy >= 80%', () {
       final result = adaptive.next(
