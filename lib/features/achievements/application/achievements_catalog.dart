@@ -122,6 +122,20 @@ List<Achievement> buildAchievementsCatalog() => [
         ),
       ),
       Achievement(
+        id: 'steel_resolve',
+        group: AchievementGroup.milestones,
+        icon: Icons.stars_rounded,
+        tracksProgress: true,
+        localizedTitle: (l) => l.achSteelResolveTitle,
+        localizedDescription: (l) => l.achSteelResolveDesc,
+        evaluate: (ctx) => AchievementProgress.tracked(
+          current:
+              AchievementHelpers.bestStreakEver(
+                ctx.sessions, ctx.dailyGoal, ctx.restDays,),
+          target: 60,
+        ),
+      ),
+      Achievement(
         id: 'flawless_quarter',
         group: AchievementGroup.milestones,
         icon: Icons.stars_rounded,
@@ -133,6 +147,20 @@ List<Achievement> buildAchievementsCatalog() => [
               AchievementHelpers.bestStreakEver(
                 ctx.sessions, ctx.dailyGoal, ctx.restDays,),
           target: 90,
+        ),
+      ),
+      Achievement(
+        id: 'flawless_half_year',
+        group: AchievementGroup.milestones,
+        icon: Icons.stars_rounded,
+        tracksProgress: true,
+        localizedTitle: (l) => l.achFlawlessHalfYearTitle,
+        localizedDescription: (l) => l.achFlawlessHalfYearDesc,
+        evaluate: (ctx) => AchievementProgress.tracked(
+          current:
+              AchievementHelpers.bestStreakEver(
+                ctx.sessions, ctx.dailyGoal, ctx.restDays,),
+          target: 180,
         ),
       ),
       Achievement(

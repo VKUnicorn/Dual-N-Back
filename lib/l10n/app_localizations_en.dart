@@ -761,10 +761,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get achTitanDesc => 'Play 150,000 trials in total';
 
   @override
+  String get achSteelResolveTitle => 'Steel Resolve';
+
+  @override
+  String get achSteelResolveDesc => 'Hit the daily goal 60 days in a row';
+
+  @override
   String get achFlawlessQuarterTitle => 'Flawless Quarter';
 
   @override
   String get achFlawlessQuarterDesc => 'Hit the daily goal 90 days in a row';
+
+  @override
+  String get achFlawlessHalfYearTitle => 'Flawless Half-Year';
+
+  @override
+  String get achFlawlessHalfYearDesc => 'Hit the daily goal 180 days in a row';
 
   @override
   String get achPerfectYearTitle => 'Perfect Year';

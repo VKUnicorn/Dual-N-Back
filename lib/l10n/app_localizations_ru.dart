@@ -779,10 +779,22 @@ class AppLocalizationsRu extends AppLocalizations {
   String get achTitanDesc => 'Сыграй 150 000 trial\'ов в сумме';
 
   @override
+  String get achSteelResolveTitle => 'Стальная воля';
+
+  @override
+  String get achSteelResolveDesc => 'Достигай дневной цели 60 дней подряд';
+
+  @override
   String get achFlawlessQuarterTitle => 'Безупречный квартал';
 
   @override
   String get achFlawlessQuarterDesc => 'Достигай дневной цели 90 дней подряд';
+
+  @override
+  String get achFlawlessHalfYearTitle => 'Безупречное полугодие';
+
+  @override
+  String get achFlawlessHalfYearDesc => 'Достигай дневной цели 180 дней подряд';
 
   @override
   String get achPerfectYearTitle => 'Идеальный год';

@@ -1328,6 +1328,18 @@ abstract class AppLocalizations {
   /// **'Play 150,000 trials in total'**
   String get achTitanDesc;
 
+  /// No description provided for @achSteelResolveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Steel Resolve'**
+  String get achSteelResolveTitle;
+
+  /// No description provided for @achSteelResolveDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Hit the daily goal 60 days in a row'**
+  String get achSteelResolveDesc;
+
   /// No description provided for @achFlawlessQuarterTitle.
   ///
   /// In en, this message translates to:
@@ -1339,6 +1351,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hit the daily goal 90 days in a row'**
   String get achFlawlessQuarterDesc;
+
+  /// No description provided for @achFlawlessHalfYearTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Flawless Half-Year'**
+  String get achFlawlessHalfYearTitle;
+
+  /// No description provided for @achFlawlessHalfYearDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Hit the daily goal 180 days in a row'**
+  String get achFlawlessHalfYearDesc;
 
   /// No description provided for @achPerfectYearTitle.
   ///
