@@ -9,11 +9,17 @@ class SummaryCard extends StatelessWidget {
   const SummaryCard({
     required this.summary,
     required this.period,
+    this.isRestDay = false,
     super.key,
   });
 
   final PeriodSummary summary;
   final StatsPeriod period;
+
+  /// Day mode only: the displayed day is a configured rest day. When
+  /// true, the "Daily goal" tile shows the rest-day label instead of
+  /// the "{played}/{goal}" counter, mirroring the home-screen badge.
+  final bool isRestDay;
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +65,12 @@ class SummaryCard extends StatelessWidget {
         // progress. Multi-day modes keep the "X days achieved out of Y
         // (Z%)" rate aggregation.
         value: isDay
-            ? l.homeDailyProgress(summary.sessionsInPeriod, summary.dailyGoal)
+            ? (isRestDay
+                ? l.homeRestDayLabel
+                : l.homeDailyProgress(
+                    summary.sessionsInPeriod,
+                    summary.dailyGoal,
+                  ))
             : summary.totalDays == 0
                 ? l.statisticsSummaryNone
                 : l.statisticsSummaryDailyGoalValue(

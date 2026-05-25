@@ -195,7 +195,12 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                 child: ListView(
                   padding: const EdgeInsets.all(16),
                   children: [
-                    SummaryCard(summary: summary, period: _period),
+                    SummaryCard(
+                      summary: summary,
+                      period: _period,
+                      isRestDay: _period == StatsPeriod.day &&
+                          restDays.contains(range.start.weekday),
+                    ),
                     const SizedBox(height: 16),
                     HeatmapCard(
                       period: _period,
