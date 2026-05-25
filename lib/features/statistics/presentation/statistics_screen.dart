@@ -201,6 +201,12 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                       period: _period,
                       range: range,
                       sessions: inRange,
+                      onDrillDown: (period, anchor) {
+                        setState(() {
+                          _period = period;
+                          _anchor = anchor;
+                        });
+                      },
                     ),
                     // Day mode collapses every multi-bucket line chart to
                     // a single value — those values surface inside the
