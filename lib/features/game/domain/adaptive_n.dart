@@ -7,10 +7,12 @@ enum NAdjustment { advance, hold, regress }
 /// Adaptive-N rule per Jaeggi et al. (2008):
 ///
 /// - If the worst per-channel accuracy >= [advanceThreshold] → N + 1
-/// - If it falls below [regressThreshold] → max(minN, N - 1)
+/// - If it is <= [regressThreshold] → max(minN, N - 1)
 /// - Otherwise → unchanged
 ///
-/// The result is clamped to [[minN], [maxN]].
+/// Both thresholds are inclusive, so accuracy that lands exactly on
+/// either rail moves N (or holds at the clamp). The result is clamped
+/// to [[minN], [maxN]].
 class AdaptiveN {
   const AdaptiveN({
     this.advanceThreshold = NBackDefaults.advanceThreshold,
@@ -32,7 +34,7 @@ class AdaptiveN {
     if (acc >= advanceThreshold && currentN < maxN) {
       return (n: currentN + 1, adjustment: NAdjustment.advance);
     }
-    if (acc < regressThreshold && currentN > minN) {
+    if (acc <= regressThreshold && currentN > minN) {
       return (n: currentN - 1, adjustment: NAdjustment.regress);
     }
     return (n: currentN, adjustment: NAdjustment.hold);

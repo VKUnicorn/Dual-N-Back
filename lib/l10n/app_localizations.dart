@@ -161,7 +161,7 @@ abstract class AppLocalizations {
   /// No description provided for @infoSectionJaeggiBody.
   ///
   /// In en, this message translates to:
-  /// **'In 2008, researchers led by Jaeggi published a study showing that about 19 days of daily Dual N-back training improved fluid intelligence (Gf) — the ability to solve new, unfamiliar problems. N-back has been a popular \'brain trainer\' ever since.\n\nThe app\'s default settings come from that same study: 20 trials per session, each cue shown for 500 ms, 2500 ms pause between cues, matches appear about 30% of the time. If adaptive mode is on, the N level goes up when per-channel accuracy is ≥80% and down when it\'s below 50%.'**
+  /// **'In 2008, researchers led by Jaeggi published a study showing that about 19 days of daily Dual N-back training improved fluid intelligence (Gf) — the ability to solve new, unfamiliar problems. N-back has been a popular \'brain trainer\' ever since.\n\nThe app\'s default settings come from that same study: 20 trials per session, each cue shown for 500 ms, 2500 ms pause between cues, matches appear about 30% of the time. If adaptive mode is on, the N level goes up when per-channel accuracy is ≥90% and down when it\'s ≤70%.'**
   String get infoSectionJaeggiBody;
 
   /// No description provided for @infoSectionMetrics.
@@ -467,7 +467,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsAdaptiveSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Increase N at ≥{advance}% accuracy, decrease at <{regress}%'**
+  /// **'Increase N at ≥{advance}% accuracy, decrease at ≤{regress}%'**
   String settingsAdaptiveSubtitle(int advance, int regress);
 
   /// No description provided for @settingsAdaptiveThresholds.

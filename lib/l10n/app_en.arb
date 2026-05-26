@@ -11,7 +11,7 @@
   "infoSectionWhatIs": "What is N-back?",
   "infoSectionWhatIsBody": "N-back is an exercise for your working memory. Cues appear one at a time on the screen (a letter, a colour, a position in a grid, and so on), and your job is to notice whether the current cue matches the one shown N steps back. The bigger N is, the harder it is to keep the sequence in mind.\n\nYou can train one channel at a time (Single — e.g. position only), two together (Dual — the classic version, usually position + sound), or all four (Quad). Each channel is judged on its own: a match in position doesn't mean a match in sound.",
   "infoSectionJaeggi": "The Jaeggi study",
-  "infoSectionJaeggiBody": "In 2008, researchers led by Jaeggi published a study showing that about 19 days of daily Dual N-back training improved fluid intelligence (Gf) — the ability to solve new, unfamiliar problems. N-back has been a popular 'brain trainer' ever since.\n\nThe app's default settings come from that same study: 20 trials per session, each cue shown for 500 ms, 2500 ms pause between cues, matches appear about 30% of the time. If adaptive mode is on, the N level goes up when per-channel accuracy is ≥80% and down when it's below 50%.",
+  "infoSectionJaeggiBody": "In 2008, researchers led by Jaeggi published a study showing that about 19 days of daily Dual N-back training improved fluid intelligence (Gf) — the ability to solve new, unfamiliar problems. N-back has been a popular 'brain trainer' ever since.\n\nThe app's default settings come from that same study: 20 trials per session, each cue shown for 500 ms, 2500 ms pause between cues, matches appear about 30% of the time. If adaptive mode is on, the N level goes up when per-channel accuracy is ≥90% and down when it's ≤70%.",
   "infoSectionMetrics": "Score metrics",
   "infoMetricHits": "Hits — you pressed Match where there really was a match.",
   "infoMetricMisses": "Misses — there was a match, but you didn't catch it.",
@@ -88,7 +88,7 @@
     "placeholders": {"min": {"type": "int"}, "max": {"type": "int"}}
   },
   "settingsAdaptive": "Adaptive mode",
-  "settingsAdaptiveSubtitle": "Increase N at ≥{advance}% accuracy, decrease at <{regress}%",
+  "settingsAdaptiveSubtitle": "Increase N at ≥{advance}% accuracy, decrease at ≤{regress}%",
   "@settingsAdaptiveSubtitle": {
     "placeholders": {"advance": {"type": "int"}, "regress": {"type": "int"}}
   },

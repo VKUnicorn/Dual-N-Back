@@ -44,7 +44,7 @@ void main() {
       expect(result.adjustment, NAdjustment.advance);
     });
 
-    test('regresses when accuracy < 50%', () {
+    test('regresses when accuracy <= 50%', () {
       final result = adaptive.next(
         currentN: 3,
         score: _scoreWithMinAccuracy(0.4),
@@ -70,12 +70,13 @@ void main() {
       expect(result.adjustment, NAdjustment.advance);
     });
 
-    test('exactly at regress threshold holds (must be strictly below)', () {
+    test('exactly at regress threshold regresses (inclusive lower rail)', () {
       final result = adaptive.next(
         currentN: 3,
         score: _scoreWithMinAccuracy(0.50),
       );
-      expect(result.adjustment, NAdjustment.hold);
+      expect(result.n, 2);
+      expect(result.adjustment, NAdjustment.regress);
     });
 
     test('does not advance past maxN', () {
