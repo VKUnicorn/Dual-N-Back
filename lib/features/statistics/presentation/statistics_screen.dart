@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -46,6 +47,17 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   // is computed from it via [StatsPeriodMath.rangeFor].
   DateTime _anchor = DateTime.now();
 
+  /// One [ExpansibleController] + [GlobalKey] per session id, lazily
+  /// allocated on first focus. The controller lets us call `.expand()`
+  /// programmatically; the key gives us a BuildContext under the
+  /// ListView so [Scrollable.ensureVisible] knows where to scroll.
+  ///
+  /// We keep these maps alive for the lifetime of the screen — sessions
+  /// are bounded by the visible period and the maps reset on hot-reload
+  /// (when the State is recreated). No explicit eviction needed.
+  final Map<int, ExpansibleController> _expandControllers = {};
+  final Map<int, GlobalKey> _tileKeys = {};
+
   void _setPeriod(StatsPeriod p) {
     setState(() {
       _period = p;
@@ -57,6 +69,71 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   void _shift(int delta) {
     setState(() {
       _anchor = StatsPeriodMath.shift(_period, _anchor, delta);
+    });
+  }
+
+  /// Ensures every visible session has a controller + key in the maps,
+  /// so the corresponding `SessionTile` is built with both from the
+  /// very first frame. Pre-allocating avoids the alternative race —
+  /// where the controller is created lazily on tap, the SessionTile
+  /// rebuilds with a brand-new `key` (forcing element replacement),
+  /// and the controller hasn't been attached to its `ExpansibleState`
+  /// by the time the post-frame callback fires.
+  void _ensureSessionHandles(List<SavedSession> sessions) {
+    for (final s in sessions) {
+      _expandControllers.putIfAbsent(
+        s.session.id,
+        ExpansibleController.new,
+      );
+      _tileKeys.putIfAbsent(s.session.id, GlobalKey.new);
+    }
+  }
+
+  /// Animates the scrollable so the widget tagged by [key] is brought
+  /// into view at ~10% from the top. Extracted into its own method so
+  /// the BuildContext lookup happens synchronously — calling it from a
+  /// post-delay callback avoids the `use_build_context_synchronously`
+  /// lint that fires when a context-typed local crosses an await.
+  void _scrollIntoView(GlobalKey key) {
+    final ctx = key.currentContext;
+    if (ctx == null) return;
+    unawaited(
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeInOutCubic,
+        alignment: 0.1,
+      ),
+    );
+  }
+
+  /// Duration of the expand animation a [SessionTile] runs after we
+  /// call `controller.expand()` — ExpansionTile defaults to 200 ms,
+  /// we wait a bit longer to be sure layout has fully settled before
+  /// measuring the tile's render box for the scroll.
+  static const Duration _expandSettleDelay = Duration(milliseconds: 260);
+
+  /// Heatmap day-cell tap handler. Expands the matching SessionTile
+  /// and, after the expand animation has had time to settle (see
+  /// [_expandSettleDelay]), scrolls the now-grown tile into view via
+  /// its [GlobalKey]. Scrolling BEFORE the expand finishes measures
+  /// the collapsed render box and the freshly-grown content slides
+  /// off screen — the "works 1-in-20" symptom.
+  void _focusDaySession(SavedSession session) {
+    final id = session.session.id;
+    final controller = _expandControllers[id];
+    final key = _tileKeys[id];
+    if (controller == null || key == null) return;
+    try {
+      controller.expand();
+    } on Object {
+      // Controller wasn't attached yet — fall through; the scroll
+      // below still uses the collapsed tile's position, which is
+      // better than nothing.
+    }
+    Future<void>.delayed(_expandSettleDelay, () {
+      if (!mounted) return;
+      _scrollIntoView(key);
     });
   }
 
@@ -103,6 +180,11 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                     s.session.startedAt.isBefore(range.end),
               )
               .toList();
+          // Pre-allocate the per-session controller / key for every
+          // visible tile so day-mode taps can rely on both being live
+          // from the first frame the tile is built (see
+          // [_focusDaySession] for the post-frame expand + scroll).
+          _ensureSessionHandles(inRange);
 
           // Active state for nav arrows.
           final hasOlder = sessions.any(
@@ -192,9 +274,17 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
               ),
               const Divider(height: 1),
               Expanded(
-                child: ListView(
+                // SingleChildScrollView (not ListView) so every
+                // [SessionTile] always has a live Element + RenderObject
+                // even when scrolled off-screen — the day-mode "focus
+                // session" tap relies on the GlobalKey resolving, and
+                // ListView's SliverList virtualises off-screen elements
+                // away, leaving the key with a null currentContext.
+                child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
-                  children: [
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
                     SummaryCard(
                       summary: summary,
                       period: _period,
@@ -206,6 +296,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                       period: _period,
                       range: range,
                       sessions: inRange,
+                      onDaySessionTap: _focusDaySession,
                       onDrillDown: (period, anchor) {
                         setState(() {
                           _period = period;
@@ -292,13 +383,19 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                             ),
                             isFirst: i == 0,
                           ),
-                        SessionTile(saved: inRange[i]),
+                        SessionTile(
+                          key: _tileKeys[inRange[i].session.id],
+                          saved: inRange[i],
+                          controller:
+                              _expandControllers[inRange[i].session.id],
+                        ),
                       ],
                     const SizedBox(height: 24),
                     // Debug button hidden — keep the import and widget so
                     // it can be re-enabled by uncommenting this line.
                     // const DebugFillButton(),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],

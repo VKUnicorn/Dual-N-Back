@@ -11,10 +11,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 /// Expandable per-session card in the sessions list.
+///
+/// [controller] lets the surrounding screen programmatically expand the
+/// tile when the user taps the matching cell in the day-mode heatmap.
+/// The same controller can be re-attached across rebuilds and is stable
+/// across them, so it's safe to keep one per session id at the screen
+/// level and pass it in.
 class SessionTile extends ConsumerWidget {
-  const SessionTile({required this.saved, super.key});
+  const SessionTile({
+    required this.saved,
+    this.controller,
+    super.key,
+  });
 
   final SavedSession saved;
+  final ExpansibleController? controller;
 
   static final _dateFmt = DateFormat('dd.MM.yyyy HH:mm');
 
@@ -30,6 +41,7 @@ class SessionTile extends ConsumerWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ExpansionTile(
+        controller: controller,
         // Material 3's default ExpansionTile draws hairline dividers above
         // and below the children. Override with empty borders so the tile
         // expands cleanly inside the Card.

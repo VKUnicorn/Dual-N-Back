@@ -20,6 +20,7 @@ class HeatmapCard extends StatefulWidget {
     required this.range,
     required this.sessions,
     this.onDrillDown,
+    this.onDaySessionTap,
     super.key,
   });
 
@@ -28,30 +29,21 @@ class HeatmapCard extends StatefulWidget {
   final List<SavedSession> sessions;
 
   /// Called when the user taps a cell in week / month / year mode to
-  /// drill down into a smaller period. Day mode handles its own
-  /// selection state and never invokes this. The callback receives the
-  /// target period and an anchor moment inside that period.
+  /// drill down into a smaller period. Day mode never invokes this
+  /// (see [onDaySessionTap]). The callback receives the target period
+  /// and an anchor moment inside that period.
   final void Function(StatsPeriod period, DateTime anchor)? onDrillDown;
+
+  /// Day-mode tap target: tapping a per-session tile in day view fires
+  /// this with the tapped session. The screen-level handler scrolls
+  /// the corresponding session tile into view and expands it.
+  final void Function(SavedSession session)? onDaySessionTap;
 
   @override
   State<HeatmapCard> createState() => _HeatmapCardState();
 }
 
 class _HeatmapCardState extends State<HeatmapCard> {
-  // For day-mode selection: the index of the highlighted session within
-  // `widget.sessions` (oldest-first list built in `_buildDay`). Only
-  // day mode has selectable state — week / month / year cells now
-  // drill down into a smaller period on tap instead of toggling a
-  // selection.
-  int? _selectedDaySession;
-
-  @override
-  void didUpdateWidget(HeatmapCard old) {
-    super.didUpdateWidget(old);
-    if (old.period != widget.period || old.range.start != widget.range.start) {
-      _selectedDaySession = null;
-    }
-  }
 
   Color _cellColor(ThemeData theme, int count, int maxCount) {
     if (count == 0 || maxCount == 0) {
@@ -69,8 +61,9 @@ class _HeatmapCardState extends State<HeatmapCard> {
 
   /// Drill-down target for a tap on a week / month / year cell. Week
   /// cells drop to day, month cells drop to week, year cells drop to
-  /// month. Day mode never reaches here (it uses [_onTapDaySession]
-  /// for its own per-session selection).
+  /// month. Day mode never reaches here — its cells fire
+  /// `widget.onDaySessionTap` instead, which the screen turns into a
+  /// scroll + expand of the matching session tile.
   void _drillDown(DateTime anchor) {
     final cb = widget.onDrillDown;
     if (cb == null) return;
@@ -108,41 +101,10 @@ class _HeatmapCardState extends State<HeatmapCard> {
       StatsPeriod.year => _buildYear(theme, byDay, maxCount),
     };
 
-    // Day-mode tap-to-inspect subtitle: "HH:mm: N{n} · {acc}%". Week /
-    // month / year no longer have a subtitle (their cells now drill
-    // down on tap instead of toggling a textual readout).
-    String? daySubtitle;
-    if (widget.period == StatsPeriod.day && _selectedDaySession != null) {
-      final ordered = _sessionsOldestFirst();
-      if (_selectedDaySession! < ordered.length) {
-        final s = ordered[_selectedDaySession!];
-        final locale = Localizations.localeOf(context).toString();
-        final time = DateFormat.Hm(locale).format(s.session.startedAt);
-        final acc = (overallAccuracy(s.scores) * 100).round();
-        daySubtitle = '$time: N${s.session.n} · $acc%';
-      }
-    }
-
     return ChartCard(
       title: '${l.statisticsChartHeatmap}: '
           '${l.statisticsSessionPlural(widget.sessions.length)}',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          body,
-          if (widget.period == StatsPeriod.day) ...[
-            const SizedBox(height: 10),
-            // Stays mounted (with a non-breaking space) so the card
-            // height doesn't jump when the user toggles a tile on/off.
-            Text(
-              daySubtitle ?? '\u00a0',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ],
-      ),
+      child: body,
     );
   }
 
@@ -341,7 +303,6 @@ class _HeatmapCardState extends State<HeatmapCard> {
                       _buildDayCell(
                         theme,
                         ordered[r * cols + c],
-                        r * cols + c,
                         cellSize,
                       )
                     else
@@ -362,24 +323,19 @@ class _HeatmapCardState extends State<HeatmapCard> {
   Widget _buildDayCell(
     ThemeData theme,
     SavedSession session,
-    int index,
     double size,
   ) {
     final acc = overallAccuracy(session.scores);
     final accColor = accuracyTierColor(theme, acc);
     final accPercent = (acc * 100).round();
-    final isSelected = _selectedDaySession == index;
     return GestureDetector(
-      onTap: () => _onTapDaySession(index),
+      onTap: () => widget.onDaySessionTap?.call(session),
       child: Container(
         width: size,
         height: size,
         decoration: BoxDecoration(
           color: accColor.withValues(alpha: 0.18),
           borderRadius: BorderRadius.circular(8),
-          border: isSelected
-              ? Border.all(color: theme.colorScheme.onSurface, width: 2)
-              : null,
         ),
         alignment: Alignment.center,
         child: Column(
@@ -411,12 +367,6 @@ class _HeatmapCardState extends State<HeatmapCard> {
   List<SavedSession> _sessionsOldestFirst() {
     return List<SavedSession>.from(widget.sessions)
       ..sort((a, b) => a.session.startedAt.compareTo(b.session.startedAt));
-  }
-
-  void _onTapDaySession(int index) {
-    setState(() {
-      _selectedDaySession = _selectedDaySession == index ? null : index;
-    });
   }
 
   /// Year heatmap collapsed to 12 month cells (4 cols × 3 rows). Each
