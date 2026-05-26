@@ -73,6 +73,7 @@
   "statFalseAlarms": "false +",
   "statCorrectRejections": "correct -",
   "statDPrime": "d'",
+  "statEngaged": "engaged",
 
   "settingsTitle": "Settings",
   "settingsResetTooltip": "Reset",
@@ -272,6 +273,13 @@
   "@statisticsSessionPlural": {
     "placeholders": {"count": {"type": "int"}}
   },
+  "statisticsSessionOverallLabel": "Overall accuracy",
+  "statisticsSessionOverallValue": "{hits}/{engaged} = {percent}%",
+  "@statisticsSessionOverallValue": {
+    "placeholders": {"hits": {"type": "int"}, "engaged": {"type": "int"}, "percent": {"type": "int"}}
+  },
+  "statisticsSessionOverallFormulaHint": "= sum of hits across channels / sum of engaged across channels (engaged = hits + misses + false alarms; correct rejections excluded)",
+  "statisticsSessionAdaptiveChangeLabel": "Adaptive N:",
   "statisticsSessionDeleteTooltip": "Delete session",
   "statisticsSessionDeleteTitle": "Delete this session?",
   "statisticsSessionDeleteContent": "This action can't be undone.",

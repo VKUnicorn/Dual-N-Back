@@ -398,6 +398,12 @@ abstract class AppLocalizations {
   /// **'d\''**
   String get statDPrime;
 
+  /// No description provided for @statEngaged.
+  ///
+  /// In en, this message translates to:
+  /// **'engaged'**
+  String get statEngaged;
+
   /// No description provided for @settingsTitle.
   ///
   /// In en, this message translates to:
@@ -1109,6 +1115,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =0{0 sessions} one{{count} session} other{{count} sessions}}'**
   String statisticsSessionPlural(int count);
+
+  /// No description provided for @statisticsSessionOverallLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall accuracy'**
+  String get statisticsSessionOverallLabel;
+
+  /// No description provided for @statisticsSessionOverallValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{hits}/{engaged} = {percent}%'**
+  String statisticsSessionOverallValue(int hits, int engaged, int percent);
+
+  /// No description provided for @statisticsSessionOverallFormulaHint.
+  ///
+  /// In en, this message translates to:
+  /// **'= sum of hits across channels / sum of engaged across channels (engaged = hits + misses + false alarms; correct rejections excluded)'**
+  String get statisticsSessionOverallFormulaHint;
+
+  /// No description provided for @statisticsSessionAdaptiveChangeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Adaptive N:'**
+  String get statisticsSessionAdaptiveChangeLabel;
 
   /// No description provided for @statisticsSessionDeleteTooltip.
   ///

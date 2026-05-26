@@ -96,22 +96,19 @@ class SessionTile extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 for (final score in saved.scores)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(_channelDisplay(context, score.channel)),
-                        Text(
-                          '${(score.accuracy * 100).toStringAsFixed(0)}% '
-                          "·  d'=${score.dPrime.toStringAsFixed(2)}",
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
-                      ],
-                    ),
+                  _ChannelBreakdown(
+                    label: _channelDisplay(context, score.channel),
+                    score: score,
                   ),
+                const Divider(height: 24),
+                _OverallRow(
+                  scores: saved.scores,
+                  overallAccuracy: overallAcc,
+                ),
+                if (session.newN != session.n) ...[
+                  const SizedBox(height: 8),
+                  _AdaptiveChangeRow(from: session.n, to: session.newN),
+                ],
                 Align(
                   alignment: Alignment.centerRight,
                   child: IconButton(
@@ -169,5 +166,170 @@ class SessionTile extends ConsumerWidget {
   int _scoredTrials(Session session) {
     final scored = session.totalTrials - session.n;
     return scored < 0 ? 0 : scored;
+  }
+}
+
+/// Per-channel breakdown row shown inside an expanded session tile.
+/// Displays the channel name, headline accuracy + d′, and the raw signal-
+/// detection counters (hits / misses / false alarms / correct rejections).
+/// The raw counters are the debug-grade information that lets the user
+/// reproduce `overallAccuracy = sum(hits) / sum(hits + misses + fa)` by
+/// hand and verify what the adaptive rule was looking at.
+class _ChannelBreakdown extends StatelessWidget {
+  const _ChannelBreakdown({required this.label, required this.score});
+
+  final String label;
+  final ChannelScore score;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
+    final scheme = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(label, style: theme.textTheme.bodyMedium),
+              // Per-channel headline now includes the raw `hits / engaged`
+              // fraction (engaged = hits + misses + false alarms) — these
+              // are the exact numbers the overall row sums up. With them
+              // visible per channel, the user can see e.g. "5/8" + "4/7"
+              // → 9/15 on the overall row and not wonder where the digits
+              // came from.
+              Text(
+                '${score.hits}/${score.hits + score.misses + score.falseAlarms}'
+                ' = ${(score.accuracy * 100).toStringAsFixed(0)}% '
+                "·  d'=${score.dPrime.toStringAsFixed(2)}",
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: scheme.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Wrap(
+            spacing: 12,
+            runSpacing: 2,
+            children: [
+              _counter(theme, l.statHits, score.hits),
+              _counter(theme, l.statMisses, score.misses),
+              _counter(theme, l.statFalseAlarms, score.falseAlarms),
+              _counter(theme, l.statCorrectRejections, score.correctRejections),
+              _counter(
+                theme,
+                l.statEngaged,
+                score.hits + score.misses + score.falseAlarms,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _counter(ThemeData theme, String label, int value) => Text(
+        '$label: $value',
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+      );
+}
+
+/// Pooled-accuracy summary row at the bottom of an expanded tile.
+/// Shows the raw fraction `hits / engaged` so the user can verify the
+/// rounded percentage against the threshold the adaptive rule used.
+class _OverallRow extends StatelessWidget {
+  const _OverallRow({required this.scores, required this.overallAccuracy});
+
+  final List<ChannelScore> scores;
+  final double overallAccuracy;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
+    final totalHits = scores.fold<int>(0, (a, s) => a + s.hits);
+    final totalEngaged = scores.fold<int>(
+      0,
+      (a, s) => a + s.hits + s.misses + s.falseAlarms,
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              l.statisticsSessionOverallLabel,
+              style: theme.textTheme.bodyMedium,
+            ),
+            Text(
+              l.statisticsSessionOverallValue(
+                totalHits,
+                totalEngaged,
+                (overallAccuracy * 100).round(),
+              ),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          l.statisticsSessionOverallFormulaHint,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// "N before → N after" line, only rendered when adaptive mode actually
+/// moved the level. Hold sessions (where `newN == n`) intentionally
+/// render nothing — they include both adaptive-mode holds and any
+/// session played with adaptive mode off, and we can't distinguish the
+/// two from persisted state.
+class _AdaptiveChangeRow extends StatelessWidget {
+  const _AdaptiveChangeRow({required this.from, required this.to});
+
+  final int from;
+  final int to;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final l = AppLocalizations.of(context);
+    final advanced = to > from;
+    final color = advanced ? scheme.primary : scheme.error;
+    final icon = advanced ? Icons.trending_up : Icons.trending_down;
+    final numberStyle = theme.textTheme.bodyMedium?.copyWith(
+      color: color,
+      fontWeight: FontWeight.w600,
+    );
+    return Row(
+      children: [
+        Text(
+          l.statisticsSessionAdaptiveChangeLabel,
+          style: theme.textTheme.bodyMedium,
+        ),
+        const SizedBox(width: 6),
+        Text('$from', style: numberStyle),
+        const SizedBox(width: 6),
+        Icon(icon, size: 18, color: color),
+        const SizedBox(width: 6),
+        Text('$to', style: numberStyle),
+      ],
+    );
   }
 }

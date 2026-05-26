@@ -55,6 +55,7 @@
   "statFalseAlarms": "false +",
   "statCorrectRejections": "correct -",
   "statDPrime": "d'",
+  "statEngaged": "engaged",
 
   "settingsTitle": "Настройки",
   "settingsResetTooltip": "Сбросить",
@@ -176,6 +177,10 @@
   "statisticsSummaryMinutes": "{minutes} мин",
   "statisticsSummaryNone": "—",
   "statisticsSessionPlural": "{count, plural, =0{0 сессий} one{{count} сессия} few{{count} сессии} many{{count} сессий} other{{count} сессии}}",
+  "statisticsSessionOverallLabel": "Общая точность",
+  "statisticsSessionOverallValue": "{hits}/{engaged} = {percent}%",
+  "statisticsSessionOverallFormulaHint": "= сумма hits по всем каналам / сумма engaged по всем каналам (engaged = hits + misses + false +; correct − не учитывается)",
+  "statisticsSessionAdaptiveChangeLabel": "Адаптация N:",
   "statisticsSessionDeleteTooltip": "Удалить сессию",
   "statisticsSessionDeleteTitle": "Удалить эту сессию?",
   "statisticsSessionDeleteContent": "Это действие нельзя отменить.",

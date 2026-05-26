@@ -181,6 +181,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get statDPrime => 'd\'';
 
   @override
+  String get statEngaged => 'engaged';
+
+  @override
   String get settingsTitle => 'Настройки';
 
   @override
@@ -655,6 +658,21 @@ class AppLocalizationsRu extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get statisticsSessionOverallLabel => 'Общая точность';
+
+  @override
+  String statisticsSessionOverallValue(int hits, int engaged, int percent) {
+    return '$hits/$engaged = $percent%';
+  }
+
+  @override
+  String get statisticsSessionOverallFormulaHint =>
+      '= сумма hits по всем каналам / сумма engaged по всем каналам (engaged = hits + misses + false +; correct − не учитывается)';
+
+  @override
+  String get statisticsSessionAdaptiveChangeLabel => 'Адаптация N:';
 
   @override
   String get statisticsSessionDeleteTooltip => 'Удалить сессию';
