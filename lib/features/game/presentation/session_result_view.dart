@@ -355,15 +355,10 @@ class _AdjustmentBadge extends StatelessWidget {
           ],
         );
       case NAdjustment.hold:
-        content = Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: color),
-            const SizedBox(width: 8),
-            Text(l.resultLevelHold(currentN), style: labelStyle),
-          ],
-        );
+        // Hold-case has no second N to put an arrow between, so we
+        // skip the trending_flat icon entirely — the bare label reads
+        // better than label + irrelevant horizontal-arrow glyph.
+        content = Text(l.resultLevelHold(currentN), style: labelStyle);
     }
 
     return Container(

@@ -31,6 +31,7 @@
   "gameInstructions": "Нажимай «Match» по каждому каналу, когда стимул совпадает с тем, что был N шагов назад.",
   "gameChannelsLabel": "Каналы",
   "gameLevelLabel": "Уровень N: {n}",
+  "gameInitialLevelLabel": "Начальный уровень N: {n}",
   "gameStartButton": "Старт",
   "gameStartHintNoChannels": "Выбери хотя бы один канал",
   "gameSoundOffWarning": "На телефоне выключен звук",

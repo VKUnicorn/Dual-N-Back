@@ -34,6 +34,10 @@
   "@gameLevelLabel": {
     "placeholders": {"n": {"type": "int"}}
   },
+  "gameInitialLevelLabel": "Initial level N: {n}",
+  "@gameInitialLevelLabel": {
+    "placeholders": {"n": {"type": "int"}}
+  },
   "gameStartButton": "Start",
   "gameStartHintNoChannels": "Pick at least one channel",
   "gameSoundOffWarning": "Phone sound is off",

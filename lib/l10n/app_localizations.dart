@@ -266,6 +266,12 @@ abstract class AppLocalizations {
   /// **'Level N: {n}'**
   String gameLevelLabel(int n);
 
+  /// No description provided for @gameInitialLevelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Initial level N: {n}'**
+  String gameInitialLevelLabel(int n);
+
   /// No description provided for @gameStartButton.
   ///
   /// In en, this message translates to:

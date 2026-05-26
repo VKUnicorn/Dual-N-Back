@@ -105,6 +105,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String gameInitialLevelLabel(int n) {
+    return 'Initial level N: $n';
+  }
+
+  @override
   String get gameStartButton => 'Start';
 
   @override

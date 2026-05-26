@@ -264,7 +264,12 @@ class _StartViewState extends ConsumerState<_StartView> {
             onChanged: (next) => setState(() => _active = next),
           ),
           const SizedBox(height: 24),
-          Text(l.gameLevelLabel(n), style: theme.textTheme.titleMedium),
+          Text(
+            settings.adaptiveMode
+                ? l.gameInitialLevelLabel(n)
+                : l.gameLevelLabel(n),
+            style: theme.textTheme.titleMedium,
+          ),
           Slider(
             value: n.toDouble(),
             min: settings.minN.toDouble(),
