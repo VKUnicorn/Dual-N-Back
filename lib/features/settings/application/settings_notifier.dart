@@ -75,6 +75,13 @@ class SettingsNotifier extends Notifier<SettingsModel> {
     await _repo.save(state);
   }
 
+  Future<void> updateMatchProbabilityJitter(double jitter) async {
+    state = state.copyWith(
+      matchProbabilityJitter: jitter.clamp(0.0, 1.0),
+    );
+    await _repo.save(state);
+  }
+
   Future<void> updateAdaptiveMode({required bool enabled}) async {
     state = state.copyWith(adaptiveMode: enabled);
     await _repo.save(state);
@@ -254,6 +261,7 @@ class SettingsNotifier extends Notifier<SettingsModel> {
       minN: NBackDefaults.minN,
       maxN: NBackDefaults.initialMaxN,
       matchProbability: NBackDefaults.matchProbability,
+      matchProbabilityJitter: NBackDefaults.matchProbabilityJitter,
       adaptiveMode: false,
       advanceThreshold: NBackDefaults.advanceThreshold,
       regressThreshold: NBackDefaults.regressThreshold,

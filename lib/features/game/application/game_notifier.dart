@@ -30,6 +30,7 @@ class GameNotifierConfig {
     this.countdownTickDuration = const Duration(seconds: 1),
     this.firstStimulusDelay = const Duration(milliseconds: 500),
     this.matchProbability = NBackDefaults.matchProbability,
+    this.matchProbabilityJitter = NBackDefaults.matchProbabilityJitter,
     this.trialsPerSession = NBackDefaults.trialsPerSession,
     this.adaptiveN = const AdaptiveN(),
     this.evaluator = const ResponseEvaluator(),
@@ -46,6 +47,7 @@ class GameNotifierConfig {
   /// because the user has just seen "1" vanish.
   final Duration firstStimulusDelay;
   final double matchProbability;
+  final double matchProbabilityJitter;
   final int trialsPerSession;
   final AdaptiveN adaptiveN;
   final ResponseEvaluator evaluator;
@@ -89,6 +91,7 @@ class GameNotifier extends Notifier<GameSession> {
         stimulusDuration: Duration(milliseconds: s.stimulusDurationMs),
         trialDuration: Duration(milliseconds: s.isiMs),
         matchProbability: s.matchProbability,
+        matchProbabilityJitter: s.matchProbabilityJitter,
         trialsPerSession: s.trialsPerSession,
         adaptiveN: AdaptiveN(
           minN: s.minN,
@@ -159,6 +162,7 @@ class GameNotifier extends Notifier<GameSession> {
       trialCount: trialCount,
       activeChannels: activeChannels,
       matchProbability: _config.matchProbability,
+      matchProbabilityJitter: _config.matchProbabilityJitter,
       cardinalityOverrides: _channelCardinalityOverrides(),
     );
 

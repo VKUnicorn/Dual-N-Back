@@ -232,11 +232,28 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get settingsMatchProbability => 'Вероятность совпадения канала';
+  String get settingsMatchProbability => 'Совпадение канала';
 
   @override
-  String get settingsMatchProbabilityHint =>
-      '30% соответствует оригинальному протоколу Jaeggi 2008 — около 6 совпадений на канал из 20 трайлов в сессии.';
+  String get settingsMatchProbabilityJitter => 'Добавленная случайность';
+
+  @override
+  String settingsMatchProbabilityHint(int matches, int trials) {
+    return 'Во время игровой сессии по каждому каналу будет $matches совпадений, случайно распределённых по $trials trials.';
+  }
+
+  @override
+  String settingsMatchProbabilityHintJitter(
+    int matches,
+    int jitter,
+    int trials,
+  ) {
+    return 'Во время игровой сессии по каждому каналу будет $matches±$jitter совпадений, случайно распределённых по $trials trials.';
+  }
+
+  @override
+  String get settingsMatchProbabilityHintMinMatch =>
+      'Минимум одно совпадение на канал.';
 
   @override
   String settingsPercent(int value) {

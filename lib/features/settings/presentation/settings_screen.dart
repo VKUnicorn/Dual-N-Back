@@ -5,6 +5,7 @@ import 'package:dual_n_back/core/constants/app_theme_mode.dart';
 import 'package:dual_n_back/core/constants/audio_voice.dart';
 import 'package:dual_n_back/core/constants/grid_style.dart';
 import 'package:dual_n_back/core/constants/nback_defaults.dart';
+import 'package:dual_n_back/features/game/domain/stimulus_generator.dart';
 import 'package:dual_n_back/features/settings/application/settings_notifier.dart';
 import 'package:dual_n_back/features/settings/domain/settings_model.dart';
 import 'package:dual_n_back/l10n/app_localizations.dart';
@@ -252,10 +253,21 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   onChanged: notifier.updateMatchProbability,
                 ),
+                _SliderTile(
+                  label: l.settingsMatchProbabilityJitter,
+                  value: settings.matchProbabilityJitter,
+                  min: 0,
+                  max: 1,
+                  divisions: 20,
+                  display: l.settingsPercent(
+                    (settings.matchProbabilityJitter * 100).round(),
+                  ),
+                  onChanged: notifier.updateMatchProbabilityJitter,
+                ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                   child: Text(
-                    l.settingsMatchProbabilityHint,
+                    _matchProbabilityHint(l, settings),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
@@ -500,6 +512,33 @@ class SettingsScreen extends ConsumerWidget {
           hour: picked.hour,
           minute: picked.minute,
         );
+  }
+
+  /// Builds the localized hint shown under the "match probability" /
+  /// "jitter" sliders. Uses the same per-channel `ceil` + `floor` math
+  /// that the stimulus generator applies, so the numbers the user sees
+  /// here are exactly what they get in a generated session.
+  String _matchProbabilityHint(AppLocalizations l, SettingsModel s) {
+    final trials = s.trialsPerSession;
+    // Same epsilon-protected ceil as in the stimulus generator — keeps
+    // the displayed match count in sync with what a session actually
+    // produces (20 * 0.3 must show 6 matches, not 7).
+    final base =
+        (trials * s.matchProbability - StimulusGenerator.matchCeilEpsilon)
+            .ceil()
+            .clamp(1, trials);
+    final jitter = (base * s.matchProbabilityJitter).floor();
+    if (jitter == 0) {
+      return l.settingsMatchProbabilityHint(base, trials);
+    }
+    final main = l.settingsMatchProbabilityHintJitter(base, jitter, trials);
+    // When jitter ≥ base, the lower end of the range (base - jitter) is
+    // ≤ 0 and gets clamped to 1 by the generator. Make that explicit so
+    // the user doesn't think they might get a zero-match session.
+    if (jitter >= base) {
+      return '$main ${l.settingsMatchProbabilityHintMinMatch}';
+    }
+    return main;
   }
 
   void _confirmReset(BuildContext context, SettingsNotifier notifier) {

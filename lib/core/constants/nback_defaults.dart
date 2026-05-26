@@ -24,8 +24,17 @@ class NBackDefaults {
   /// Total inter-stimulus interval (display + blank) in milliseconds.
   static const int isiMs = 2500;
 
-  /// Probability that a given trial is a match on a given channel.
+  /// Fraction of scoring trials in a session that should be a match on a
+  /// given channel. The stimulus generator turns this into a fixed integer
+  /// count via `ceil(trialsPerSession * matchProbability)` (minimum 1).
   static const double matchProbability = 0.3;
+
+  /// Fraction added to / subtracted from [matchProbability]'s integer
+  /// target per channel as random jitter, so the player can't intuitively
+  /// "feel" when all matches for the session have already happened.
+  /// Computed as `floor(targetMatches * matchProbabilityJitter)` and used
+  /// as a uniform `[-j, +j]` offset (final count is still clamped to ≥1).
+  static const double matchProbabilityJitter = 0.2;
 
   /// Threshold to increase N (per-channel min accuracy).
   static const double advanceThreshold = 0.9;

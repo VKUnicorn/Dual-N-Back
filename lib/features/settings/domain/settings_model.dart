@@ -22,6 +22,7 @@ class SettingsModel {
     required this.stimulusDurationMs,
     required this.isiMs,
     required this.matchProbability,
+    required this.matchProbabilityJitter,
     required this.adaptiveMode,
     required this.advanceThreshold,
     required this.regressThreshold,
@@ -55,6 +56,7 @@ class SettingsModel {
         stimulusDurationMs: NBackDefaults.stimulusDurationMs,
         isiMs: NBackDefaults.isiMs,
         matchProbability: NBackDefaults.matchProbability,
+        matchProbabilityJitter: NBackDefaults.matchProbabilityJitter,
         adaptiveMode: false,
         advanceThreshold: NBackDefaults.advanceThreshold,
         regressThreshold: NBackDefaults.regressThreshold,
@@ -161,9 +163,16 @@ class SettingsModel {
   /// Total inter-stimulus interval (display + blank) in milliseconds.
   final int isiMs;
 
-  /// Probability that a given trial is a match on a given channel
-  /// (clamped to [0, 1]).
+  /// Fraction of scoring trials that should be a match on a given channel.
+  /// Clamped to [0, 1]. Turned into a fixed integer match count by the
+  /// stimulus generator (rounded up, minimum 1).
   final double matchProbability;
+
+  /// Fraction of the match-count target used as random jitter when picking
+  /// the actual per-channel match count for a session. Clamped to [0, 1];
+  /// applied as `floor(targetMatches * matchProbabilityJitter)` and used
+  /// as a uniform `[-j, +j]` integer offset per channel (clamped to ≥1).
+  final double matchProbabilityJitter;
 
   /// Whether N auto-adjusts after each session (Jaeggi protocol).
   final bool adaptiveMode;
@@ -267,6 +276,7 @@ class SettingsModel {
     int? stimulusDurationMs,
     int? isiMs,
     double? matchProbability,
+    double? matchProbabilityJitter,
     bool? adaptiveMode,
     double? advanceThreshold,
     double? regressThreshold,
@@ -298,6 +308,8 @@ class SettingsModel {
       stimulusDurationMs: stimulusDurationMs ?? this.stimulusDurationMs,
       isiMs: isiMs ?? this.isiMs,
       matchProbability: matchProbability ?? this.matchProbability,
+      matchProbabilityJitter:
+          matchProbabilityJitter ?? this.matchProbabilityJitter,
       adaptiveMode: adaptiveMode ?? this.adaptiveMode,
       advanceThreshold: advanceThreshold ?? this.advanceThreshold,
       regressThreshold: regressThreshold ?? this.regressThreshold,

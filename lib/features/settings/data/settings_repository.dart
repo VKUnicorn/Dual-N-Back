@@ -24,6 +24,7 @@ class SettingsRepository {
   static const _kStimulusMs = 'settings.stimulusDurationMs';
   static const _kIsiMs = 'settings.isiMs';
   static const _kMatchProbability = 'settings.matchProbability';
+  static const _kMatchProbabilityJitter = 'settings.matchProbabilityJitter';
   static const _kAdaptive = 'settings.adaptiveMode';
   static const _kAdvanceThreshold = 'settings.advanceThreshold';
   static const _kRegressThreshold = 'settings.regressThreshold';
@@ -61,6 +62,9 @@ class SettingsRepository {
       isiMs: _prefs.getInt(_kIsiMs) ?? defaults.isiMs,
       matchProbability: _prefs.getDouble(_kMatchProbability) ??
           defaults.matchProbability,
+      matchProbabilityJitter:
+          _prefs.getDouble(_kMatchProbabilityJitter) ??
+              defaults.matchProbabilityJitter,
       adaptiveMode: _prefs.getBool(_kAdaptive) ?? defaults.adaptiveMode,
       advanceThreshold: _prefs.getDouble(_kAdvanceThreshold) ??
           defaults.advanceThreshold,
@@ -113,6 +117,10 @@ class SettingsRepository {
       _prefs.setInt(_kStimulusMs, model.stimulusDurationMs),
       _prefs.setInt(_kIsiMs, model.isiMs),
       _prefs.setDouble(_kMatchProbability, model.matchProbability),
+      _prefs.setDouble(
+        _kMatchProbabilityJitter,
+        model.matchProbabilityJitter,
+      ),
       _prefs.setBool(_kAdaptive, model.adaptiveMode),
       _prefs.setDouble(_kAdvanceThreshold, model.advanceThreshold),
       _prefs.setDouble(_kRegressThreshold, model.regressThreshold),
@@ -159,6 +167,7 @@ class SettingsRepository {
       _prefs.remove(_kStimulusMs),
       _prefs.remove(_kIsiMs),
       _prefs.remove(_kMatchProbability),
+      _prefs.remove(_kMatchProbabilityJitter),
       _prefs.remove(_kAdaptive),
       _prefs.remove(_kAdvanceThreshold),
       _prefs.remove(_kRegressThreshold),

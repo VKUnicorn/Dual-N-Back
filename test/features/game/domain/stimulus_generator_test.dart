@@ -91,24 +91,100 @@ void main() {
       }
     });
 
-    test('match probability ≈ matchProbability over many trials', () {
-      // With seeded random and many trials, observed rate should be close.
+    test('match count is exactly ceil(scoring*p) when jitter is 0', () {
+      // Count-based selection: with jitter disabled, every channel hits
+      // the exact target. 20 scoring trials * 0.3 = 6.0 -> 6 matches
+      // (NOT 7 — the generator absorbs floating-point round-trip noise
+      // so users get the integer they expect from "30% of 20").
       final gen = StimulusGenerator(random: Random(1));
       const n = 2;
-      const trialCount = 2002;
-      const probability = 0.4;
+      const trialCount = 22; // 20 scoring trials
       final trials = gen.generate(
         n: n,
         trialCount: trialCount,
-        activeChannels: {ChannelType.position},
-        matchProbability: probability,
+        activeChannels: {ChannelType.position, ChannelType.audio},
+        matchProbabilityJitter: 0,
       );
       final scoringTrials = trials.skip(n);
-      final matches = scoringTrials
+      for (final channel in [ChannelType.position, ChannelType.audio]) {
+        final matches =
+            scoringTrials.where((t) => t.isMatchOn(channel)).length;
+        expect(matches, 6, reason: 'channel $channel');
+      }
+    });
+
+    test('non-integer matchProbability rounds up to a whole match', () {
+      // 20 * 0.35 = 7.0 (after epsilon-protected ceil) but 20 * 0.36 = 7.2
+      // → ceil = 8. Both fall above the strict 6 baseline, so we use
+      // 20 * 0.31 = 6.2 → ceil = 7 as the discriminating case.
+      final gen = StimulusGenerator(random: Random(7));
+      final trials = gen.generate(
+        n: 2,
+        trialCount: 22,
+        activeChannels: {ChannelType.position},
+        matchProbability: 0.31,
+        matchProbabilityJitter: 0,
+      );
+      final matches = trials
+          .skip(2)
           .where((t) => t.isMatchOn(ChannelType.position))
           .length;
-      final rate = matches / scoringTrials.length;
-      expect(rate, closeTo(probability, 0.05));
+      expect(matches, 7);
+    });
+
+    test('jitter keeps match count within ±floor(base*jitter)', () {
+      // Default jitter = 0.2, base = ceil(20 * 0.3) = 6 → floor(6 * 0.2) = 1.
+      // Over many sessions, every per-channel count must land in [5, 7].
+      final gen = StimulusGenerator(random: Random(1));
+      const n = 2;
+      const trialCount = 22;
+      const sessions = 200;
+      final counts = <int>{};
+      for (var i = 0; i < sessions; i++) {
+        final trials = gen.generate(
+          n: n,
+          trialCount: trialCount,
+          activeChannels: {ChannelType.position},
+        );
+        final matches = trials
+            .skip(n)
+            .where((t) => t.isMatchOn(ChannelType.position))
+            .length;
+        expect(matches, inInclusiveRange(5, 7));
+        counts.add(matches);
+      }
+      // With 200 samples we expect to actually exercise the full range.
+      expect(counts.length, greaterThan(1));
+    });
+
+    test('match count is at least 1 even when math rounds to 0', () {
+      // matchProbability=0.0 + ceil would be 0, but the algorithm enforces
+      // a per-channel minimum of 1 so accuracy is never structurally 0%.
+      final gen = StimulusGenerator(random: Random(1));
+      final trials = gen.generate(
+        n: 2,
+        trialCount: 22,
+        activeChannels: {ChannelType.position},
+        matchProbability: 0,
+      );
+      final matches = trials
+          .skip(2)
+          .where((t) => t.isMatchOn(ChannelType.position))
+          .length;
+      expect(matches, 1);
+    });
+
+    test('rejects out-of-range matchProbabilityJitter', () {
+      final gen = StimulusGenerator(random: Random(0));
+      expect(
+        () => gen.generate(
+          n: 2,
+          trialCount: 10,
+          activeChannels: {ChannelType.position},
+          matchProbabilityJitter: 1.1,
+        ),
+        throwsArgumentError,
+      );
     });
 
     test('channels are independent', () {

@@ -97,8 +97,17 @@
   "@settingsAdaptiveThresholdsValue": {
     "placeholders": {"regress": {"type": "int"}, "advance": {"type": "int"}}
   },
-  "settingsMatchProbability": "Channel match probability",
-  "settingsMatchProbabilityHint": "30% matches the original Jaeggi 2008 protocol — roughly 6 targets per channel per 20-trial block.",
+  "settingsMatchProbability": "Channel matches",
+  "settingsMatchProbabilityJitter": "Added randomness",
+  "settingsMatchProbabilityHint": "Each channel in a session will have {matches} matches randomly distributed across {trials} trials.",
+  "@settingsMatchProbabilityHint": {
+    "placeholders": {"matches": {"type": "int"}, "trials": {"type": "int"}}
+  },
+  "settingsMatchProbabilityHintJitter": "Each channel in a session will have {matches}±{jitter} matches randomly distributed across {trials} trials.",
+  "@settingsMatchProbabilityHintJitter": {
+    "placeholders": {"matches": {"type": "int"}, "jitter": {"type": "int"}, "trials": {"type": "int"}}
+  },
+  "settingsMatchProbabilityHintMinMatch": "At least one match per channel.",
   "settingsPercent": "{value}%",
   "@settingsPercent": {
     "placeholders": {"value": {"type": "int"}}

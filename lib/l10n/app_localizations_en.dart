@@ -231,11 +231,28 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get settingsMatchProbability => 'Channel match probability';
+  String get settingsMatchProbability => 'Channel matches';
 
   @override
-  String get settingsMatchProbabilityHint =>
-      '30% matches the original Jaeggi 2008 protocol — roughly 6 targets per channel per 20-trial block.';
+  String get settingsMatchProbabilityJitter => 'Added randomness';
+
+  @override
+  String settingsMatchProbabilityHint(int matches, int trials) {
+    return 'Each channel in a session will have $matches matches randomly distributed across $trials trials.';
+  }
+
+  @override
+  String settingsMatchProbabilityHintJitter(
+    int matches,
+    int jitter,
+    int trials,
+  ) {
+    return 'Each channel in a session will have $matches±$jitter matches randomly distributed across $trials trials.';
+  }
+
+  @override
+  String get settingsMatchProbabilityHintMinMatch =>
+      'At least one match per channel.';
 
   @override
   String settingsPercent(int value) {

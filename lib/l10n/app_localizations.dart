@@ -485,14 +485,36 @@ abstract class AppLocalizations {
   /// No description provided for @settingsMatchProbability.
   ///
   /// In en, this message translates to:
-  /// **'Channel match probability'**
+  /// **'Channel matches'**
   String get settingsMatchProbability;
+
+  /// No description provided for @settingsMatchProbabilityJitter.
+  ///
+  /// In en, this message translates to:
+  /// **'Added randomness'**
+  String get settingsMatchProbabilityJitter;
 
   /// No description provided for @settingsMatchProbabilityHint.
   ///
   /// In en, this message translates to:
-  /// **'30% matches the original Jaeggi 2008 protocol — roughly 6 targets per channel per 20-trial block.'**
-  String get settingsMatchProbabilityHint;
+  /// **'Each channel in a session will have {matches} matches randomly distributed across {trials} trials.'**
+  String settingsMatchProbabilityHint(int matches, int trials);
+
+  /// No description provided for @settingsMatchProbabilityHintJitter.
+  ///
+  /// In en, this message translates to:
+  /// **'Each channel in a session will have {matches}±{jitter} matches randomly distributed across {trials} trials.'**
+  String settingsMatchProbabilityHintJitter(
+    int matches,
+    int jitter,
+    int trials,
+  );
+
+  /// No description provided for @settingsMatchProbabilityHintMinMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'At least one match per channel.'**
+  String get settingsMatchProbabilityHintMinMatch;
 
   /// No description provided for @settingsPercent.
   ///
