@@ -38,11 +38,17 @@ class SummaryCard extends StatelessWidget {
             // it, repeating inside the card is just noise).
             : isDay
                 ? l.statisticsSummaryBestSessionValueShort(
-                    summary.bestSession!.session.n,
+                    nLevelLabel(
+                      summary.bestSession!.scores.length,
+                      summary.bestSession!.session.n,
+                    ),
                     (summary.bestAccuracy * 100).round(),
                   )
                 : l.statisticsSummaryBestSessionValue(
-                    summary.bestSession!.session.n,
+                    nLevelLabel(
+                      summary.bestSession!.scores.length,
+                      summary.bestSession!.session.n,
+                    ),
                     (summary.bestAccuracy * 100).round(),
                     DateFormat.MMMd(locale).format(
                       summary.bestSession!.session.startedAt,

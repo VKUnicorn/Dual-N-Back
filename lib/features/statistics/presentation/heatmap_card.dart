@@ -342,8 +342,8 @@ class _HeatmapCardState extends State<HeatmapCard> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'N${session.session.n}',
-              style: theme.textTheme.titleMedium?.copyWith(
+              nLevelLabel(session.scores.length, session.session.n),
+              style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: accColor,
               ),

@@ -1059,14 +1059,18 @@ abstract class AppLocalizations {
   /// No description provided for @statisticsSummaryBestSessionValue.
   ///
   /// In en, this message translates to:
-  /// **'N{n} · {percent}% · {date}'**
-  String statisticsSummaryBestSessionValue(int n, int percent, String date);
+  /// **'{label} · {percent}% · {date}'**
+  String statisticsSummaryBestSessionValue(
+    String label,
+    int percent,
+    String date,
+  );
 
   /// No description provided for @statisticsSummaryBestSessionValueShort.
   ///
   /// In en, this message translates to:
-  /// **'N{n} · {percent}%'**
-  String statisticsSummaryBestSessionValueShort(int n, int percent);
+  /// **'{label} · {percent}%'**
+  String statisticsSummaryBestSessionValueShort(String label, int percent);
 
   /// No description provided for @statisticsSummaryTotalTrials.
   ///

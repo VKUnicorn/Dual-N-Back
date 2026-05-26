@@ -605,13 +605,17 @@ class AppLocalizationsRu extends AppLocalizations {
   String get statisticsSummaryBestSession => 'Лучшая сессия';
 
   @override
-  String statisticsSummaryBestSessionValue(int n, int percent, String date) {
-    return 'N$n · $percent% · $date';
+  String statisticsSummaryBestSessionValue(
+    String label,
+    int percent,
+    String date,
+  ) {
+    return '$label · $percent% · $date';
   }
 
   @override
-  String statisticsSummaryBestSessionValueShort(int n, int percent) {
-    return 'N$n · $percent%';
+  String statisticsSummaryBestSessionValueShort(String label, int percent) {
+    return '$label · $percent%';
   }
 
   @override

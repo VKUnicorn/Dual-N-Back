@@ -239,13 +239,13 @@
   "statisticsChartNDistribution": "Sessions per N",
   "statisticsSummaryTitle": "Period summary",
   "statisticsSummaryBestSession": "Best session",
-  "statisticsSummaryBestSessionValue": "N{n} · {percent}% · {date}",
+  "statisticsSummaryBestSessionValue": "{label} · {percent}% · {date}",
   "@statisticsSummaryBestSessionValue": {
-    "placeholders": {"n": {"type": "int"}, "percent": {"type": "int"}, "date": {"type": "String"}}
+    "placeholders": {"label": {"type": "String"}, "percent": {"type": "int"}, "date": {"type": "String"}}
   },
-  "statisticsSummaryBestSessionValueShort": "N{n} · {percent}%",
+  "statisticsSummaryBestSessionValueShort": "{label} · {percent}%",
   "@statisticsSummaryBestSessionValueShort": {
-    "placeholders": {"n": {"type": "int"}, "percent": {"type": "int"}}
+    "placeholders": {"label": {"type": "String"}, "percent": {"type": "int"}}
   },
   "statisticsSummaryTotalTrials": "Total trials",
   "statisticsSummaryTrainingTime": "Training time",

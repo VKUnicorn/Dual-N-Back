@@ -58,7 +58,7 @@ class SessionTile extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'N${session.n}',
+              nLevelLabel(saved.scores.length, session.n),
               style: TextStyle(
                 color: accColor,
                 fontWeight: FontWeight.w700,

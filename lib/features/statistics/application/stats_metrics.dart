@@ -6,6 +6,22 @@ import 'package:dual_n_back/features/statistics/domain/stats_period.dart';
 /// Pure-Dart aggregation helpers for the statistics screen. No Flutter
 /// imports here — keeps the module trivially unit-testable.
 
+/// Builds the per-session level label used everywhere on the statistics
+/// screen: a one-letter prefix denoting how many channels were active
+/// (`S`ingle / `T`riple / `Q`uad), followed by `N{n}`. Dual sessions —
+/// the app default — render as a bare `N{n}` with no prefix, since
+/// repeating "D" on the vast majority of tiles would be noise. Falls
+/// back to a bare `N{n}` for channel counts outside 1..4 too.
+String nLevelLabel(int channelCount, int n) {
+  final prefix = switch (channelCount) {
+    1 => 'S',
+    3 => 'T',
+    4 => 'Q',
+    _ => '',
+  };
+  return '${prefix}N$n';
+}
+
 /// Overall accuracy for a saved session.
 ///
 /// Uses each channel's persisted `accuracy` snapshot rather than
