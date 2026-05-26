@@ -332,17 +332,17 @@ abstract class AppLocalizations {
   /// **'N={n}'**
   String resultAppBarTitle(int n);
 
-  /// No description provided for @resultLevelUp.
+  /// No description provided for @resultLevelUpLabel.
   ///
   /// In en, this message translates to:
-  /// **'Level up: {oldN} → {newN}'**
-  String resultLevelUp(int oldN, int newN);
+  /// **'Level up:'**
+  String get resultLevelUpLabel;
 
-  /// No description provided for @resultLevelDown.
+  /// No description provided for @resultLevelDownLabel.
   ///
   /// In en, this message translates to:
-  /// **'Level down: {oldN} → {newN}'**
-  String resultLevelDown(int oldN, int newN);
+  /// **'Level down:'**
+  String get resultLevelDownLabel;
 
   /// No description provided for @resultLevelHold.
   ///

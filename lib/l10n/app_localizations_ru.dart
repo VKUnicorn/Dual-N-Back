@@ -142,14 +142,10 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String resultLevelUp(int oldN, int newN) {
-    return 'Уровень повышен: $oldN → $newN';
-  }
+  String get resultLevelUpLabel => 'Уровень повышен:';
 
   @override
-  String resultLevelDown(int oldN, int newN) {
-    return 'Уровень понижен: $oldN → $newN';
-  }
+  String get resultLevelDownLabel => 'Уровень понижен:';
 
   @override
   String resultLevelHold(int n) {

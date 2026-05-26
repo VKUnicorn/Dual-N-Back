@@ -315,25 +315,57 @@ class _AdjustmentBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final l = AppLocalizations.of(context);
-    final (label, icon, color) = switch (adjustment) {
-      NAdjustment.advance => (
-          l.resultLevelUp(currentN, newN),
-          Icons.trending_up,
-          scheme.primary,
-        ),
-      NAdjustment.regress => (
-          l.resultLevelDown(currentN, newN),
-          Icons.trending_down,
-          scheme.error,
-        ),
-      NAdjustment.hold => (
-          l.resultLevelHold(currentN),
-          Icons.trending_flat,
-          scheme.tertiary,
-        ),
+    final (icon, color) = switch (adjustment) {
+      NAdjustment.advance => (Icons.trending_up, scheme.primary),
+      NAdjustment.regress => (Icons.trending_down, scheme.error),
+      NAdjustment.hold => (Icons.trending_flat, scheme.tertiary),
     };
+    final labelStyle = TextStyle(
+      color: color,
+      fontWeight: FontWeight.w600,
+      fontSize: 16,
+    );
+    final numberStyle = labelStyle.copyWith(fontWeight: FontWeight.w700);
+
+    // For advance/regress: "{label} {oldN} {icon} {newN}".
+    // For hold: keep the single "Level held: N = {n}" string with the
+    // trending_flat icon as a prefix — there's no second number to put
+    // the icon between.
+    final Widget content;
+    switch (adjustment) {
+      case NAdjustment.advance:
+      case NAdjustment.regress:
+        final label = adjustment == NAdjustment.advance
+            ? l.resultLevelUpLabel
+            : l.resultLevelDownLabel;
+        content = Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(label, style: labelStyle),
+            const SizedBox(width: 8),
+            Text('$currentN', style: numberStyle),
+            const SizedBox(width: 8),
+            Icon(icon, color: color),
+            const SizedBox(width: 8),
+            Text('$newN', style: numberStyle),
+          ],
+        );
+      case NAdjustment.hold:
+        content = Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color),
+            const SizedBox(width: 8),
+            Text(l.resultLevelHold(currentN), style: labelStyle),
+          ],
+        );
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -341,22 +373,7 @@ class _AdjustmentBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color.withValues(alpha: 0.4)),
       ),
-      child: Row(
-        children: [
-          Icon(icon, color: color),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
-            ),
-          ),
-        ],
-      ),
+      child: Center(child: content),
     );
   }
 }
