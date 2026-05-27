@@ -343,53 +343,67 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                     ],
                     const SizedBox(height: 16),
                     NDistributionChart(sessions: inRange),
-                    const SizedBox(height: 24),
-                    Text(
-                      l.statisticsSessionsCount(inRange.length),
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                    const SizedBox(height: 8),
-                    if (inRange.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 24),
-                        child: Center(
-                          child: Text(
-                            l.statisticsEmptyTitle,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
+                    // Session list is only rendered for Day / Week.
+                    // For Month / Year the list can grow to hundreds of
+                    // tiles, and because the screen uses
+                    // SingleChildScrollView (not ListView.builder — see
+                    // the comment near `child: SingleChildScrollView`
+                    // above for why) every tile is built and laid out
+                    // up-front, which causes severe scroll lag. The
+                    // day-mode focus / scroll-to-session interaction is
+                    // also only meaningful for Day mode, so hiding the
+                    // section in Month / Year loses no functionality.
+                    if (_period == StatsPeriod.day ||
+                        _period == StatsPeriod.week) ...[
+                      const SizedBox(height: 24),
+                      Text(
+                        l.statisticsSessionsCount(inRange.length),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
                                 ),
-                          ),
-                        ),
-                      )
-                    else
-                      for (var i = 0; i < inRange.length; i++) ...[
-                        if (i == 0 ||
-                            !_isSameDay(
-                              inRange[i].session.startedAt,
-                              inRange[i - 1].session.startedAt,
-                            ))
-                          _DaySectionHeader(
-                            date: inRange[i].session.startedAt,
-                            count: _countSessionsOnDay(
-                              inRange,
-                              inRange[i].session.startedAt,
+                      ),
+                      const SizedBox(height: 8),
+                      if (inRange.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 24),
+                          child: Center(
+                            child: Text(
+                              l.statisticsEmptyTitle,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                             ),
-                            isFirst: i == 0,
                           ),
-                        SessionTile(
-                          key: _tileKeys[inRange[i].session.id],
-                          saved: inRange[i],
-                          controller:
-                              _expandControllers[inRange[i].session.id],
-                        ),
-                      ],
+                        )
+                      else
+                        for (var i = 0; i < inRange.length; i++) ...[
+                          if (i == 0 ||
+                              !_isSameDay(
+                                inRange[i].session.startedAt,
+                                inRange[i - 1].session.startedAt,
+                              ))
+                            _DaySectionHeader(
+                              date: inRange[i].session.startedAt,
+                              count: _countSessionsOnDay(
+                                inRange,
+                                inRange[i].session.startedAt,
+                              ),
+                              isFirst: i == 0,
+                            ),
+                          SessionTile(
+                            key: _tileKeys[inRange[i].session.id],
+                            saved: inRange[i],
+                            controller:
+                                _expandControllers[inRange[i].session.id],
+                          ),
+                        ],
+                    ],
                     const SizedBox(height: 24),
                     // Debug button hidden — keep the import and widget so
                     // it can be re-enabled by uncommenting this line.
