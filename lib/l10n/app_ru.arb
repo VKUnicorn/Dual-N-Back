@@ -45,9 +45,9 @@
 
   "resultTitle": "Сессия завершена",
   "resultAppBarTitle": "N={n}",
-  "resultLevelUpLabel": "Уровень повышен:",
-  "resultLevelDownLabel": "Уровень понижен:",
-  "resultLevelHold": "Уровень сохранён: N = {n}",
+  "resultLevelUpLabel": "Уровень N повышен:",
+  "resultLevelDownLabel": "Уровень N понижен:",
+  "resultLevelHold": "Уровень N сохранён: {n}",
   "resultAccuracyLabel": "Точность",
   "resultClose": "Закрыть",
   "resultAgain": "Ещё раз",

@@ -341,19 +341,19 @@ abstract class AppLocalizations {
   /// No description provided for @resultLevelUpLabel.
   ///
   /// In en, this message translates to:
-  /// **'Level up:'**
+  /// **'Level N up:'**
   String get resultLevelUpLabel;
 
   /// No description provided for @resultLevelDownLabel.
   ///
   /// In en, this message translates to:
-  /// **'Level down:'**
+  /// **'Level N down:'**
   String get resultLevelDownLabel;
 
   /// No description provided for @resultLevelHold.
   ///
   /// In en, this message translates to:
-  /// **'Level held: N = {n}'**
+  /// **'Level N held: {n}'**
   String resultLevelHold(int n);
 
   /// No description provided for @resultAccuracyLabel.

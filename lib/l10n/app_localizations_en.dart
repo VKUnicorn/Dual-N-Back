@@ -147,14 +147,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get resultLevelUpLabel => 'Level up:';
+  String get resultLevelUpLabel => 'Level N up:';
 
   @override
-  String get resultLevelDownLabel => 'Level down:';
+  String get resultLevelDownLabel => 'Level N down:';
 
   @override
   String resultLevelHold(int n) {
-    return 'Level held: N = $n';
+    return 'Level N held: $n';
   }
 
   @override

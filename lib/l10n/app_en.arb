@@ -57,9 +57,9 @@
   "@resultAppBarTitle": {
     "placeholders": {"n": {"type": "int"}}
   },
-  "resultLevelUpLabel": "Level up:",
-  "resultLevelDownLabel": "Level down:",
-  "resultLevelHold": "Level held: N = {n}",
+  "resultLevelUpLabel": "Level N up:",
+  "resultLevelDownLabel": "Level N down:",
+  "resultLevelHold": "Level N held: {n}",
   "@resultLevelHold": {
     "placeholders": {"n": {"type": "int"}}
   },
