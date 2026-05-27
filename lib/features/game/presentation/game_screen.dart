@@ -244,7 +244,7 @@ class _StartViewState extends ConsumerState<_StartView> {
         children: [
           const SizedBox(height: 24),
           Text(
-            'N-back',
+            _titleFor(l, active.length, n),
             textAlign: TextAlign.center,
             style: theme.textTheme.displaySmall?.copyWith(
               fontWeight: FontWeight.w700,
@@ -252,7 +252,7 @@ class _StartViewState extends ConsumerState<_StartView> {
           ),
           const SizedBox(height: 8),
           Text(
-            l.gameInstructions,
+            l.gameInstructions(n),
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium,
           ),
@@ -311,6 +311,21 @@ class _StartViewState extends ConsumerState<_StartView> {
       ),
     );
   }
+}
+
+/// Builds the start-screen title: "Single 2-back" / "Dual 3-back" /
+/// "Triple 5-back" / "Quad 1-back" depending on how many channels are
+/// active. With zero channels (start button disabled) we keep the
+/// generic "N-back" so the title doesn't read e.g. "Single 2-back"
+/// when nothing is selected.
+String _titleFor(AppLocalizations l, int channelCount, int n) {
+  return switch (channelCount) {
+    1 => l.gameTitleSingle(n),
+    2 => l.gameTitleDual(n),
+    3 => l.gameTitleTriple(n),
+    4 => l.gameTitleQuad(n),
+    _ => l.gameTitle,
+  };
 }
 
 /// Threshold at and below which the start screen flags the media

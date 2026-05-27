@@ -28,7 +28,26 @@
   "channelShape": "Shape",
 
   "gameTitle": "N-back",
-  "gameInstructions": "Tap \"Match\" on each channel when the stimulus matches the one N steps ago.",
+  "gameTitleSingle": "Single {n}-back",
+  "@gameTitleSingle": {
+    "placeholders": {"n": {"type": "int"}}
+  },
+  "gameTitleDual": "Dual {n}-back",
+  "@gameTitleDual": {
+    "placeholders": {"n": {"type": "int"}}
+  },
+  "gameTitleTriple": "Triple {n}-back",
+  "@gameTitleTriple": {
+    "placeholders": {"n": {"type": "int"}}
+  },
+  "gameTitleQuad": "Quad {n}-back",
+  "@gameTitleQuad": {
+    "placeholders": {"n": {"type": "int"}}
+  },
+  "gameInstructions": "Tap the matching channel button when the stimulus matches the one from N (i.e., {n}) steps ago.",
+  "@gameInstructions": {
+    "placeholders": {"n": {"type": "int"}}
+  },
   "gameChannelsLabel": "Channels",
   "gameLevelLabel": "Level N: {n}",
   "@gameLevelLabel": {

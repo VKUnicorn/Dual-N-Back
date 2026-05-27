@@ -93,8 +93,29 @@ class AppLocalizationsRu extends AppLocalizations {
   String get gameTitle => 'N-back';
 
   @override
-  String get gameInstructions =>
-      'Нажимай «Match» по каждому каналу, когда стимул совпадает с тем, что был N шагов назад.';
+  String gameTitleSingle(int n) {
+    return 'Single $n-back';
+  }
+
+  @override
+  String gameTitleDual(int n) {
+    return 'Dual $n-back';
+  }
+
+  @override
+  String gameTitleTriple(int n) {
+    return 'Triple $n-back';
+  }
+
+  @override
+  String gameTitleQuad(int n) {
+    return 'Quad $n-back';
+  }
+
+  @override
+  String gameInstructions(int n) {
+    return 'Нажимай соответствующую кнопку канала, когда стимул совпадает с тем, что был N, то есть $n шагов назад.';
+  }
 
   @override
   String get gameChannelsLabel => 'Каналы';

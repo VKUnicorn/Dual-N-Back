@@ -28,7 +28,26 @@
   "channelShape": "Форма",
 
   "gameTitle": "N-back",
-  "gameInstructions": "Нажимай «Match» по каждому каналу, когда стимул совпадает с тем, что был N шагов назад.",
+  "gameTitleSingle": "Single {n}-back",
+  "@gameTitleSingle": {
+    "placeholders": {"n": {"type": "int"}}
+  },
+  "gameTitleDual": "Dual {n}-back",
+  "@gameTitleDual": {
+    "placeholders": {"n": {"type": "int"}}
+  },
+  "gameTitleTriple": "Triple {n}-back",
+  "@gameTitleTriple": {
+    "placeholders": {"n": {"type": "int"}}
+  },
+  "gameTitleQuad": "Quad {n}-back",
+  "@gameTitleQuad": {
+    "placeholders": {"n": {"type": "int"}}
+  },
+  "gameInstructions": "Нажимай соответствующую кнопку канала, когда стимул совпадает с тем, что был N, то есть {n} шагов назад.",
+  "@gameInstructions": {
+    "placeholders": {"n": {"type": "int"}}
+  },
   "gameChannelsLabel": "Каналы",
   "gameLevelLabel": "Уровень N: {n}",
   "gameInitialLevelLabel": "Начальный уровень N: {n}",

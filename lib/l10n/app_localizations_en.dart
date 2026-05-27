@@ -93,8 +93,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gameTitle => 'N-back';
 
   @override
-  String get gameInstructions =>
-      'Tap \"Match\" on each channel when the stimulus matches the one N steps ago.';
+  String gameTitleSingle(int n) {
+    return 'Single $n-back';
+  }
+
+  @override
+  String gameTitleDual(int n) {
+    return 'Dual $n-back';
+  }
+
+  @override
+  String gameTitleTriple(int n) {
+    return 'Triple $n-back';
+  }
+
+  @override
+  String gameTitleQuad(int n) {
+    return 'Quad $n-back';
+  }
+
+  @override
+  String gameInstructions(int n) {
+    return 'Tap the matching channel button when the stimulus matches the one from N (i.e., $n) steps ago.';
+  }
 
   @override
   String get gameChannelsLabel => 'Channels';

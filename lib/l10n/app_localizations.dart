@@ -248,11 +248,35 @@ abstract class AppLocalizations {
   /// **'N-back'**
   String get gameTitle;
 
+  /// No description provided for @gameTitleSingle.
+  ///
+  /// In en, this message translates to:
+  /// **'Single {n}-back'**
+  String gameTitleSingle(int n);
+
+  /// No description provided for @gameTitleDual.
+  ///
+  /// In en, this message translates to:
+  /// **'Dual {n}-back'**
+  String gameTitleDual(int n);
+
+  /// No description provided for @gameTitleTriple.
+  ///
+  /// In en, this message translates to:
+  /// **'Triple {n}-back'**
+  String gameTitleTriple(int n);
+
+  /// No description provided for @gameTitleQuad.
+  ///
+  /// In en, this message translates to:
+  /// **'Quad {n}-back'**
+  String gameTitleQuad(int n);
+
   /// No description provided for @gameInstructions.
   ///
   /// In en, this message translates to:
-  /// **'Tap \"Match\" on each channel when the stimulus matches the one N steps ago.'**
-  String get gameInstructions;
+  /// **'Tap the matching channel button when the stimulus matches the one from N (i.e., {n}) steps ago.'**
+  String gameInstructions(int n);
 
   /// No description provided for @gameChannelsLabel.
   ///
