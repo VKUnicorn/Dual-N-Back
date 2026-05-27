@@ -48,10 +48,10 @@ class NBackDefaults {
   /// Available colors for the color channel.
   static const List<int> colorPalette = [
     0xFFF52F27, // red
-    0xFF50DE4E, // green
+    0xFF9EDA55, // green
     0xFF0A88F0, // blue
     0xFFFCAF0A, // orange
-    0xFFF7E72D, // yellow
+    0xFFFFD700, // yellow
     0xFFBF3AF0, // purple
     0xFFF75CA7, // pink
     0xFF1C1C1C, // black
