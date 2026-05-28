@@ -53,7 +53,7 @@ class NBackDefaults {
     0xFFFCAF0A, // orange
     0xFFFFD700, // yellow
     0xFFBF3AF0, // purple
-    0xFFF75CA7, // pink
+    0xFFFF81BE, // pink
     0xFF1C1C1C, // black
   ];
 
