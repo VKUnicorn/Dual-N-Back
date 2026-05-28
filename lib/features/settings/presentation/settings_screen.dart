@@ -188,6 +188,40 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           _Section(
+            title: l.settingsSectionColors,
+            trailing: _GroupResetButton(
+              groupTitle: l.settingsSectionColors,
+              onConfirm: () => unawaited(notifier.resetColors()),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _ColorPaletteGrid(
+                    colors: settings.colors,
+                    onTapColor: (index) async {
+                      final initial = Color(settings.colors[index]);
+                      final picked = await _openColorPicker(
+                        context,
+                        initial: initial,
+                      );
+                      if (picked == null) return;
+                      unawaited(
+                        notifier.updateColor(index, _toArgb(picked)),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l.settingsColorsHint,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          _Section(
             title: l.settingsSectionDefaultChannels,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1070,6 +1104,299 @@ class _RestDayCell extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Returns the 32-bit ARGB representation of [color]. Wraps the
+/// modern `Color.toARGB32()` API in a tiny helper so call sites don't
+/// have to deal with floating-point rounding manually.
+int _toArgb(Color color) => color.toARGB32();
+
+/// 4×2 grid of color swatches — visually mirrors [_AudioLetterGrid].
+/// Tap fires [onTapColor] with the slot index (0..7) so the parent can
+/// open the color picker and dispatch the resulting value back into
+/// settings.
+class _ColorPaletteGrid extends StatelessWidget {
+  const _ColorPaletteGrid({
+    required this.colors,
+    required this.onTapColor,
+  });
+
+  final List<int> colors;
+  final ValueChanged<int> onTapColor;
+
+  static const int _cols = 8;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const spacing = 6.0;
+        final cellWidth =
+            (constraints.maxWidth - spacing * (_cols - 1)) / _cols;
+        final rows = (colors.length / _cols).ceil();
+        return Column(
+          children: [
+            for (var r = 0; r < rows; r++)
+              Padding(
+                padding: EdgeInsets.only(top: r == 0 ? 0 : spacing),
+                child: Row(
+                  children: [
+                    for (var c = 0; c < _cols; c++) ...[
+                      if (c > 0) const SizedBox(width: spacing),
+                      Builder(
+                        builder: (context) {
+                          final index = r * _cols + c;
+                          if (index >= colors.length) {
+                            return SizedBox(width: cellWidth, height: cellWidth);
+                          }
+                          return _ColorSwatchCell(
+                            color: Color(colors[index]),
+                            size: cellWidth,
+                            onTap: () => onTapColor(index),
+                          );
+                        },
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _ColorSwatchCell extends StatelessWidget {
+  const _ColorSwatchCell({
+    required this.color,
+    required this.size,
+    required this.onTap,
+  });
+
+  final Color color;
+  final double size;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Material(
+        color: color,
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: scheme.outlineVariant.withValues(alpha: 0.6),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Shows a modal color picker dialog seeded with [initial] and resolves
+/// with the chosen colour (or `null` if dismissed).
+Future<Color?> _openColorPicker(
+  BuildContext context, {
+  required Color initial,
+}) {
+  return showDialog<Color>(
+    context: context,
+    builder: (ctx) => _ColorPickerDialog(initial: initial),
+  );
+}
+
+/// HSV-based color picker dialog. Three sliders (hue / saturation /
+/// value) plus a live preview swatch. Returns the selected [Color] via
+/// `Navigator.pop`. Kept dependency-free on purpose — the app only
+/// needs basic picking; adding `flutter_colorpicker` for this would be
+/// disproportionate.
+class _ColorPickerDialog extends StatefulWidget {
+  const _ColorPickerDialog({required this.initial});
+
+  final Color initial;
+
+  @override
+  State<_ColorPickerDialog> createState() => _ColorPickerDialogState();
+}
+
+class _ColorPickerDialogState extends State<_ColorPickerDialog> {
+  late HSVColor _hsv;
+
+  @override
+  void initState() {
+    super.initState();
+    _hsv = HSVColor.fromColor(widget.initial);
+  }
+
+  Color get _current => _hsv.toColor();
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return AlertDialog(
+      title: Text(l.settingsColorPickerTitle),
+      content: SizedBox(
+        width: 320,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Preview swatch — fills the dialog width so the user sees
+            // a realistic sample of the chosen colour.
+            Container(
+              height: 56,
+              decoration: BoxDecoration(
+                color: _current,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: theme.colorScheme.outlineVariant
+                      .withValues(alpha: 0.6),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            _PickerSlider(
+              label: l.settingsColorPickerHue,
+              value: _hsv.hue,
+              min: 0,
+              max: 360,
+              gradient: const LinearGradient(
+                colors: [
+                  Color(0xFFFF0000),
+                  Color(0xFFFFFF00),
+                  Color(0xFF00FF00),
+                  Color(0xFF00FFFF),
+                  Color(0xFF0000FF),
+                  Color(0xFFFF00FF),
+                  Color(0xFFFF0000),
+                ],
+              ),
+              onChanged: (v) => setState(() => _hsv = _hsv.withHue(v)),
+            ),
+            _PickerSlider(
+              label: l.settingsColorPickerSaturation,
+              value: _hsv.saturation,
+              min: 0,
+              max: 1,
+              gradient: LinearGradient(
+                colors: [
+                  HSVColor.fromAHSV(1, _hsv.hue, 0, _hsv.value).toColor(),
+                  HSVColor.fromAHSV(1, _hsv.hue, 1, _hsv.value).toColor(),
+                ],
+              ),
+              onChanged: (v) =>
+                  setState(() => _hsv = _hsv.withSaturation(v)),
+            ),
+            _PickerSlider(
+              label: l.settingsColorPickerValue,
+              value: _hsv.value,
+              min: 0,
+              max: 1,
+              gradient: LinearGradient(
+                colors: [
+                  HSVColor.fromAHSV(1, _hsv.hue, _hsv.saturation, 0)
+                      .toColor(),
+                  HSVColor.fromAHSV(1, _hsv.hue, _hsv.saturation, 1)
+                      .toColor(),
+                ],
+              ),
+              onChanged: (v) => setState(() => _hsv = _hsv.withValue(v)),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l.commonCancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(_current),
+          child: Text(MaterialLocalizations.of(context).okButtonLabel),
+        ),
+      ],
+    );
+  }
+}
+
+/// Single slider tile used by [_ColorPickerDialog]. The gradient track
+/// below the label gives a visual hint of the channel being scrubbed —
+/// hue shows the full rainbow, saturation goes grey-to-saturated, value
+/// goes black-to-color.
+class _PickerSlider extends StatelessWidget {
+  const _PickerSlider({
+    required this.label,
+    required this.value,
+    required this.min,
+    required this.max,
+    required this.gradient,
+    required this.onChanged,
+  });
+
+  final String label;
+  final double value;
+  final double min;
+  final double max;
+  final LinearGradient gradient;
+  final ValueChanged<double> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(label, style: theme.textTheme.bodyMedium),
+          const SizedBox(height: 4),
+          // Gradient strip stacked behind the slider gives the visual
+          // hint for what the slider controls.
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Container(
+                  height: 8,
+                  decoration: BoxDecoration(
+                    gradient: gradient,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+              SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  // Slim track so the gradient stays visible underneath.
+                  trackHeight: 2,
+                  activeTrackColor: Colors.transparent,
+                  inactiveTrackColor: Colors.transparent,
+                ),
+                child: Slider(
+                  value: value.clamp(min, max),
+                  min: min,
+                  max: max,
+                  onChanged: onChanged,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

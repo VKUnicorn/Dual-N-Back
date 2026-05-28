@@ -44,6 +44,13 @@
   "@gameTitleQuad": {
     "placeholders": {"n": {"type": "int"}}
   },
+  "settingsSectionColors": "Цвета",
+  "settingsColors": "Цвета",
+  "settingsColorsHint": "Тап по цвету откроет окно выбора цвета.",
+  "settingsColorPickerTitle": "Выбор цвета",
+  "settingsColorPickerHue": "Оттенок",
+  "settingsColorPickerSaturation": "Насыщенность",
+  "settingsColorPickerValue": "Яркость",
   "gameInstructions": "Нажимай соответствующую кнопку канала, когда стимул совпадает с тем, что был N, то есть {n} шагов назад.",
   "@gameInstructions": {
     "placeholders": {"n": {"type": "int"}}

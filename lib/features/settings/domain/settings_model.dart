@@ -29,6 +29,7 @@ class SettingsModel {
     required this.volume,
     required this.audioVoice,
     required this.audioLetters,
+    required this.colors,
     required this.gridStyle,
     required this.showFixationCross,
     required this.allowCenterPosition,
@@ -63,6 +64,7 @@ class SettingsModel {
         volume: 1,
         audioVoice: AudioVoice.female,
         audioLetters: NBackDefaults.audioLetters,
+        colors: NBackDefaults.colorPalette,
         gridStyle: GridStyle.classic,
         showFixationCross: true,
         allowCenterPosition: false,
@@ -202,6 +204,16 @@ class SettingsModel {
   /// Always contains at least [minAudioLetters] entries.
   final List<String> audioLetters;
 
+  /// Custom color palette for the color channel — ARGB ints, one per
+  /// stimulus index 0..[colorCount]-1. Always exactly [colorCount]
+  /// entries; the notifier enforces the length on every update.
+  final List<int> colors;
+
+  /// Number of distinct stimulus values the color channel uses. Locked
+  /// to 8 because the in-game cardinality (`ChannelType.color`) and the
+  /// stimulus generator both assume a fixed palette size.
+  static const int colorCount = 8;
+
   /// Visual style of the in-game 3x3 grid.
   final GridStyle gridStyle;
 
@@ -283,6 +295,7 @@ class SettingsModel {
     double? volume,
     AudioVoice? audioVoice,
     List<String>? audioLetters,
+    List<int>? colors,
     GridStyle? gridStyle,
     bool? showFixationCross,
     bool? allowCenterPosition,
@@ -316,6 +329,7 @@ class SettingsModel {
       volume: volume ?? this.volume,
       audioVoice: audioVoice ?? this.audioVoice,
       audioLetters: audioLetters ?? this.audioLetters,
+      colors: colors ?? this.colors,
       gridStyle: gridStyle ?? this.gridStyle,
       showFixationCross: showFixationCross ?? this.showFixationCross,
       allowCenterPosition: allowCenterPosition ?? this.allowCenterPosition,

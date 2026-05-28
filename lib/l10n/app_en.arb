@@ -44,6 +44,13 @@
   "@gameTitleQuad": {
     "placeholders": {"n": {"type": "int"}}
   },
+  "settingsSectionColors": "Colors",
+  "settingsColors": "Colors",
+  "settingsColorsHint": "Tap a swatch to open the color picker.",
+  "settingsColorPickerTitle": "Pick a color",
+  "settingsColorPickerHue": "Hue",
+  "settingsColorPickerSaturation": "Saturation",
+  "settingsColorPickerValue": "Brightness",
   "gameInstructions": "Tap the matching channel button when the stimulus matches the one from N (i.e., {n}) steps ago.",
   "@gameInstructions": {
     "placeholders": {"n": {"type": "int"}}

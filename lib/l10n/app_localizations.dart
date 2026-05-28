@@ -272,6 +272,48 @@ abstract class AppLocalizations {
   /// **'Quad {n}-back'**
   String gameTitleQuad(int n);
 
+  /// No description provided for @settingsSectionColors.
+  ///
+  /// In en, this message translates to:
+  /// **'Colors'**
+  String get settingsSectionColors;
+
+  /// No description provided for @settingsColors.
+  ///
+  /// In en, this message translates to:
+  /// **'Colors'**
+  String get settingsColors;
+
+  /// No description provided for @settingsColorsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a swatch to open the color picker.'**
+  String get settingsColorsHint;
+
+  /// No description provided for @settingsColorPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a color'**
+  String get settingsColorPickerTitle;
+
+  /// No description provided for @settingsColorPickerHue.
+  ///
+  /// In en, this message translates to:
+  /// **'Hue'**
+  String get settingsColorPickerHue;
+
+  /// No description provided for @settingsColorPickerSaturation.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturation'**
+  String get settingsColorPickerSaturation;
+
+  /// No description provided for @settingsColorPickerValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Brightness'**
+  String get settingsColorPickerValue;
+
   /// No description provided for @gameInstructions.
   ///
   /// In en, this message translates to:

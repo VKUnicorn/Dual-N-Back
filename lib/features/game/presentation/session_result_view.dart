@@ -4,7 +4,6 @@ import 'dart:math' as math;
 import 'package:confetti/confetti.dart';
 import 'package:dual_n_back/core/audio/audio_provider.dart';
 import 'package:dual_n_back/core/audio/audio_service.dart';
-import 'package:dual_n_back/core/constants/nback_defaults.dart';
 import 'package:dual_n_back/features/achievements/application/achievement.dart';
 import 'package:dual_n_back/features/achievements/application/achievements_provider.dart';
 import 'package:dual_n_back/features/game/application/game_notifier.dart';
@@ -103,6 +102,12 @@ class _SessionResultViewState extends ConsumerState<SessionResultView> {
     );
     final sessionsToday = ref.watch(sessionsTodayCountProvider);
     final dailyGoalReached = dailyGoal > 0 && sessionsToday >= dailyGoal;
+    // Confetti reuses the player's customised stimulus palette so the
+    // celebration matches the colours they just saw in-game.
+    final confettiPalette = [
+      for (final c in ref.watch(settingsProvider.select((s) => s.colors)))
+        Color(c),
+    ];
 
     return Stack(
       children: [
@@ -199,7 +204,7 @@ class _SessionResultViewState extends ConsumerState<SessionResultView> {
               maxBlastForce: 28,
               minBlastForce: 12,
               gravity: 0.25,
-              colors: _confettiPalette,
+              colors: confettiPalette,
             ),
           ),
         ),
@@ -213,7 +218,7 @@ class _SessionResultViewState extends ConsumerState<SessionResultView> {
               maxBlastForce: 28,
               minBlastForce: 12,
               gravity: 0.25,
-              colors: _confettiPalette,
+              colors: confettiPalette,
             ),
           ),
         ),
@@ -228,10 +233,6 @@ class _SessionResultViewState extends ConsumerState<SessionResultView> {
   }
 }
 
-/// Confetti colour palette — reuses the in-game stimulus colours so the
-/// celebration feels tied to the visuals the player just saw.
-final List<Color> _confettiPalette =
-    NBackDefaults.colorPalette.map(Color.new).toList();
 
 class _AccuracyGauge extends StatelessWidget {
   const _AccuracyGauge({required this.accuracy});

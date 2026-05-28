@@ -126,6 +126,29 @@ class SettingsNotifier extends Notifier<SettingsModel> {
     await _repo.save(state);
   }
 
+  /// Replaces a single entry in the custom color palette. [index] must
+  /// be in `[0, colorCount)`; [argb] is the 32-bit ARGB value.
+  Future<void> updateColor(int index, int argb) async {
+    if (index < 0 || index >= SettingsModel.colorCount) return;
+    final next = [...state.colors];
+    if (next.length != SettingsModel.colorCount) {
+      // Defensive: a corrupted persisted list could be shorter; rebuild
+      // from defaults before mutating the slot.
+      next
+        ..clear()
+        ..addAll(NBackDefaults.colorPalette);
+    }
+    next[index] = argb;
+    state = state.copyWith(colors: next);
+    await _repo.save(state);
+  }
+
+  /// Restores the color palette to [NBackDefaults.colorPalette].
+  Future<void> resetColors() async {
+    state = state.copyWith(colors: NBackDefaults.colorPalette);
+    await _repo.save(state);
+  }
+
   /// Replaces the active audio-letter set. Silently rejects updates that
   /// would shrink the selection below [SettingsModel.minAudioLetters].
   Future<void> updateAudioLetters(List<String> letters) async {

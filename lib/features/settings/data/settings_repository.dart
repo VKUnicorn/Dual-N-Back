@@ -31,6 +31,7 @@ class SettingsRepository {
   static const _kVolume = 'settings.volume';
   static const _kAudioVoice = 'settings.audioVoice';
   static const _kAudioLetters = 'settings.audioLetters';
+  static const _kColors = 'settings.colors';
   static const _kGridStyle = 'settings.gridStyle';
   static const _kShowFixationCross = 'settings.showFixationCross';
   static const _kAllowCenterPosition = 'settings.allowCenterPosition';
@@ -73,6 +74,7 @@ class SettingsRepository {
       volume: _prefs.getDouble(_kVolume) ?? defaults.volume,
       audioVoice: _loadAudioVoice() ?? defaults.audioVoice,
       audioLetters: _loadAudioLetters() ?? defaults.audioLetters,
+      colors: _loadColors() ?? defaults.colors,
       gridStyle: _loadGridStyle() ?? defaults.gridStyle,
       showFixationCross:
           _prefs.getBool(_kShowFixationCross) ?? defaults.showFixationCross,
@@ -127,6 +129,12 @@ class SettingsRepository {
       _prefs.setDouble(_kVolume, model.volume),
       _prefs.setString(_kAudioVoice, model.audioVoice.name),
       _prefs.setStringList(_kAudioLetters, model.audioLetters),
+      _prefs.setStringList(
+        _kColors,
+        // Persist as hex strings — avoids relying on getStringList
+        // round-tripping leading zeros or signed int quirks.
+        [for (final c in model.colors) c.toRadixString(16).padLeft(8, '0')],
+      ),
       _prefs.setString(_kGridStyle, model.gridStyle.name),
       _prefs.setBool(_kShowFixationCross, model.showFixationCross),
       _prefs.setBool(_kAllowCenterPosition, model.allowCenterPosition),
@@ -174,6 +182,7 @@ class SettingsRepository {
       _prefs.remove(_kVolume),
       _prefs.remove(_kAudioVoice),
       _prefs.remove(_kAudioLetters),
+      _prefs.remove(_kColors),
       _prefs.remove(_kGridStyle),
       _prefs.remove(_kShowFixationCross),
       _prefs.remove(_kAllowCenterPosition),
@@ -251,6 +260,22 @@ class SettingsRepository {
     ];
     if (filtered.length < SettingsModel.minAudioLetters) return null;
     return filtered;
+  }
+
+  /// Loads the persisted custom color palette. Returns null when the
+  /// stored value is missing, the wrong length, or contains a malformed
+  /// hex string — caller then falls back to `NBackDefaults.colorPalette`.
+  List<int>? _loadColors() {
+    final stored = _prefs.getStringList(_kColors);
+    if (stored == null) return null;
+    if (stored.length != SettingsModel.colorCount) return null;
+    final out = <int>[];
+    for (final raw in stored) {
+      final parsed = int.tryParse(raw, radix: 16);
+      if (parsed == null) return null;
+      out.add(parsed);
+    }
+    return out;
   }
 
   /// Loads the persisted rest-day weekday set. Filters to ints in

@@ -113,6 +113,27 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get settingsSectionColors => 'Цвета';
+
+  @override
+  String get settingsColors => 'Цвета';
+
+  @override
+  String get settingsColorsHint => 'Тап по цвету откроет окно выбора цвета.';
+
+  @override
+  String get settingsColorPickerTitle => 'Выбор цвета';
+
+  @override
+  String get settingsColorPickerHue => 'Оттенок';
+
+  @override
+  String get settingsColorPickerSaturation => 'Насыщенность';
+
+  @override
+  String get settingsColorPickerValue => 'Яркость';
+
+  @override
   String gameInstructions(int n) {
     return 'Нажимай соответствующую кнопку канала, когда стимул совпадает с тем, что был N, то есть $n шагов назад.';
   }

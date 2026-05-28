@@ -66,13 +66,15 @@ class NBackSingleCell extends StatelessWidget {
     required this.colorIndex,
     required this.shapeIndex,
     required this.fadeDuration,
+    this.palette,
     super.key,
   });
 
   /// True if the stimulus is currently visible (on its display window).
   final bool highlight;
 
-  /// Index into [NBackDefaults.colorPalette] or null if color channel is off.
+  /// Index into [palette] (or [NBackDefaults.colorPalette] when null)
+  /// — null if the color channel is off entirely.
   final int? colorIndex;
 
   /// Index into [kShapeBuilders] or null if shape channel is off.
@@ -82,13 +84,19 @@ class NBackSingleCell extends StatelessWidget {
   /// `Duration.zero` means snap on/off.
   final Duration fadeDuration;
 
+  /// User-customised palette (8 ARGB ints). Falls back to
+  /// [NBackDefaults.colorPalette] when null — keeps the widget usable
+  /// from non-Riverpod contexts (preview / tests).
+  final List<int>? palette;
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final hasShape = shapeIndex != null;
     final showShape = highlight && hasShape;
+    final activePalette = palette ?? NBackDefaults.colorPalette;
     final stimulusColor = colorIndex != null
-        ? Color(NBackDefaults.colorPalette[colorIndex!])
+        ? Color(activePalette[colorIndex!])
         : scheme.primary;
     // When a shape is shown, the color belongs to the shape — the
     // panel stays neutral so the colored shape stands out.
@@ -148,6 +156,7 @@ class NBackGrid extends StatelessWidget {
     this.style = GridStyle.tile,
     this.showFixation = true,
     this.centerIsPositionTarget = false,
+    this.palette,
     super.key,
   });
 
@@ -157,8 +166,13 @@ class NBackGrid extends StatelessWidget {
   /// True if the stimulus is currently visible (on its display window).
   final bool highlight;
 
-  /// Index into [NBackDefaults.colorPalette] or null if color channel is off.
+  /// Index into [palette] (or [NBackDefaults.colorPalette] when null)
+  /// — null if the color channel is off entirely.
   final int? colorIndex;
+
+  /// User-customised palette (8 ARGB ints). Falls back to
+  /// [NBackDefaults.colorPalette] when null.
+  final List<int>? palette;
 
   /// Index into [kShapeBuilders] or null if shape channel is off.
   final int? shapeIndex;
@@ -240,8 +254,9 @@ class NBackGrid extends StatelessWidget {
               );
             }
 
+            final activePalette = palette ?? NBackDefaults.colorPalette;
             final stimulusColor = colorIndex != null
-                ? Color(NBackDefaults.colorPalette[colorIndex!])
+                ? Color(activePalette[colorIndex!])
                 : scheme.primary;
             // When the shape channel is on the cell stays neutral —
             // the shape carries the colour. Otherwise the active cell
@@ -314,8 +329,9 @@ class NBackGrid extends StatelessWidget {
 
   Widget _buildClassic(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final activePalette = palette ?? NBackDefaults.colorPalette;
     final stimulusColor = colorIndex != null
-        ? Color(NBackDefaults.colorPalette[colorIndex!])
+        ? Color(activePalette[colorIndex!])
         : scheme.primary;
 
     return AspectRatio(

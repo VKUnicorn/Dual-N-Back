@@ -113,6 +113,27 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settingsSectionColors => 'Colors';
+
+  @override
+  String get settingsColors => 'Colors';
+
+  @override
+  String get settingsColorsHint => 'Tap a swatch to open the color picker.';
+
+  @override
+  String get settingsColorPickerTitle => 'Pick a color';
+
+  @override
+  String get settingsColorPickerHue => 'Hue';
+
+  @override
+  String get settingsColorPickerSaturation => 'Saturation';
+
+  @override
+  String get settingsColorPickerValue => 'Brightness';
+
+  @override
   String gameInstructions(int n) {
     return 'Tap the matching channel button when the stimulus matches the one from N (i.e., $n) steps ago.';
   }

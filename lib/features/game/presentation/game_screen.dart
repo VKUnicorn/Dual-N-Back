@@ -426,6 +426,7 @@ class _RunningView extends ConsumerWidget {
                             session.status != GameStatus.preparing &&
                             session.status != GameStatus.countdown,
                     centerIsPositionTarget: allowCenter,
+                    palette: ref.watch(settingsProvider).colors,
                   )
                 : NBackSingleCell(
                     highlight: session.stimulusVisible && isRunning,
@@ -435,6 +436,7 @@ class _RunningView extends ConsumerWidget {
                       milliseconds:
                           ref.watch(settingsProvider).stimulusFadeMs,
                     ),
+                    palette: ref.watch(settingsProvider).colors,
                   ),
           ),
           const SizedBox(height: 16),
