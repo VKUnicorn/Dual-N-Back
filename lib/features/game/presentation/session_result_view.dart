@@ -14,6 +14,7 @@ import 'package:dual_n_back/features/game/domain/stimulus.dart';
 import 'package:dual_n_back/features/game/presentation/game_screen.dart';
 import 'package:dual_n_back/features/settings/application/settings_notifier.dart';
 import 'package:dual_n_back/features/statistics/application/statistics_provider.dart';
+import 'package:dual_n_back/features/statistics/presentation/accuracy_color.dart';
 import 'package:dual_n_back/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -246,9 +247,10 @@ class _AccuracyGauge extends StatelessWidget {
     final scheme = theme.colorScheme;
     final l = AppLocalizations.of(context);
     final clamped = accuracy.clamp(0.0, 1.0);
-    final color = clamped >= 0.8
-        ? scheme.primary
-        : (clamped < 0.5 ? scheme.error : scheme.tertiary);
+    // Same accuracy-tier thresholds as the statistics screen (red < 0.7,
+    // blue 0.7–0.85, green > 0.85) so both surfaces agree on what counts
+    // as a good/poor session.
+    final color = accuracyTierColor(theme, clamped);
 
     return SizedBox(
       width: 160,

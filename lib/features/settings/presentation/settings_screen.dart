@@ -364,8 +364,8 @@ class SettingsScreen extends ConsumerWidget {
                   label: l.settingsStimulusDuration,
                   value: settings.stimulusDurationMs.toDouble(),
                   min: 100,
-                  max: 1500,
-                  divisions: 14,
+                  max: 3500,
+                  divisions: 34,
                   display: l.settingsMs(settings.stimulusDurationMs),
                   onChanged: (v) =>
                       notifier.updateStimulusDuration(v.round()),
