@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:dual_n_back/core/constants/app_theme_mode.dart';
 import 'package:dual_n_back/core/constants/audio_voice.dart';
 import 'package:dual_n_back/core/constants/grid_style.dart';
 import 'package:dual_n_back/features/game/domain/stimulus.dart';
+import 'package:dual_n_back/features/settings/domain/preset.dart';
 import 'package:dual_n_back/features/settings/domain/settings_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -47,6 +50,11 @@ class SettingsRepository {
   static const _kFeedbackAudioOnPress = 'settings.feedbackAudioOnPress';
   static const _kFeedbackVisualOnMiss = 'settings.feedbackVisualOnMiss';
   static const _kFeedbackAudioOnMiss = 'settings.feedbackAudioOnMiss';
+
+  /// Presets are stored as a single JSON-encoded list (each entry is a
+  /// [Preset.toJson]) rather than per-field, since the count is dynamic.
+  static const _kPresetPayloads = 'presets.payloads';
+  static const _kActivePresetId = 'presets.activeId';
 
   SettingsModel load() {
     final defaults = SettingsModel.defaults();
@@ -164,6 +172,67 @@ class SettingsRepository {
     ]);
   }
 
+  /// Persists only the 6 global (non-preset-scoped) fields. The notifier
+  /// calls this instead of [save] for global updates so the legacy
+  /// per-field preset keys aren't rewritten with a stale mirror of the
+  /// active preset (which would confuse a future migration).
+  Future<void> saveGlobals(SettingsModel model) async {
+    await Future.wait([
+      _prefs.setInt(_kDailyGoal, model.dailyGoalSessions),
+      _prefs.setStringList(
+        _kRestDays,
+        model.restDays.map((d) => d.toString()).toList(),
+      ),
+      _prefs.setBool(_kNotificationsEnabled, model.notificationsEnabled),
+      _prefs.setInt(_kNotificationTimeMinutes, model.notificationTimeMinutes),
+      _prefs.setString(_kThemeMode, model.themeMode.name),
+      if (model.localeCode != null)
+        _prefs.setString(_kLocale, model.localeCode!)
+      else
+        _prefs.remove(_kLocale),
+    ]);
+  }
+
+  /// Loads the persisted preset list. Returns `null` when the key is
+  /// absent (→ caller migrates from legacy per-field settings). Otherwise
+  /// always guarantees a [Preset.defaultPresetId] entry exists (rebuilt
+  /// from defaults if the stored list is empty or malformed).
+  List<Preset>? loadPresets() {
+    final raw = _prefs.getString(_kPresetPayloads);
+    if (raw == null) return null;
+    final presets = <Preset>[];
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List) {
+        for (final entry in decoded) {
+          if (entry is Map) {
+            presets.add(Preset.fromJson(entry.cast<String, dynamic>()));
+          }
+        }
+      }
+    } on FormatException {
+      // Corrupt payload — fall through to the default-only list.
+    }
+    if (!presets.any((p) => p.isDefault)) {
+      presets.insert(0, Preset.defaultPreset());
+    }
+    return presets;
+  }
+
+  String loadActivePresetId() =>
+      _prefs.getString(_kActivePresetId) ?? Preset.defaultPresetId;
+
+  Future<void> savePresets(List<Preset> presets) async {
+    await _prefs.setString(
+      _kPresetPayloads,
+      jsonEncode([for (final p in presets) p.toJson()]),
+    );
+  }
+
+  Future<void> saveActivePresetId(String id) async {
+    await _prefs.setString(_kActivePresetId, id);
+  }
+
   Future<void> clear() async {
     await Future.wait([
       _prefs.remove(_kChannels),
@@ -197,6 +266,8 @@ class SettingsRepository {
       _prefs.remove(_kFeedbackVisualOnMiss),
       _prefs.remove(_kFeedbackAudioOnMiss),
       _prefs.remove(_kLocale),
+      _prefs.remove(_kPresetPayloads),
+      _prefs.remove(_kActivePresetId),
     ]);
   }
 

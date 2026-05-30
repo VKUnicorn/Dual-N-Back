@@ -10,9 +10,9 @@ import 'package:dual_n_back/features/game/presentation/grid_widget.dart';
 import 'package:dual_n_back/features/game/presentation/session_result_view.dart';
 import 'package:dual_n_back/features/settings/application/settings_notifier.dart';
 import 'package:dual_n_back/l10n/app_localizations.dart';
-import 'package:dual_n_back/shared/widgets/channel_selection_grid.dart';
 import 'package:dual_n_back/shared/widgets/daily_goal_badge.dart';
 import 'package:dual_n_back/shared/widgets/estimated_duration_tile.dart';
+import 'package:dual_n_back/shared/widgets/preset_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -224,16 +224,27 @@ class _StartView extends ConsumerStatefulWidget {
 }
 
 class _StartViewState extends ConsumerState<_StartView> {
-  Set<ChannelType>? _active;
   int? _n;
+
+  @override
+  void initState() {
+    super.initState();
+    // When the active preset changes (e.g. via the preset dropdown), drop
+    // the ad-hoc N override so the slider re-seeds from the new preset's
+    // initialN on the next build.
+    ref.listenManual(
+      settingsProvider.select((s) => s.activePresetId),
+      (_, _) => setState(() => _n = null),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
     final settings = ref.watch(settingsProvider);
-    // Seed local override from settings the first time we render.
-    final active = _active ?? settings.defaultChannels;
+    // Channels now come from the active preset (no ad-hoc channel picker).
+    final active = settings.defaultChannels;
     final n = (_n ?? settings.initialN).clamp(settings.minN, settings.maxN);
     final canStart = active.isNotEmpty;
 
@@ -257,12 +268,9 @@ class _StartViewState extends ConsumerState<_StartView> {
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 32),
-          Text(l.gameChannelsLabel, style: theme.textTheme.titleMedium),
+          Text(l.settingsSectionPreset, style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
-          ChannelSelectionGrid(
-            selected: active,
-            onChanged: (next) => setState(() => _active = next),
-          ),
+          const PresetSelector(showActions: false),
           const SizedBox(height: 24),
           Text(
             settings.adaptiveMode

@@ -3,6 +3,8 @@ import 'package:dual_n_back/core/constants/audio_voice.dart';
 import 'package:dual_n_back/core/constants/grid_style.dart';
 import 'package:dual_n_back/core/constants/nback_defaults.dart';
 import 'package:dual_n_back/features/game/domain/stimulus.dart';
+import 'package:dual_n_back/features/settings/domain/preset.dart';
+import 'package:dual_n_back/features/settings/domain/preset_settings.dart';
 import 'package:meta/meta.dart';
 
 /// User-configurable settings persisted across app launches.
@@ -43,6 +45,8 @@ class SettingsModel {
     required this.feedbackAudioOnPress,
     required this.feedbackVisualOnMiss,
     required this.feedbackAudioOnMiss,
+    this.presets = const [PresetRef(id: Preset.defaultPresetId, name: '')],
+    this.activePresetId = Preset.defaultPresetId,
     this.localeCode,
   });
 
@@ -261,6 +265,48 @@ class SettingsModel {
   /// Locale override. `null` means follow system locale.
   final String? localeCode;
 
+  /// Lightweight (id + name) list of all available presets, for the
+  /// selector UI. The preset-scoped fields above mirror the *active*
+  /// preset's payload. These refs change only on create / rename / delete
+  /// / select, so copying them on every slider tick is cheap.
+  final List<PresetRef> presets;
+
+  /// Id of the currently active preset (whose payload is mirrored into the
+  /// preset-scoped fields above). Defaults to [Preset.defaultPresetId].
+  final String activePresetId;
+
+  /// Returns a copy with the 25 preset-scoped fields replaced by [p].
+  /// Used by the notifier when switching the active preset; global fields
+  /// (language, theme, daily goal, notifications, presets list, active id)
+  /// are preserved.
+  SettingsModel applyPreset(PresetSettings p) => copyWith(
+        defaultChannels: p.defaultChannels,
+        channelLayout: p.channelLayout,
+        initialN: p.initialN,
+        minN: p.minN,
+        maxN: p.maxN,
+        trialsPerSession: p.trialsPerSession,
+        stimulusDurationMs: p.stimulusDurationMs,
+        isiMs: p.isiMs,
+        matchProbability: p.matchProbability,
+        matchProbabilityJitter: p.matchProbabilityJitter,
+        adaptiveMode: p.adaptiveMode,
+        advanceThreshold: p.advanceThreshold,
+        regressThreshold: p.regressThreshold,
+        volume: p.volume,
+        audioVoice: p.audioVoice,
+        audioLetters: p.audioLetters,
+        colors: p.colors,
+        gridStyle: p.gridStyle,
+        showFixationCross: p.showFixationCross,
+        allowCenterPosition: p.allowCenterPosition,
+        stimulusFadeMs: p.stimulusFadeMs,
+        feedbackVisualOnPress: p.feedbackVisualOnPress,
+        feedbackAudioOnPress: p.feedbackAudioOnPress,
+        feedbackVisualOnMiss: p.feedbackVisualOnMiss,
+        feedbackAudioOnMiss: p.feedbackAudioOnMiss,
+      );
+
   /// When true, the match button briefly flashes green on a correct press
   /// and red on a false-alarm press. Default true.
   final bool feedbackVisualOnPress;
@@ -309,6 +355,8 @@ class SettingsModel {
     bool? feedbackAudioOnPress,
     bool? feedbackVisualOnMiss,
     bool? feedbackAudioOnMiss,
+    List<PresetRef>? presets,
+    String? activePresetId,
     String? Function()? localeCode,
   }) {
     return SettingsModel(
@@ -349,6 +397,8 @@ class SettingsModel {
           feedbackVisualOnMiss ?? this.feedbackVisualOnMiss,
       feedbackAudioOnMiss:
           feedbackAudioOnMiss ?? this.feedbackAudioOnMiss,
+      presets: presets ?? this.presets,
+      activePresetId: activePresetId ?? this.activePresetId,
       localeCode: localeCode != null ? localeCode() : this.localeCode,
     );
   }

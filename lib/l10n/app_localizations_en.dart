@@ -237,7 +237,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsSectionDefaultChannels =>
-      'Default channels and button layout';
+      'Active channels and button layout';
 
   @override
   String get settingsLayoutHint =>
@@ -467,10 +467,53 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsThemeDark => 'Dark';
 
   @override
+  String get settingsSectionPreset => 'Settings preset';
+
+  @override
+  String get presetSectionHint =>
+      'All settings in the block below are saved in the settings preset. You can add your own presets.';
+
+  @override
+  String get presetDefaultName => 'Default';
+
+  @override
+  String get presetAddTooltip => 'New preset';
+
+  @override
+  String get presetRenameTooltip => 'Rename preset';
+
+  @override
+  String get presetDeleteTooltip => 'Delete preset';
+
+  @override
+  String get presetCreateTitle => 'New preset';
+
+  @override
+  String get presetRenameTitle => 'Rename preset';
+
+  @override
+  String get presetNameLabel => 'Name';
+
+  @override
+  String get presetCreateConfirm => 'Create';
+
+  @override
+  String get presetRenameConfirm => 'Rename';
+
+  @override
+  String get presetDeleteTitle => 'Delete preset?';
+
+  @override
+  String presetDeleteContent(String name) {
+    return 'Preset \"$name\" will be permanently removed.';
+  }
+
+  @override
   String get settingsResetTitle => 'Reset settings?';
 
   @override
-  String get settingsResetContent => 'All values will revert to defaults.';
+  String get settingsResetContent =>
+      'The active preset and global settings will revert to defaults. Other presets are kept.';
 
   @override
   String get commonCancel => 'Cancel';

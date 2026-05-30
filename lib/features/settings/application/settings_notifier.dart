@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:dual_n_back/core/constants/app_theme_mode.dart';
 import 'package:dual_n_back/core/constants/audio_voice.dart';
 import 'package:dual_n_back/core/constants/grid_style.dart';
 import 'package:dual_n_back/core/constants/nback_defaults.dart';
 import 'package:dual_n_back/features/game/domain/stimulus.dart';
 import 'package:dual_n_back/features/settings/data/settings_repository.dart';
+import 'package:dual_n_back/features/settings/domain/preset.dart';
+import 'package:dual_n_back/features/settings/domain/preset_settings.dart';
 import 'package:dual_n_back/features/settings/domain/settings_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,64 +31,170 @@ final settingsProvider =
 class SettingsNotifier extends Notifier<SettingsModel> {
   SettingsRepository get _repo => ref.read(settingsRepositoryProvider);
 
+  /// Ordered source of truth for presets. The active preset's payload is
+  /// mirrored into the flat [state] (which the rest of the app reads).
+  final List<Preset> _presets = [];
+
   @override
-  SettingsModel build() => _repo.load();
+  SettingsModel build() {
+    // Globals (and, for legacy users, the seed for the default preset)
+    // come from the legacy per-field keys.
+    final legacy = _repo.load();
+    final loaded = _repo.loadPresets();
+
+    _presets.clear();
+    if (loaded == null) {
+      // First launch on this build (or pre-presets install): seed a
+      // Default preset from whatever the legacy per-field settings held.
+      _presets.add(Preset.defaultPreset(PresetSettings.fromSettings(legacy)));
+      unawaited(_repo.savePresets(_presets));
+      unawaited(_repo.saveActivePresetId(Preset.defaultPresetId));
+    } else {
+      _presets.addAll(loaded);
+    }
+
+    var activeId = _repo.loadActivePresetId();
+    if (!_presets.any((p) => p.id == activeId)) {
+      activeId = Preset.defaultPresetId;
+    }
+    final activePayload = _presets
+        .firstWhere(
+          (p) => p.id == activeId,
+          orElse: () => _presets.first,
+        )
+        .settings;
+
+    return legacy.applyPreset(activePayload).copyWith(
+          presets: _refs(),
+          activePresetId: activeId,
+        );
+  }
+
+  List<PresetRef> _refs() =>
+      [for (final p in _presets) PresetRef(id: p.id, name: p.name)];
+
+  /// Mirrors the just-mutated preset-scoped [next] back into the active
+  /// preset payload and persists the preset list. Used by every
+  /// preset-scoped update method.
+  Future<void> _commitScoped(SettingsModel next) async {
+    final idx = _presets.indexWhere((p) => p.id == next.activePresetId);
+    if (idx >= 0) {
+      _presets[idx] =
+          _presets[idx].copyWith(settings: PresetSettings.fromSettings(next));
+    }
+    state = next;
+    await _repo.savePresets(_presets);
+  }
+
+  // ---- Preset management ----
+
+  /// Switches the active preset, mirroring its payload into [state].
+  Future<void> selectPreset(String id) async {
+    final preset = _presets.firstWhere(
+      (p) => p.id == id,
+      orElse: () => _presets.first,
+    );
+    state = state
+        .applyPreset(preset.settings)
+        .copyWith(activePresetId: preset.id);
+    await _repo.saveActivePresetId(preset.id);
+  }
+
+  /// Creates a new preset copying the *current* active preset's settings,
+  /// then makes it active. [name] is trimmed; empty names are rejected.
+  Future<void> createPreset(String name) async {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return;
+    final id = Preset.generateId(_presets.map((p) => p.id));
+    _presets.add(
+      Preset(id: id, name: trimmed, settings: PresetSettings.fromSettings(state)),
+    );
+    state = state.copyWith(presets: _refs(), activePresetId: id);
+    await _repo.savePresets(_presets);
+    await _repo.saveActivePresetId(id);
+  }
+
+  /// Renames a preset. The default preset cannot be renamed.
+  Future<void> renamePreset(String id, String name) async {
+    if (id == Preset.defaultPresetId) return;
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return;
+    final idx = _presets.indexWhere((p) => p.id == id);
+    if (idx < 0) return;
+    _presets[idx] = _presets[idx].copyWith(name: trimmed);
+    state = state.copyWith(presets: _refs());
+    await _repo.savePresets(_presets);
+  }
+
+  /// Deletes a preset. The default preset cannot be deleted. If the active
+  /// preset is removed, falls back to the default preset.
+  Future<void> deletePreset(String id) async {
+    if (id == Preset.defaultPresetId) return;
+    final idx = _presets.indexWhere((p) => p.id == id);
+    if (idx < 0) return;
+    _presets.removeAt(idx);
+    if (state.activePresetId == id) {
+      final def = _presets.firstWhere((p) => p.isDefault);
+      state = state.applyPreset(def.settings).copyWith(
+            presets: _refs(),
+            activePresetId: def.id,
+          );
+      await _repo.saveActivePresetId(def.id);
+    } else {
+      state = state.copyWith(presets: _refs());
+    }
+    await _repo.savePresets(_presets);
+  }
 
   Future<void> updateChannels(Set<ChannelType> channels) async {
-    state = state.copyWith(defaultChannels: channels);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(defaultChannels: channels));
   }
 
   Future<void> updateChannelLayout(List<ChannelType> layout) async {
-    state = state.copyWith(channelLayout: layout);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(channelLayout: layout));
   }
 
   Future<void> updateInitialN(int n) async {
-    state = state.copyWith(initialN: n);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(initialN: n));
   }
 
   Future<void> updateNRange(int min, int max) async {
-    state = state.copyWith(
-      minN: min,
-      maxN: max,
-      // Clamp initialN inside the new range.
-      initialN: state.initialN.clamp(min, max),
+    await _commitScoped(
+      state.copyWith(
+        minN: min,
+        maxN: max,
+        // Clamp initialN inside the new range.
+        initialN: state.initialN.clamp(min, max),
+      ),
     );
-    await _repo.save(state);
   }
 
   Future<void> updateTrialsPerSession(int trials) async {
-    state = state.copyWith(trialsPerSession: trials);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(trialsPerSession: trials));
   }
 
   Future<void> updateStimulusDuration(int ms) async {
-    state = state.copyWith(stimulusDurationMs: ms);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(stimulusDurationMs: ms));
   }
 
   Future<void> updateIsi(int ms) async {
-    state = state.copyWith(isiMs: ms);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(isiMs: ms));
   }
 
   Future<void> updateMatchProbability(double probability) async {
-    state = state.copyWith(matchProbability: probability.clamp(0.0, 1.0));
-    await _repo.save(state);
+    await _commitScoped(
+      state.copyWith(matchProbability: probability.clamp(0.0, 1.0)),
+    );
   }
 
   Future<void> updateMatchProbabilityJitter(double jitter) async {
-    state = state.copyWith(
-      matchProbabilityJitter: jitter.clamp(0.0, 1.0),
+    await _commitScoped(
+      state.copyWith(matchProbabilityJitter: jitter.clamp(0.0, 1.0)),
     );
-    await _repo.save(state);
   }
 
   Future<void> updateAdaptiveMode({required bool enabled}) async {
-    state = state.copyWith(adaptiveMode: enabled);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(adaptiveMode: enabled));
   }
 
   /// Updates the per-channel accuracy thresholds used by adaptive mode.
@@ -109,21 +219,20 @@ class SettingsNotifier extends Notifier<SettingsModel> {
     if (snappedAdvance - snappedRegress < minGap) {
       snappedRegress = (snappedAdvance - minGap).clamp(lo, hi);
     }
-    state = state.copyWith(
-      advanceThreshold: snappedAdvance,
-      regressThreshold: snappedRegress,
+    await _commitScoped(
+      state.copyWith(
+        advanceThreshold: snappedAdvance,
+        regressThreshold: snappedRegress,
+      ),
     );
-    await _repo.save(state);
   }
 
   Future<void> updateVolume(double volume) async {
-    state = state.copyWith(volume: volume);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(volume: volume));
   }
 
   Future<void> updateAudioVoice(AudioVoice voice) async {
-    state = state.copyWith(audioVoice: voice);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(audioVoice: voice));
   }
 
   /// Replaces a single entry in the custom color palette. [index] must
@@ -139,14 +248,12 @@ class SettingsNotifier extends Notifier<SettingsModel> {
         ..addAll(NBackDefaults.colorPalette);
     }
     next[index] = argb;
-    state = state.copyWith(colors: next);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(colors: next));
   }
 
   /// Restores the color palette to [NBackDefaults.colorPalette].
   Future<void> resetColors() async {
-    state = state.copyWith(colors: NBackDefaults.colorPalette);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(colors: NBackDefaults.colorPalette));
   }
 
   /// Replaces the active audio-letter set. Silently rejects updates that
@@ -159,23 +266,19 @@ class SettingsNotifier extends Notifier<SettingsModel> {
         if (allowed.contains(letter)) letter,
     ];
     if (filtered.length < SettingsModel.minAudioLetters) return;
-    state = state.copyWith(audioLetters: filtered);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(audioLetters: filtered));
   }
 
   Future<void> updateGridStyle(GridStyle style) async {
-    state = state.copyWith(gridStyle: style);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(gridStyle: style));
   }
 
   Future<void> updateShowFixationCross({required bool enabled}) async {
-    state = state.copyWith(showFixationCross: enabled);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(showFixationCross: enabled));
   }
 
   Future<void> updateAllowCenterPosition({required bool enabled}) async {
-    state = state.copyWith(allowCenterPosition: enabled);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(allowCenterPosition: enabled));
   }
 
   Future<void> updateDailyGoalSessions(int sessions) async {
@@ -184,7 +287,7 @@ class SettingsNotifier extends Notifier<SettingsModel> {
       SettingsModel.maxDailyGoalSessions,
     );
     state = state.copyWith(dailyGoalSessions: clamped);
-    await _repo.save(state);
+    await _repo.saveGlobals(state);
   }
 
   /// Replaces the rest-day weekday set. Filters to valid `DateTime.weekday`
@@ -200,7 +303,7 @@ class SettingsNotifier extends Notifier<SettingsModel> {
         ? filtered.take(SettingsModel.maxRestDays).toSet()
         : filtered;
     state = state.copyWith(restDays: capped);
-    await _repo.save(state);
+    await _repo.saveGlobals(state);
   }
 
   /// Updates the stimulus fade-in/out duration. Clamped to the allowed
@@ -213,14 +316,13 @@ class SettingsNotifier extends Notifier<SettingsModel> {
     );
     const step = SettingsModel.stimulusFadeStepMs;
     final snapped = (clamped / step).round() * step;
-    state = state.copyWith(stimulusFadeMs: snapped);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(stimulusFadeMs: snapped));
   }
 
   /// Toggles the daily-reminder local notification.
   Future<void> updateNotificationsEnabled({required bool enabled}) async {
     state = state.copyWith(notificationsEnabled: enabled);
-    await _repo.save(state);
+    await _repo.saveGlobals(state);
   }
 
   /// Sets the time-of-day for the daily reminder. [hour] 0..23,
@@ -232,75 +334,87 @@ class SettingsNotifier extends Notifier<SettingsModel> {
     final h = hour.clamp(0, 23);
     final m = minute.clamp(0, 59);
     state = state.copyWith(notificationTimeMinutes: h * 60 + m);
-    await _repo.save(state);
+    await _repo.saveGlobals(state);
   }
 
   Future<void> updateLocale(String? localeCode) async {
     state = state.copyWith(localeCode: () => localeCode);
-    await _repo.save(state);
+    await _repo.saveGlobals(state);
   }
 
   Future<void> updateThemeMode(AppThemeMode mode) async {
     state = state.copyWith(themeMode: mode);
-    await _repo.save(state);
+    await _repo.saveGlobals(state);
   }
 
   Future<void> updateFeedbackVisualOnPress({required bool enabled}) async {
-    state = state.copyWith(feedbackVisualOnPress: enabled);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(feedbackVisualOnPress: enabled));
   }
 
   Future<void> updateFeedbackAudioOnPress({required bool enabled}) async {
-    state = state.copyWith(feedbackAudioOnPress: enabled);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(feedbackAudioOnPress: enabled));
   }
 
   Future<void> updateFeedbackVisualOnMiss({required bool enabled}) async {
-    state = state.copyWith(feedbackVisualOnMiss: enabled);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(feedbackVisualOnMiss: enabled));
   }
 
   Future<void> updateFeedbackAudioOnMiss({required bool enabled}) async {
-    state = state.copyWith(feedbackAudioOnMiss: enabled);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(feedbackAudioOnMiss: enabled));
   }
 
+  /// Resets the *active* preset's scoped settings to defaults AND the
+  /// global settings to defaults. Other presets are left untouched.
   Future<void> resetToDefaults() async {
-    state = SettingsModel.defaults();
-    await _repo.clear();
+    final idx = _presets.indexWhere((p) => p.id == state.activePresetId);
+    if (idx >= 0) {
+      _presets[idx] = _presets[idx].copyWith(settings: PresetSettings.defaults());
+    }
+    final defaults = SettingsModel.defaults();
+    state = state.applyPreset(PresetSettings.defaults()).copyWith(
+          dailyGoalSessions: defaults.dailyGoalSessions,
+          restDays: defaults.restDays,
+          notificationsEnabled: defaults.notificationsEnabled,
+          notificationTimeMinutes: defaults.notificationTimeMinutes,
+          themeMode: defaults.themeMode,
+          localeCode: () => defaults.localeCode,
+        );
+    await _repo.savePresets(_presets);
+    await _repo.saveGlobals(state);
   }
 
   /// Restores only the active audio-letter set to the Jaeggi default.
   Future<void> resetAudioLetters() async {
-    state = state.copyWith(audioLetters: NBackDefaults.audioLetters);
-    await _repo.save(state);
+    await _commitScoped(state.copyWith(audioLetters: NBackDefaults.audioLetters));
   }
 
   /// Restores only the "Level N" group: initial N, N range, match
   /// probability, and adaptive-mode toggle.
   Future<void> resetLevelN() async {
-    state = state.copyWith(
-      initialN: NBackDefaults.initialN,
-      minN: NBackDefaults.minN,
-      maxN: NBackDefaults.initialMaxN,
-      matchProbability: NBackDefaults.matchProbability,
-      matchProbabilityJitter: NBackDefaults.matchProbabilityJitter,
-      adaptiveMode: false,
-      advanceThreshold: NBackDefaults.advanceThreshold,
-      regressThreshold: NBackDefaults.regressThreshold,
+    await _commitScoped(
+      state.copyWith(
+        initialN: NBackDefaults.initialN,
+        minN: NBackDefaults.minN,
+        maxN: NBackDefaults.initialMaxN,
+        matchProbability: NBackDefaults.matchProbability,
+        matchProbabilityJitter: NBackDefaults.matchProbabilityJitter,
+        adaptiveMode: false,
+        advanceThreshold: NBackDefaults.advanceThreshold,
+        regressThreshold: NBackDefaults.regressThreshold,
+      ),
     );
-    await _repo.save(state);
   }
 
   /// Restores only the "Timings" group: trials per session, stimulus
   /// duration, stimulus fade, and ISI.
   Future<void> resetTimings() async {
-    state = state.copyWith(
-      trialsPerSession: NBackDefaults.trialsPerSession,
-      stimulusDurationMs: NBackDefaults.stimulusDurationMs,
-      stimulusFadeMs: SettingsModel.defaultStimulusFadeMs,
-      isiMs: NBackDefaults.isiMs,
+    await _commitScoped(
+      state.copyWith(
+        trialsPerSession: NBackDefaults.trialsPerSession,
+        stimulusDurationMs: NBackDefaults.stimulusDurationMs,
+        stimulusFadeMs: SettingsModel.defaultStimulusFadeMs,
+        isiMs: NBackDefaults.isiMs,
+      ),
     );
-    await _repo.save(state);
   }
 }

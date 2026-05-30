@@ -497,7 +497,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSectionDefaultChannels.
   ///
   /// In en, this message translates to:
-  /// **'Default channels and button layout'**
+  /// **'Active channels and button layout'**
   String get settingsSectionDefaultChannels;
 
   /// No description provided for @settingsLayoutHint.
@@ -888,6 +888,84 @@ abstract class AppLocalizations {
   /// **'Dark'**
   String get settingsThemeDark;
 
+  /// No description provided for @settingsSectionPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings preset'**
+  String get settingsSectionPreset;
+
+  /// No description provided for @presetSectionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'All settings in the block below are saved in the settings preset. You can add your own presets.'**
+  String get presetSectionHint;
+
+  /// No description provided for @presetDefaultName.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get presetDefaultName;
+
+  /// No description provided for @presetAddTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'New preset'**
+  String get presetAddTooltip;
+
+  /// No description provided for @presetRenameTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename preset'**
+  String get presetRenameTooltip;
+
+  /// No description provided for @presetDeleteTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete preset'**
+  String get presetDeleteTooltip;
+
+  /// No description provided for @presetCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New preset'**
+  String get presetCreateTitle;
+
+  /// No description provided for @presetRenameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename preset'**
+  String get presetRenameTitle;
+
+  /// No description provided for @presetNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get presetNameLabel;
+
+  /// No description provided for @presetCreateConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get presetCreateConfirm;
+
+  /// No description provided for @presetRenameConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get presetRenameConfirm;
+
+  /// No description provided for @presetDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete preset?'**
+  String get presetDeleteTitle;
+
+  /// No description provided for @presetDeleteContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset \"{name}\" will be permanently removed.'**
+  String presetDeleteContent(String name);
+
   /// No description provided for @settingsResetTitle.
   ///
   /// In en, this message translates to:
@@ -897,7 +975,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsResetContent.
   ///
   /// In en, this message translates to:
-  /// **'All values will revert to defaults.'**
+  /// **'The active preset and global settings will revert to defaults. Other presets are kept.'**
   String get settingsResetContent;
 
   /// No description provided for @commonCancel.

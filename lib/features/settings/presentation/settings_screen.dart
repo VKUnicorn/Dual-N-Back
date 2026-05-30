@@ -11,6 +11,7 @@ import 'package:dual_n_back/features/settings/domain/settings_model.dart';
 import 'package:dual_n_back/l10n/app_localizations.dart';
 import 'package:dual_n_back/shared/widgets/channel_layout_editor.dart';
 import 'package:dual_n_back/shared/widgets/estimated_duration_tile.dart';
+import 'package:dual_n_back/shared/widgets/preset_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -56,6 +57,104 @@ class SettingsScreen extends ConsumerWidget {
               current: settings.themeMode,
               onChanged: (mode) =>
                   unawaited(notifier.updateThemeMode(mode)),
+            ),
+          ),
+          _Section(
+            title: l.settingsSectionDailyGoal,
+            child: Column(
+              children: [
+                _SliderTile(
+                  label: l.settingsDailyGoal,
+                  value: settings.dailyGoalSessions.toDouble(),
+                  min: SettingsModel.minDailyGoalSessions.toDouble(),
+                  max: SettingsModel.maxDailyGoalSessions.toDouble(),
+                  divisions: SettingsModel.maxDailyGoalSessions -
+                      SettingsModel.minDailyGoalSessions,
+                  display: '${settings.dailyGoalSessions}',
+                  onChanged: (v) => notifier.updateDailyGoalSessions(v.round()),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 8),
+                      Text(
+                        l.settingsRestDays,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      _RestDayGrid(
+                        selected: settings.restDays,
+                        onChanged: (next) =>
+                            unawaited(notifier.updateRestDays(next)),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        l.settingsRestDaysHint,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          _Section(
+            title: l.settingsSectionNotifications,
+            child: Column(
+              children: [
+                SwitchListTile(
+                  title: Text(l.settingsNotificationsEnabled),
+                  value: settings.notificationsEnabled,
+                  onChanged: (v) => unawaited(
+                    notifier.updateNotificationsEnabled(enabled: v),
+                  ),
+                ),
+                ListTile(
+                  title: Text(l.settingsNotificationTime),
+                  enabled: settings.notificationsEnabled,
+                  trailing: Text(
+                    _formatNotificationTime(
+                      settings.notificationTimeMinutes,
+                    ),
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  onTap: settings.notificationsEnabled
+                      ? () => _pickNotificationTime(context, ref, settings)
+                      : null,
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                  child: Text(
+                    l.settingsNotificationsRestDaysHint,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Everything below this preset selector is preset-scoped: the
+          // active preset's payload is what these controls read and write.
+          _Section(
+            title: l.settingsSectionPreset,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const PresetSelector(),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    l.presetSectionHint,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                ),
+              ],
             ),
           ),
           _Section(
@@ -432,82 +531,6 @@ class SettingsScreen extends ConsumerWidget {
                   value: settings.feedbackAudioOnMiss,
                   onChanged: (v) => unawaited(
                     notifier.updateFeedbackAudioOnMiss(enabled: v),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          _Section(
-            title: l.settingsSectionDailyGoal,
-            child: Column(
-              children: [
-                _SliderTile(
-                  label: l.settingsDailyGoal,
-                  value: settings.dailyGoalSessions.toDouble(),
-                  min: SettingsModel.minDailyGoalSessions.toDouble(),
-                  max: SettingsModel.maxDailyGoalSessions.toDouble(),
-                  divisions: SettingsModel.maxDailyGoalSessions -
-                      SettingsModel.minDailyGoalSessions,
-                  display: '${settings.dailyGoalSessions}',
-                  onChanged: (v) => notifier.updateDailyGoalSessions(v.round()),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const SizedBox(height: 8),
-                      Text(
-                        l.settingsRestDays,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                      const SizedBox(height: 8),
-                      _RestDayGrid(
-                        selected: settings.restDays,
-                        onChanged: (next) =>
-                            unawaited(notifier.updateRestDays(next)),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        l.settingsRestDaysHint,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          _Section(
-            title: l.settingsSectionNotifications,
-            child: Column(
-              children: [
-                SwitchListTile(
-                  title: Text(l.settingsNotificationsEnabled),
-                  value: settings.notificationsEnabled,
-                  onChanged: (v) => unawaited(
-                    notifier.updateNotificationsEnabled(enabled: v),
-                  ),
-                ),
-                ListTile(
-                  title: Text(l.settingsNotificationTime),
-                  enabled: settings.notificationsEnabled,
-                  trailing: Text(
-                    _formatNotificationTime(
-                      settings.notificationTimeMinutes,
-                    ),
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                  onTap: settings.notificationsEnabled
-                      ? () => _pickNotificationTime(context, ref, settings)
-                      : null,
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-                  child: Text(
-                    l.settingsNotificationsRestDaysHint,
-                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
               ],

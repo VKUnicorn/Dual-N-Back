@@ -238,7 +238,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get settingsSectionDefaultChannels =>
-      'Каналы по умолчанию и расположение кнопок';
+      'Активные каналы и расположение кнопок';
 
   @override
   String get settingsLayoutHint =>
@@ -469,11 +469,53 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsThemeDark => 'Тёмная';
 
   @override
+  String get settingsSectionPreset => 'Пресет настроек';
+
+  @override
+  String get presetSectionHint =>
+      'Все настройки из блока ниже сохраняются в пресет настроек. Вы можете добавлять свои пресеты.';
+
+  @override
+  String get presetDefaultName => 'По умолчанию';
+
+  @override
+  String get presetAddTooltip => 'Новый пресет';
+
+  @override
+  String get presetRenameTooltip => 'Переименовать пресет';
+
+  @override
+  String get presetDeleteTooltip => 'Удалить пресет';
+
+  @override
+  String get presetCreateTitle => 'Новый пресет';
+
+  @override
+  String get presetRenameTitle => 'Переименовать пресет';
+
+  @override
+  String get presetNameLabel => 'Название';
+
+  @override
+  String get presetCreateConfirm => 'Создать';
+
+  @override
+  String get presetRenameConfirm => 'Переименовать';
+
+  @override
+  String get presetDeleteTitle => 'Удалить пресет?';
+
+  @override
+  String presetDeleteContent(String name) {
+    return 'Пресет «$name» будет удалён без возможности восстановления.';
+  }
+
+  @override
   String get settingsResetTitle => 'Сбросить настройки?';
 
   @override
   String get settingsResetContent =>
-      'Все значения вернутся к значениям по умолчанию.';
+      'Активный пресет и глобальные настройки вернутся к значениям по умолчанию. Остальные пресеты сохранятся.';
 
   @override
   String get commonCancel => 'Отмена';
