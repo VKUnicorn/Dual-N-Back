@@ -467,29 +467,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsThemeDark => 'Dark';
 
   @override
-  String get settingsSectionPreset => 'Settings preset';
+  String get settingsSectionPreset => 'Training profiles';
 
   @override
   String get presetSectionHint =>
-      'All settings in the block below are saved in the settings preset. You can add your own presets.';
+      'All settings in the block below are saved in the training profile. You can add your own profiles.';
 
   @override
-  String get presetDefaultName => 'Default';
+  String get presetDefaultName => 'Classic';
 
   @override
-  String get presetAddTooltip => 'New preset';
+  String get presetAddTooltip => 'New profile';
 
   @override
-  String get presetRenameTooltip => 'Rename preset';
+  String get presetRenameTooltip => 'Rename profile';
 
   @override
-  String get presetDeleteTooltip => 'Delete preset';
+  String get presetDeleteTooltip => 'Delete profile';
 
   @override
-  String get presetCreateTitle => 'New preset';
+  String get presetCreateTitle => 'New profile';
 
   @override
-  String get presetRenameTitle => 'Rename preset';
+  String get presetRenameTitle => 'Rename profile';
 
   @override
   String get presetNameLabel => 'Name';
@@ -501,11 +501,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get presetRenameConfirm => 'Rename';
 
   @override
-  String get presetDeleteTitle => 'Delete preset?';
+  String get presetDeleteTitle => 'Delete profile?';
 
   @override
   String presetDeleteContent(String name) {
-    return 'Preset \"$name\" will be permanently removed.';
+    return 'Profile \"$name\" will be permanently removed.';
   }
 
   @override

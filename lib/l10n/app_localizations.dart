@@ -891,49 +891,49 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSectionPreset.
   ///
   /// In en, this message translates to:
-  /// **'Settings preset'**
+  /// **'Training profiles'**
   String get settingsSectionPreset;
 
   /// No description provided for @presetSectionHint.
   ///
   /// In en, this message translates to:
-  /// **'All settings in the block below are saved in the settings preset. You can add your own presets.'**
+  /// **'All settings in the block below are saved in the training profile. You can add your own profiles.'**
   String get presetSectionHint;
 
   /// No description provided for @presetDefaultName.
   ///
   /// In en, this message translates to:
-  /// **'Default'**
+  /// **'Classic'**
   String get presetDefaultName;
 
   /// No description provided for @presetAddTooltip.
   ///
   /// In en, this message translates to:
-  /// **'New preset'**
+  /// **'New profile'**
   String get presetAddTooltip;
 
   /// No description provided for @presetRenameTooltip.
   ///
   /// In en, this message translates to:
-  /// **'Rename preset'**
+  /// **'Rename profile'**
   String get presetRenameTooltip;
 
   /// No description provided for @presetDeleteTooltip.
   ///
   /// In en, this message translates to:
-  /// **'Delete preset'**
+  /// **'Delete profile'**
   String get presetDeleteTooltip;
 
   /// No description provided for @presetCreateTitle.
   ///
   /// In en, this message translates to:
-  /// **'New preset'**
+  /// **'New profile'**
   String get presetCreateTitle;
 
   /// No description provided for @presetRenameTitle.
   ///
   /// In en, this message translates to:
-  /// **'Rename preset'**
+  /// **'Rename profile'**
   String get presetRenameTitle;
 
   /// No description provided for @presetNameLabel.
@@ -957,13 +957,13 @@ abstract class AppLocalizations {
   /// No description provided for @presetDeleteTitle.
   ///
   /// In en, this message translates to:
-  /// **'Delete preset?'**
+  /// **'Delete profile?'**
   String get presetDeleteTitle;
 
   /// No description provided for @presetDeleteContent.
   ///
   /// In en, this message translates to:
-  /// **'Preset \"{name}\" will be permanently removed.'**
+  /// **'Profile \"{name}\" will be permanently removed.'**
   String presetDeleteContent(String name);
 
   /// No description provided for @settingsResetTitle.

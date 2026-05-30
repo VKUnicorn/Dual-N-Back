@@ -469,29 +469,29 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsThemeDark => 'Тёмная';
 
   @override
-  String get settingsSectionPreset => 'Пресет настроек';
+  String get settingsSectionPreset => 'Профили тренировки';
 
   @override
   String get presetSectionHint =>
-      'Все настройки из блока ниже сохраняются в пресет настроек. Вы можете добавлять свои пресеты.';
+      'Все настройки из блока ниже сохраняются в профиль тренировки. Вы можете добавлять свои профили.';
 
   @override
-  String get presetDefaultName => 'По умолчанию';
+  String get presetDefaultName => 'Классический';
 
   @override
-  String get presetAddTooltip => 'Новый пресет';
+  String get presetAddTooltip => 'Новый профиль';
 
   @override
-  String get presetRenameTooltip => 'Переименовать пресет';
+  String get presetRenameTooltip => 'Переименовать профиль';
 
   @override
-  String get presetDeleteTooltip => 'Удалить пресет';
+  String get presetDeleteTooltip => 'Удалить профиль';
 
   @override
-  String get presetCreateTitle => 'Новый пресет';
+  String get presetCreateTitle => 'Новый профиль';
 
   @override
-  String get presetRenameTitle => 'Переименовать пресет';
+  String get presetRenameTitle => 'Переименовать профиль';
 
   @override
   String get presetNameLabel => 'Название';
@@ -503,11 +503,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get presetRenameConfirm => 'Переименовать';
 
   @override
-  String get presetDeleteTitle => 'Удалить пресет?';
+  String get presetDeleteTitle => 'Удалить профиль?';
 
   @override
   String presetDeleteContent(String name) {
-    return 'Пресет «$name» будет удалён без возможности восстановления.';
+    return 'Профиль «$name» будет удалён без возможности восстановления.';
   }
 
   @override
