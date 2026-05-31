@@ -6,6 +6,7 @@ import 'package:dual_n_back/core/audio/audio_provider.dart';
 import 'package:dual_n_back/core/audio/audio_service.dart';
 import 'package:dual_n_back/features/achievements/application/achievement.dart';
 import 'package:dual_n_back/features/achievements/application/achievements_provider.dart';
+import 'package:dual_n_back/features/achievements/presentation/achievement_icon.dart';
 import 'package:dual_n_back/features/game/application/game_notifier.dart';
 import 'package:dual_n_back/features/game/domain/adaptive_n.dart';
 import 'package:dual_n_back/features/game/domain/game_session.dart';
@@ -511,7 +512,13 @@ class _NewlyEarnedChip extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(achievement.icon, size: 28, color: scheme.primary),
+          AchievementIcon(
+            id: achievement.id,
+            earned: true,
+            size: 28,
+            fallbackIcon: achievement.icon,
+            fallbackColor: scheme.primary,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Column(

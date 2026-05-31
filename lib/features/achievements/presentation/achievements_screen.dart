@@ -2,6 +2,7 @@ import 'package:dual_n_back/features/achievements/application/achievement.dart';
 import 'package:dual_n_back/features/achievements/application/achievements_provider.dart';
 import 'package:dual_n_back/features/achievements/domain/achievement_group.dart';
 import 'package:dual_n_back/features/achievements/domain/achievement_progress.dart';
+import 'package:dual_n_back/features/achievements/presentation/achievement_icon.dart';
 import 'package:dual_n_back/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -159,7 +160,13 @@ class _AchievementCard extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         child: Row(
           children: [
-            Icon(achievement.icon, size: 44, color: iconColor),
+            AchievementIcon(
+              id: achievement.id,
+              earned: earned,
+              size: 44,
+              fallbackIcon: achievement.icon,
+              fallbackColor: iconColor,
+            ),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
