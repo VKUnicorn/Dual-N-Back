@@ -11,7 +11,7 @@ import 'package:dual_n_back/features/statistics/domain/saved_session.dart';
 ///
 /// Bump on any structural change. Importers should reject envelopes whose
 /// version they don't understand instead of guessing missing fields.
-const int statisticsBackupVersion = 1;
+const int statisticsBackupVersion = 2;
 
 /// Pure-Dart encoder for the session history. No I/O, no DB access — the
 /// caller passes the rows from `StatisticsRepository.loadAll`.
@@ -27,6 +27,7 @@ const int statisticsBackupVersion = 1;
 ///       "activeChannels": ["position","audio"],
 ///       "totalTrials": 22, "stimulusDurationMs": 500, "isiMs": 2500,
 ///       "minAccuracy": 0.83,
+///       "profileId": "default", "profileName": "",
 ///       "scores": [
 ///         {"channel": "position", "hits": 5, "misses": 1,
 ///          "falseAlarms": 0, "correctRejections": 14,
@@ -62,6 +63,10 @@ abstract final class StatisticsBackupCodec {
       'stimulusDurationMs': s.stimulusDurationMs,
       'isiMs': s.isiMs,
       'minAccuracy': s.minAccuracy,
+      // v2: training-profile snapshot. Null for sessions recorded before
+      // profiles existed; emitted as JSON null to keep the shape stable.
+      'profileId': s.profileId,
+      'profileName': s.profileName,
       'scores': [
         for (final score in entry.scores) _encodeScore(score),
       ],
@@ -106,9 +111,12 @@ abstract final class StatisticsBackupCodec {
     if (version is! int) {
       throw const BackupFormatException('missing "version"');
     }
-    if (version != statisticsBackupVersion) {
+    // Accept any version this build understands (1..current). v2 added the
+    // optional training-profile fields; older v1 files simply lack them and
+    // decode with null profiles.
+    if (version < 1 || version > statisticsBackupVersion) {
       throw BackupFormatException(
-        'unsupported version $version (expected $statisticsBackupVersion)',
+        'unsupported version $version (expected 1..$statisticsBackupVersion)',
       );
     }
     final sessions = raw['sessions'];
@@ -172,7 +180,15 @@ abstract final class StatisticsBackupCodec {
       stimulusDurationMs: _readInt(raw, 'stimulusDurationMs'),
       isiMs: _readInt(raw, 'isiMs'),
       score: domain.SessionScore(perChannel),
+      // Optional (v2+). Non-string / absent values decode to null.
+      profileId: _readNullableString(raw, 'profileId'),
+      profileName: _readNullableString(raw, 'profileName'),
     );
+  }
+
+  static String? _readNullableString(Map<String, Object?> m, String key) {
+    final v = m[key];
+    return v is String ? v : null;
   }
 
   static int _readInt(Map<String, Object?> m, String key) {

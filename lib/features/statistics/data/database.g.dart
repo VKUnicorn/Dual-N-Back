@@ -102,6 +102,28 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
     type: DriftSqlType.double,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<String> profileId = GeneratedColumn<String>(
+    'profile_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _profileNameMeta = const VerificationMeta(
+    'profileName',
+  );
+  @override
+  late final GeneratedColumn<String> profileName = GeneratedColumn<String>(
+    'profile_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -113,6 +135,8 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
     stimulusDurationMs,
     isiMs,
     minAccuracy,
+    profileId,
+    profileName,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -202,6 +226,21 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
     } else if (isInserting) {
       context.missing(_minAccuracyMeta);
     }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    }
+    if (data.containsKey('profile_name')) {
+      context.handle(
+        _profileNameMeta,
+        profileName.isAcceptableOrUnknown(
+          data['profile_name']!,
+          _profileNameMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -247,6 +286,14 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
         DriftSqlType.double,
         data['${effectivePrefix}min_accuracy'],
       )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_id'],
+      ),
+      profileName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}profile_name'],
+      ),
     );
   }
 
@@ -266,7 +313,7 @@ class Session extends DataClass implements Insertable<Session> {
   /// Recommended next N (after adaptive adjustment, or unchanged if disabled).
   final int newN;
 
-  /// Comma-separated [ChannelType.name] values of active channels.
+  /// Comma-separated `ChannelType.name` values of active channels.
   final String activeChannels;
   final int totalTrials;
   final int stimulusDurationMs;
@@ -274,6 +321,16 @@ class Session extends DataClass implements Insertable<Session> {
 
   /// Worst per-channel accuracy across the session (Jaeggi score).
   final double minAccuracy;
+
+  /// Id of the training profile this session was played with
+  /// (`Preset.defaultPresetId` for the built-in one). Nullable: sessions
+  /// recorded before profiles existed have no value.
+  final String? profileId;
+
+  /// Snapshot of the profile's name at play time (empty for the default
+  /// profile, whose display name is localized). Survives later renames or
+  /// deletes of the profile.
+  final String? profileName;
   const Session({
     required this.id,
     required this.startedAt,
@@ -284,6 +341,8 @@ class Session extends DataClass implements Insertable<Session> {
     required this.stimulusDurationMs,
     required this.isiMs,
     required this.minAccuracy,
+    this.profileId,
+    this.profileName,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -297,6 +356,12 @@ class Session extends DataClass implements Insertable<Session> {
     map['stimulus_duration_ms'] = Variable<int>(stimulusDurationMs);
     map['isi_ms'] = Variable<int>(isiMs);
     map['min_accuracy'] = Variable<double>(minAccuracy);
+    if (!nullToAbsent || profileId != null) {
+      map['profile_id'] = Variable<String>(profileId);
+    }
+    if (!nullToAbsent || profileName != null) {
+      map['profile_name'] = Variable<String>(profileName);
+    }
     return map;
   }
 
@@ -311,6 +376,12 @@ class Session extends DataClass implements Insertable<Session> {
       stimulusDurationMs: Value(stimulusDurationMs),
       isiMs: Value(isiMs),
       minAccuracy: Value(minAccuracy),
+      profileId: profileId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(profileId),
+      profileName: profileName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(profileName),
     );
   }
 
@@ -329,6 +400,8 @@ class Session extends DataClass implements Insertable<Session> {
       stimulusDurationMs: serializer.fromJson<int>(json['stimulusDurationMs']),
       isiMs: serializer.fromJson<int>(json['isiMs']),
       minAccuracy: serializer.fromJson<double>(json['minAccuracy']),
+      profileId: serializer.fromJson<String?>(json['profileId']),
+      profileName: serializer.fromJson<String?>(json['profileName']),
     );
   }
   @override
@@ -344,6 +417,8 @@ class Session extends DataClass implements Insertable<Session> {
       'stimulusDurationMs': serializer.toJson<int>(stimulusDurationMs),
       'isiMs': serializer.toJson<int>(isiMs),
       'minAccuracy': serializer.toJson<double>(minAccuracy),
+      'profileId': serializer.toJson<String?>(profileId),
+      'profileName': serializer.toJson<String?>(profileName),
     };
   }
 
@@ -357,6 +432,8 @@ class Session extends DataClass implements Insertable<Session> {
     int? stimulusDurationMs,
     int? isiMs,
     double? minAccuracy,
+    Value<String?> profileId = const Value.absent(),
+    Value<String?> profileName = const Value.absent(),
   }) => Session(
     id: id ?? this.id,
     startedAt: startedAt ?? this.startedAt,
@@ -367,6 +444,8 @@ class Session extends DataClass implements Insertable<Session> {
     stimulusDurationMs: stimulusDurationMs ?? this.stimulusDurationMs,
     isiMs: isiMs ?? this.isiMs,
     minAccuracy: minAccuracy ?? this.minAccuracy,
+    profileId: profileId.present ? profileId.value : this.profileId,
+    profileName: profileName.present ? profileName.value : this.profileName,
   );
   Session copyWithCompanion(SessionsCompanion data) {
     return Session(
@@ -387,6 +466,10 @@ class Session extends DataClass implements Insertable<Session> {
       minAccuracy: data.minAccuracy.present
           ? data.minAccuracy.value
           : this.minAccuracy,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      profileName: data.profileName.present
+          ? data.profileName.value
+          : this.profileName,
     );
   }
 
@@ -401,7 +484,9 @@ class Session extends DataClass implements Insertable<Session> {
           ..write('totalTrials: $totalTrials, ')
           ..write('stimulusDurationMs: $stimulusDurationMs, ')
           ..write('isiMs: $isiMs, ')
-          ..write('minAccuracy: $minAccuracy')
+          ..write('minAccuracy: $minAccuracy, ')
+          ..write('profileId: $profileId, ')
+          ..write('profileName: $profileName')
           ..write(')'))
         .toString();
   }
@@ -417,6 +502,8 @@ class Session extends DataClass implements Insertable<Session> {
     stimulusDurationMs,
     isiMs,
     minAccuracy,
+    profileId,
+    profileName,
   );
   @override
   bool operator ==(Object other) =>
@@ -430,7 +517,9 @@ class Session extends DataClass implements Insertable<Session> {
           other.totalTrials == this.totalTrials &&
           other.stimulusDurationMs == this.stimulusDurationMs &&
           other.isiMs == this.isiMs &&
-          other.minAccuracy == this.minAccuracy);
+          other.minAccuracy == this.minAccuracy &&
+          other.profileId == this.profileId &&
+          other.profileName == this.profileName);
 }
 
 class SessionsCompanion extends UpdateCompanion<Session> {
@@ -443,6 +532,8 @@ class SessionsCompanion extends UpdateCompanion<Session> {
   final Value<int> stimulusDurationMs;
   final Value<int> isiMs;
   final Value<double> minAccuracy;
+  final Value<String?> profileId;
+  final Value<String?> profileName;
   const SessionsCompanion({
     this.id = const Value.absent(),
     this.startedAt = const Value.absent(),
@@ -453,6 +544,8 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     this.stimulusDurationMs = const Value.absent(),
     this.isiMs = const Value.absent(),
     this.minAccuracy = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.profileName = const Value.absent(),
   });
   SessionsCompanion.insert({
     this.id = const Value.absent(),
@@ -464,6 +557,8 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     required int stimulusDurationMs,
     required int isiMs,
     required double minAccuracy,
+    this.profileId = const Value.absent(),
+    this.profileName = const Value.absent(),
   }) : startedAt = Value(startedAt),
        n = Value(n),
        newN = Value(newN),
@@ -482,6 +577,8 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     Expression<int>? stimulusDurationMs,
     Expression<int>? isiMs,
     Expression<double>? minAccuracy,
+    Expression<String>? profileId,
+    Expression<String>? profileName,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -494,6 +591,8 @@ class SessionsCompanion extends UpdateCompanion<Session> {
         'stimulus_duration_ms': stimulusDurationMs,
       if (isiMs != null) 'isi_ms': isiMs,
       if (minAccuracy != null) 'min_accuracy': minAccuracy,
+      if (profileId != null) 'profile_id': profileId,
+      if (profileName != null) 'profile_name': profileName,
     });
   }
 
@@ -507,6 +606,8 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     Value<int>? stimulusDurationMs,
     Value<int>? isiMs,
     Value<double>? minAccuracy,
+    Value<String?>? profileId,
+    Value<String?>? profileName,
   }) {
     return SessionsCompanion(
       id: id ?? this.id,
@@ -518,6 +619,8 @@ class SessionsCompanion extends UpdateCompanion<Session> {
       stimulusDurationMs: stimulusDurationMs ?? this.stimulusDurationMs,
       isiMs: isiMs ?? this.isiMs,
       minAccuracy: minAccuracy ?? this.minAccuracy,
+      profileId: profileId ?? this.profileId,
+      profileName: profileName ?? this.profileName,
     );
   }
 
@@ -551,6 +654,12 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     if (minAccuracy.present) {
       map['min_accuracy'] = Variable<double>(minAccuracy.value);
     }
+    if (profileId.present) {
+      map['profile_id'] = Variable<String>(profileId.value);
+    }
+    if (profileName.present) {
+      map['profile_name'] = Variable<String>(profileName.value);
+    }
     return map;
   }
 
@@ -565,7 +674,9 @@ class SessionsCompanion extends UpdateCompanion<Session> {
           ..write('totalTrials: $totalTrials, ')
           ..write('stimulusDurationMs: $stimulusDurationMs, ')
           ..write('isiMs: $isiMs, ')
-          ..write('minAccuracy: $minAccuracy')
+          ..write('minAccuracy: $minAccuracy, ')
+          ..write('profileId: $profileId, ')
+          ..write('profileName: $profileName')
           ..write(')'))
         .toString();
   }
@@ -830,7 +941,7 @@ class ChannelScore extends DataClass implements Insertable<ChannelScore> {
   final int id;
   final int sessionId;
 
-  /// [ChannelType.name].
+  /// `ChannelType.name`.
   final String channel;
   final int hits;
   final int misses;
@@ -1163,6 +1274,8 @@ typedef $$SessionsTableCreateCompanionBuilder =
       required int stimulusDurationMs,
       required int isiMs,
       required double minAccuracy,
+      Value<String?> profileId,
+      Value<String?> profileName,
     });
 typedef $$SessionsTableUpdateCompanionBuilder =
     SessionsCompanion Function({
@@ -1175,6 +1288,8 @@ typedef $$SessionsTableUpdateCompanionBuilder =
       Value<int> stimulusDurationMs,
       Value<int> isiMs,
       Value<double> minAccuracy,
+      Value<String?> profileId,
+      Value<String?> profileName,
     });
 
 final class $$SessionsTableReferences
@@ -1251,6 +1366,16 @@ class $$SessionsTableFilterComposer
 
   ColumnFilters<double> get minAccuracy => $composableBuilder(
     column: $table.minAccuracy,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get profileId => $composableBuilder(
+    column: $table.profileId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get profileName => $composableBuilder(
+    column: $table.profileName,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1333,6 +1458,16 @@ class $$SessionsTableOrderingComposer
     column: $table.minAccuracy,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get profileId => $composableBuilder(
+    column: $table.profileId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get profileName => $composableBuilder(
+    column: $table.profileName,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SessionsTableAnnotationComposer
@@ -1376,6 +1511,14 @@ class $$SessionsTableAnnotationComposer
 
   GeneratedColumn<double> get minAccuracy => $composableBuilder(
     column: $table.minAccuracy,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get profileId =>
+      $composableBuilder(column: $table.profileId, builder: (column) => column);
+
+  GeneratedColumn<String> get profileName => $composableBuilder(
+    column: $table.profileName,
     builder: (column) => column,
   );
 
@@ -1442,6 +1585,8 @@ class $$SessionsTableTableManager
                 Value<int> stimulusDurationMs = const Value.absent(),
                 Value<int> isiMs = const Value.absent(),
                 Value<double> minAccuracy = const Value.absent(),
+                Value<String?> profileId = const Value.absent(),
+                Value<String?> profileName = const Value.absent(),
               }) => SessionsCompanion(
                 id: id,
                 startedAt: startedAt,
@@ -1452,6 +1597,8 @@ class $$SessionsTableTableManager
                 stimulusDurationMs: stimulusDurationMs,
                 isiMs: isiMs,
                 minAccuracy: minAccuracy,
+                profileId: profileId,
+                profileName: profileName,
               ),
           createCompanionCallback:
               ({
@@ -1464,6 +1611,8 @@ class $$SessionsTableTableManager
                 required int stimulusDurationMs,
                 required int isiMs,
                 required double minAccuracy,
+                Value<String?> profileId = const Value.absent(),
+                Value<String?> profileName = const Value.absent(),
               }) => SessionsCompanion.insert(
                 id: id,
                 startedAt: startedAt,
@@ -1474,6 +1623,8 @@ class $$SessionsTableTableManager
                 stimulusDurationMs: stimulusDurationMs,
                 isiMs: isiMs,
                 minAccuracy: minAccuracy,
+                profileId: profileId,
+                profileName: profileName,
               ),
           withReferenceMapper: (p0) => p0
               .map(

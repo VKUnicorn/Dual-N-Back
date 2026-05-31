@@ -496,6 +496,7 @@ class GameNotifier extends Notifier<GameSession> {
         state = state.copyWith(newlyEarnedAchievements: newlyEarnedIds);
       }
 
+      final (profileId, profileName) = _activeProfile();
       await repo.saveSession(
         startedAt: now,
         n: s.n,
@@ -505,6 +506,8 @@ class GameNotifier extends Notifier<GameSession> {
         stimulusDurationMs: _config.stimulusDuration.inMilliseconds,
         isiMs: _config.trialDuration.inMilliseconds,
         score: score,
+        profileId: profileId,
+        profileName: profileName,
       );
     } on Object {
       // Best-effort: in tests where statisticsRepositoryProvider isn't
@@ -517,6 +520,25 @@ class GameNotifier extends Notifier<GameSession> {
       return ref.read(settingsProvider).dailyGoalSessions;
     } on Object {
       return SettingsModel.defaultDailyGoalSessions;
+    }
+  }
+
+  /// The active training profile's `(id, name)` recorded with the session.
+  /// `name` is the literal stored name (empty for the default profile —
+  /// its display name is localized at render time). Returns `(null, null)`
+  /// when settings aren't available (tests that don't override
+  /// [settingsProvider]).
+  (String?, String?) _activeProfile() {
+    try {
+      final settings = ref.read(settingsProvider);
+      final id = settings.activePresetId;
+      final ref0 = settings.presets.firstWhere(
+        (r) => r.id == id,
+        orElse: () => settings.presets.first,
+      );
+      return (id, ref0.name);
+    } on Object {
+      return (null, null);
     }
   }
 

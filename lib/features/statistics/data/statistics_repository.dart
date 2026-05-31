@@ -22,6 +22,8 @@ class StatisticsRepository {
     required int stimulusDurationMs,
     required int isiMs,
     required domain.SessionScore score,
+    String? profileId,
+    String? profileName,
   }) {
     return _db.transaction(() async {
       final sessionId = await _db.into(_db.sessions).insert(
@@ -35,6 +37,8 @@ class StatisticsRepository {
               stimulusDurationMs: stimulusDurationMs,
               isiMs: isiMs,
               minAccuracy: score.minAccuracy,
+              profileId: Value(profileId),
+              profileName: Value(profileName),
             ),
           );
       for (final entry in score.perChannel.entries) {
@@ -129,6 +133,8 @@ class StatisticsRepository {
                 stimulusDurationMs: seed.stimulusDurationMs,
                 isiMs: seed.isiMs,
                 minAccuracy: seed.score.minAccuracy,
+                profileId: Value(seed.profileId),
+                profileName: Value(seed.profileName),
               ),
             );
         for (final entry in seed.score.perChannel.entries) {
@@ -161,6 +167,8 @@ class FakeSessionSeed {
     required this.stimulusDurationMs,
     required this.isiMs,
     required this.score,
+    this.profileId,
+    this.profileName,
   });
 
   final DateTime startedAt;
@@ -171,4 +179,6 @@ class FakeSessionSeed {
   final int stimulusDurationMs;
   final int isiMs;
   final domain.SessionScore score;
+  final String? profileId;
+  final String? profileName;
 }

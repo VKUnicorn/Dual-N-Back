@@ -104,7 +104,7 @@ void main() {
       final d = PresetSettings.defaults();
 
       test('unknown enum names', () {
-        final p = PresetSettings.fromJson({
+        final p = PresetSettings.fromJson(const {
           'audioVoice': 'robotic',
           'gridStyle': 'hologram',
         });
@@ -113,21 +113,21 @@ void main() {
       });
 
       test('layout missing a channel', () {
-        final p = PresetSettings.fromJson({
+        final p = PresetSettings.fromJson(const {
           'channelLayout': ['position', 'audio', 'color'],
         });
         expect(p.channelLayout, d.channelLayout);
       });
 
       test('audio letters below minimum', () {
-        final p = PresetSettings.fromJson({
+        final p = PresetSettings.fromJson(const {
           'audioLetters': ['a', 'b'],
         });
         expect(p.audioLetters, d.audioLetters);
       });
 
       test('colors wrong length', () {
-        final p = PresetSettings.fromJson({
+        final p = PresetSettings.fromJson(const {
           'colors': ['FF000000', 'FF111111'],
         });
         expect(p.colors, d.colors);

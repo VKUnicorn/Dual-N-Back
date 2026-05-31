@@ -32,6 +32,8 @@ void main() {
         stimulusDurationMs: 500,
         isiMs: 2500,
         minAccuracy: 0.83,
+        profileId: 'p_7',
+        profileName: 'Fast',
       );
       const score = ChannelScore(
         id: 1,
@@ -62,6 +64,8 @@ void main() {
       expect(s['stimulusDurationMs'], 500);
       expect(s['isiMs'], 2500);
       expect(s['minAccuracy'], 0.83);
+      expect(s['profileId'], 'p_7');
+      expect(s['profileName'], 'Fast');
 
       final scores = s['scores']! as List;
       expect(scores, hasLength(1));
@@ -88,6 +92,8 @@ void main() {
         stimulusDurationMs: 500,
         isiMs: 2500,
         minAccuracy: 0.83,
+        profileId: 'p_9',
+        profileName: 'Custom',
       );
       const scorePosition = ChannelScore(
         id: 1,
@@ -127,11 +133,43 @@ void main() {
       expect(seed.totalTrials, 22);
       expect(seed.stimulusDurationMs, 500);
       expect(seed.isiMs, 2500);
+      expect(seed.profileId, 'p_9');
+      expect(seed.profileName, 'Custom');
       final pos = seed.score.perChannel[ChannelType.position]!;
       expect(pos.hits, 5);
       expect(pos.misses, 1);
       expect(pos.falseAlarms, 0);
       expect(pos.correctRejections, 14);
+    });
+
+    test('accepts a v1 backup without profile fields (null profile)', () {
+      final payload = jsonEncode({
+        'version': 1,
+        'exportedAt': '2026-05-21T00:00:00.000Z',
+        'sessions': [
+          {
+            'startedAt': '2026-05-07T10:00:00.000Z',
+            'n': 2,
+            'newN': 2,
+            'activeChannels': ['position'],
+            'totalTrials': 22,
+            'stimulusDurationMs': 500,
+            'isiMs': 2500,
+            'minAccuracy': 0.5,
+            'scores': [
+              {
+                'channel': 'position',
+                'hits': 1, 'misses': 0, 'falseAlarms': 0,
+                'correctRejections': 1, 'accuracy': 1.0, 'dPrime': 1.0,
+              },
+            ],
+          },
+        ],
+      });
+      final seeds = StatisticsBackupCodec.decode(payload);
+      expect(seeds, hasLength(1));
+      expect(seeds.first.profileId, isNull);
+      expect(seeds.first.profileName, isNull);
     });
 
     test('rejects unknown version', () {

@@ -60,6 +60,28 @@ void main() {
       expect(saved.first.scores, hasLength(2));
       final names = saved.first.scores.map((s) => s.channel).toSet();
       expect(names, {'position', 'audio'});
+      // No profile passed → columns are null (back-compat with old rows).
+      expect(saved.first.session.profileId, isNull);
+      expect(saved.first.session.profileName, isNull);
+    });
+
+    test('saveSession persists the training profile id and name', () async {
+      await repo.saveSession(
+        startedAt: DateTime(2026, 4, 30, 12),
+        n: 3,
+        newN: 3,
+        activeChannels: {ChannelType.position},
+        totalTrials: 22,
+        stimulusDurationMs: 500,
+        isiMs: 2500,
+        score: _scoreFor({ChannelType.position: 0.8}),
+        profileId: 'p_42',
+        profileName: 'Fast',
+      );
+
+      final saved = await repo.loadAll();
+      expect(saved.first.session.profileId, 'p_42');
+      expect(saved.first.session.profileName, 'Fast');
     });
 
     test('loadAll returns sessions newest first', () async {

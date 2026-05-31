@@ -2,8 +2,8 @@ import 'package:dual_n_back/features/settings/application/settings_notifier.dart
 import 'package:dual_n_back/features/settings/data/settings_repository.dart';
 import 'package:dual_n_back/features/settings/domain/preset.dart';
 import 'package:dual_n_back/features/settings/domain/settings_model.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<ProviderContainer> _container([

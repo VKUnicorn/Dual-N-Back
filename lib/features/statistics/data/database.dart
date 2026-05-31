@@ -23,6 +23,16 @@ class Sessions extends Table {
 
   /// Worst per-channel accuracy across the session (Jaeggi score).
   RealColumn get minAccuracy => real()();
+
+  /// Id of the training profile this session was played with
+  /// (`Preset.defaultPresetId` for the built-in one). Nullable: sessions
+  /// recorded before profiles existed have no value.
+  TextColumn get profileId => text().nullable()();
+
+  /// Snapshot of the profile's name at play time (empty for the default
+  /// profile, whose display name is localized). Survives later renames or
+  /// deletes of the profile.
+  TextColumn get profileName => text().nullable()();
 }
 
 /// Per-channel score for a single session.
@@ -52,7 +62,18 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            // v2 added the per-session training-profile snapshot columns.
+            await m.addColumn(sessions, sessions.profileId);
+            await m.addColumn(sessions, sessions.profileName);
+          }
+        },
+      );
 
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'dual_n_back');
