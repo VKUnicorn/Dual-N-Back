@@ -24,6 +24,13 @@ class InfoScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           children: [
+            Center(
+              child: Image.asset(
+                'assets/images/example.png',
+                fit: BoxFit.contain,
+              ),
+            ),
+            const SizedBox(height: 20),
             _SectionTitle(l.infoSectionWhatIs),
             _Body(l.infoSectionWhatIsBody),
             const SizedBox(height: 20),
