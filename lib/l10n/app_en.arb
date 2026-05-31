@@ -222,6 +222,8 @@
   "commonClear": "Clear",
 
   "statisticsTitle": "Statistics",
+  "statisticsProfileFilter": "Training profile",
+  "statisticsProfileAll": "All training profiles",
   "statisticsClearTooltip": "Clear history",
   "statisticsClearTitle": "Clear history?",
   "statisticsClearContent": "This action can't be undone.",

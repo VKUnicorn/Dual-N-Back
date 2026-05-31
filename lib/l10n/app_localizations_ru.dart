@@ -530,6 +530,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get statisticsTitle => 'Статистика';
 
   @override
+  String get statisticsProfileFilter => 'Профиль тренировки';
+
+  @override
+  String get statisticsProfileAll => 'Все профили тренировок';
+
+  @override
   String get statisticsClearTooltip => 'Очистить историю';
 
   @override

@@ -528,6 +528,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statisticsTitle => 'Statistics';
 
   @override
+  String get statisticsProfileFilter => 'Training profile';
+
+  @override
+  String get statisticsProfileAll => 'All training profiles';
+
+  @override
   String get statisticsClearTooltip => 'Clear history';
 
   @override

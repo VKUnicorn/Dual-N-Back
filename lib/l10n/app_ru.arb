@@ -177,6 +177,8 @@
   "commonClear": "Очистить",
 
   "statisticsTitle": "Статистика",
+  "statisticsProfileFilter": "Профиль тренировки",
+  "statisticsProfileAll": "Все профили тренировок",
   "statisticsClearTooltip": "Очистить историю",
   "statisticsClearTitle": "Очистить историю?",
   "statisticsClearContent": "Это действие нельзя отменить.",

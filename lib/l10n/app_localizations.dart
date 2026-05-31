@@ -1002,6 +1002,18 @@ abstract class AppLocalizations {
   /// **'Statistics'**
   String get statisticsTitle;
 
+  /// No description provided for @statisticsProfileFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Training profile'**
+  String get statisticsProfileFilter;
+
+  /// No description provided for @statisticsProfileAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All training profiles'**
+  String get statisticsProfileAll;
+
   /// No description provided for @statisticsClearTooltip.
   ///
   /// In en, this message translates to:

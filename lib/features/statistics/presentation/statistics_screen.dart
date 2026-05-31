@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:dual_n_back/features/game/domain/stimulus.dart';
 import 'package:dual_n_back/features/settings/application/settings_notifier.dart';
+import 'package:dual_n_back/features/settings/domain/preset.dart';
 import 'package:dual_n_back/features/statistics/application/statistics_provider.dart';
 import 'package:dual_n_back/features/statistics/application/stats_metrics.dart';
 import 'package:dual_n_back/features/statistics/data/statistics_backup_codec.dart';
@@ -46,6 +47,12 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   // `_anchor` is any moment inside the visible period; the visible range
   // is computed from it via [StatsPeriodMath.rangeFor].
   DateTime _anchor = DateTime.now();
+
+  /// Selected training-profile filter. `null` = all profiles (no filter).
+  /// Matched against `Session.profileId`. Reset to `null` automatically
+  /// when the selected id no longer appears in the history (e.g. after a
+  /// clear / import).
+  String? _profileFilterId;
 
   /// One [ExpansibleController] + [GlobalKey] per session id, lazily
   /// allocated on first focus. The controller lets us call `.expand()`
@@ -171,7 +178,26 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) =>
             Center(child: Text(l.statisticsErrorPrefix(e.toString()))),
-        data: (sessions) {
+        data: (allSessions) {
+          // Distinct training profiles present in the history, for the
+          // filter dropdown. Drop a stale selection that no longer exists.
+          final profiles = _profilesInHistory(allSessions, l.presetDefaultName);
+          final selectedProfileId =
+              profiles.any((p) => p.id == _profileFilterId)
+                  ? _profileFilterId
+                  : null;
+          // Everything below operates on the profile-filtered set so the
+          // summary, heatmap, charts and session list all agree.
+          final sessions = selectedProfileId == null
+              ? allSessions
+              : allSessions
+                  .where(
+                    (s) =>
+                        (s.session.profileId ?? Preset.defaultPresetId) ==
+                        selectedProfileId,
+                  )
+                  .toList();
+
           final range = StatsPeriodMath.rangeFor(_period, _anchor);
           final inRange = sessions
               .where(
@@ -272,6 +298,12 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                 onPrev: hasOlder ? () => _shift(-1) : null,
                 onNext: canGoForward ? () => _shift(1) : null,
               ),
+              if (profiles.isNotEmpty)
+                _ProfileFilterBar(
+                  profiles: profiles,
+                  selectedId: selectedProfileId,
+                  onChanged: (id) => setState(() => _profileFilterId = id),
+                ),
               const Divider(height: 1),
               Expanded(
                 // SingleChildScrollView (not ListView) so every
@@ -343,8 +375,8 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                     ],
                     const SizedBox(height: 16),
                     NDistributionChart(sessions: inRange),
-                    // Session list is only rendered for Day / Week.
-                    // For Month / Year the list can grow to hundreds of
+                    // Session list is only rendered for Day.
+                    // For Week / Month / Year the list can grow to hundreds of
                     // tiles, and because the screen uses
                     // SingleChildScrollView (not ListView.builder — see
                     // the comment near `child: SingleChildScrollView`
@@ -353,8 +385,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                     // day-mode focus / scroll-to-session interaction is
                     // also only meaningful for Day mode, so hiding the
                     // section in Month / Year loses no functionality.
-                    if (_period == StatsPeriod.day ||
-                        _period == StatsPeriod.week) ...[
+                    if (_period == StatsPeriod.day) ...[
                       const SizedBox(height: 24),
                       Text(
                         l.statisticsSessionsCount(inRange.length),
@@ -542,6 +573,76 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     if (ok ?? false) {
       await ref.read(statisticsRepositoryProvider).clearAll();
     }
+  }
+}
+
+/// Distinct training profiles that appear in [sessions] (newest-first
+/// order preserved, with the default profile pinned first). Legacy
+/// sessions with a null `profileId` are treated as the default profile —
+/// before profiles existed, everyone trained on the built-in "classic"
+/// configuration — so they surface under that entry rather than being
+/// hidden. The default profile's display name is localized via
+/// [defaultName]; custom profiles use the name snapshot stored with the
+/// session.
+List<({String id, String name})> _profilesInHistory(
+  List<SavedSession> sessions,
+  String defaultName,
+) {
+  final seen = <String>{};
+  final out = <({String id, String name})>[];
+  for (final s in sessions) {
+    final id = s.session.profileId ?? Preset.defaultPresetId;
+    if (!seen.add(id)) continue;
+    final stored = s.session.profileName;
+    final name = id == Preset.defaultPresetId
+        ? defaultName
+        : (stored != null && stored.isNotEmpty ? stored : id);
+    out.add((id: id, name: name));
+  }
+  // Pin the default profile to the top for a predictable order.
+  final defIdx = out.indexWhere((p) => p.id == Preset.defaultPresetId);
+  if (defIdx > 0) {
+    out.insert(0, out.removeAt(defIdx));
+  }
+  return out;
+}
+
+/// Labelled dropdown that filters the statistics to a single training
+/// profile (or all of them). Mirrors the dropdown style used elsewhere.
+class _ProfileFilterBar extends StatelessWidget {
+  const _ProfileFilterBar({
+    required this.profiles,
+    required this.selectedId,
+    required this.onChanged,
+  });
+
+  final List<({String id, String name})> profiles;
+  final String? selectedId;
+  final ValueChanged<String?> onChanged;
+
+  static const _allValue = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: DropdownMenu<String>(
+        // Re-seed the selection when the profile list or active filter
+        // changes (DropdownMenu caches initialSelection otherwise).
+        key: ValueKey(
+          '${selectedId ?? ''}|${profiles.map((p) => p.id).join(',')}',
+        ),
+        initialSelection: selectedId ?? _allValue,
+        expandedInsets: EdgeInsets.zero,
+        dropdownMenuEntries: [
+          DropdownMenuEntry(value: _allValue, label: l.statisticsProfileAll),
+          for (final p in profiles)
+            DropdownMenuEntry(value: p.id, label: p.name),
+        ],
+        onSelected: (v) => onChanged(v == null || v.isEmpty ? null : v),
+      ),
+    );
   }
 }
 
