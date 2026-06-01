@@ -708,7 +708,7 @@ class _GroupResetButton extends StatelessWidget {
         context: context,
         builder: (ctx) => AlertDialog(
           title: Text(groupTitle),
-          content: Text(l.settingsResetContent),
+          content: Text(l.settingsResetGroupContent),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),

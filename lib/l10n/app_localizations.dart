@@ -185,13 +185,13 @@ abstract class AppLocalizations {
   /// No description provided for @infoMetricFalseAlarms.
   ///
   /// In en, this message translates to:
-  /// **'False + (false alarm) — you pressed Match, but there wasn\'t actually one.'**
+  /// **'False+ (false alarm) — you pressed Match, but there wasn\'t actually one.'**
   String get infoMetricFalseAlarms;
 
   /// No description provided for @infoMetricCorrectRejections.
   ///
   /// In en, this message translates to:
-  /// **'Correct − (correct rejection) — there was no match, and you correctly didn\'t press.'**
+  /// **'Correct− (correct rejection) — there was no match, and you correctly didn\'t press.'**
   String get infoMetricCorrectRejections;
 
   /// No description provided for @infoMetricAccuracy.
@@ -455,13 +455,13 @@ abstract class AppLocalizations {
   /// No description provided for @statFalseAlarms.
   ///
   /// In en, this message translates to:
-  /// **'false +'**
+  /// **'false+'**
   String get statFalseAlarms;
 
   /// No description provided for @statCorrectRejections.
   ///
   /// In en, this message translates to:
-  /// **'correct -'**
+  /// **'correct-'**
   String get statCorrectRejections;
 
   /// No description provided for @statDPrime.
@@ -977,6 +977,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The active preset and global settings will revert to defaults. Other presets are kept.'**
   String get settingsResetContent;
+
+  /// No description provided for @settingsResetGroupContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Only this group will revert to defaults. Other settings are kept.'**
+  String get settingsResetGroupContent;
 
   /// No description provided for @commonCancel.
   ///

@@ -10,13 +10,12 @@ import 'package:dual_n_back/features/achievements/presentation/achievement_icon.
 import 'package:dual_n_back/features/game/application/game_notifier.dart';
 import 'package:dual_n_back/features/game/domain/adaptive_n.dart';
 import 'package:dual_n_back/features/game/domain/game_session.dart';
-import 'package:dual_n_back/features/game/domain/response_evaluator.dart';
-import 'package:dual_n_back/features/game/domain/stimulus.dart';
 import 'package:dual_n_back/features/game/presentation/game_screen.dart';
 import 'package:dual_n_back/features/settings/application/settings_notifier.dart';
 import 'package:dual_n_back/features/statistics/application/statistics_provider.dart';
 import 'package:dual_n_back/features/statistics/presentation/accuracy_color.dart';
 import 'package:dual_n_back/l10n/app_localizations.dart';
+import 'package:dual_n_back/shared/widgets/channel_breakdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -156,8 +155,38 @@ class _SessionResultViewState extends ConsumerState<SessionResultView> {
               Expanded(
                 child: ListView(
                   children: [
-                    for (final entry in score.perChannel.entries)
-                      _ChannelCard(channel: entry.key, score: entry.value),
+                    Card(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            for (final entry in score.perChannel.entries)
+                              ChannelBreakdownRow(
+                                label: channelLabel(context, entry.key),
+                                hits: entry.value.hits,
+                                misses: entry.value.misses,
+                                falseAlarms: entry.value.falseAlarms,
+                                correctRejections:
+                                    entry.value.correctRejections,
+                                accuracy: entry.value.accuracy,
+                                dPrime: entry.value.dPrime,
+                              ),
+                            const Divider(height: 24),
+                            OverallAccuracyRow(
+                              totalHits: score.perChannel.values
+                                  .fold<int>(0, (a, s) => a + s.hits),
+                              totalEngaged: score.perChannel.values.fold<int>(
+                                0,
+                                (a, s) => a + s.engagedDecisions,
+                              ),
+                              overallAccuracy: score.overallAccuracy,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -375,71 +404,6 @@ class _AdjustmentBadge extends StatelessWidget {
       child: Center(child: content),
     );
   }
-}
-
-class _ChannelCard extends StatelessWidget {
-  const _ChannelCard({required this.channel, required this.score});
-
-  final ChannelType channel;
-  final ChannelScore score;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l = AppLocalizations.of(context);
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  channelLabel(context, channel),
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Text(
-                  '${(score.accuracy * 100).toStringAsFixed(0)}%',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            LinearProgressIndicator(
-              value: score.accuracy,
-              minHeight: 8,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 16,
-              runSpacing: 4,
-              children: [
-                _stat(l.statHits, score.hits),
-                _stat(l.statMisses, score.misses),
-                _stat(l.statFalseAlarms, score.falseAlarms),
-                _stat(l.statCorrectRejections, score.correctRejections),
-                _stat(l.statDPrime, score.dPrime.toStringAsFixed(2)),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _stat(String label, Object value) => Text(
-        '$label: $value',
-        style: const TextStyle(fontSize: 13),
-      );
 }
 
 /// Compact horizontal strip of achievements that flipped from un-earned

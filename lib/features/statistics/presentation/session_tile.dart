@@ -6,6 +6,7 @@ import 'package:dual_n_back/features/statistics/data/database.dart';
 import 'package:dual_n_back/features/statistics/domain/saved_session.dart';
 import 'package:dual_n_back/features/statistics/presentation/accuracy_color.dart';
 import 'package:dual_n_back/l10n/app_localizations.dart';
+import 'package:dual_n_back/shared/widgets/channel_breakdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -108,13 +109,22 @@ class SessionTile extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 for (final score in saved.scores)
-                  _ChannelBreakdown(
+                  ChannelBreakdownRow(
                     label: _channelDisplay(context, score.channel),
-                    score: score,
+                    hits: score.hits,
+                    misses: score.misses,
+                    falseAlarms: score.falseAlarms,
+                    correctRejections: score.correctRejections,
+                    accuracy: score.accuracy,
+                    dPrime: score.dPrime,
                   ),
                 const Divider(height: 24),
-                _OverallRow(
-                  scores: saved.scores,
+                OverallAccuracyRow(
+                  totalHits: saved.scores.fold<int>(0, (a, s) => a + s.hits),
+                  totalEngaged: saved.scores.fold<int>(
+                    0,
+                    (a, s) => a + s.hits + s.misses + s.falseAlarms,
+                  ),
                   overallAccuracy: overallAcc,
                 ),
                 if (session.newN != session.n) ...[
@@ -178,131 +188,6 @@ class SessionTile extends ConsumerWidget {
   int _scoredTrials(Session session) {
     final scored = session.totalTrials - session.n;
     return scored < 0 ? 0 : scored;
-  }
-}
-
-/// Per-channel breakdown row shown inside an expanded session tile.
-/// Displays the channel name, headline accuracy + d′, and the raw signal-
-/// detection counters (hits / misses / false alarms / correct rejections).
-/// The raw counters are the debug-grade information that lets the user
-/// reproduce `overallAccuracy = sum(hits) / sum(hits + misses + fa)` by
-/// hand and verify what the adaptive rule was looking at.
-class _ChannelBreakdown extends StatelessWidget {
-  const _ChannelBreakdown({required this.label, required this.score});
-
-  final String label;
-  final ChannelScore score;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l = AppLocalizations.of(context);
-    final scheme = theme.colorScheme;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(label, style: theme.textTheme.bodyMedium),
-              // Per-channel headline now includes the raw `hits / engaged`
-              // fraction (engaged = hits + misses + false alarms) — these
-              // are the exact numbers the overall row sums up. With them
-              // visible per channel, the user can see e.g. "5/8" + "4/7"
-              // → 9/15 on the overall row and not wonder where the digits
-              // came from.
-              Text(
-                '${score.hits}/${score.hits + score.misses + score.falseAlarms}'
-                ' = ${(score.accuracy * 100).toStringAsFixed(0)}% '
-                "·  d'=${score.dPrime.toStringAsFixed(2)}",
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: scheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Wrap(
-            spacing: 12,
-            runSpacing: 2,
-            children: [
-              _counter(theme, l.statHits, score.hits),
-              _counter(theme, l.statMisses, score.misses),
-              _counter(theme, l.statFalseAlarms, score.falseAlarms),
-              _counter(theme, l.statCorrectRejections, score.correctRejections),
-              _counter(
-                theme,
-                l.statEngaged,
-                score.hits + score.misses + score.falseAlarms,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _counter(ThemeData theme, String label, int value) => Text(
-        '$label: $value',
-        style: theme.textTheme.bodySmall?.copyWith(
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
-      );
-}
-
-/// Pooled-accuracy summary row at the bottom of an expanded tile.
-/// Shows the raw fraction `hits / engaged` so the user can verify the
-/// rounded percentage against the threshold the adaptive rule used.
-class _OverallRow extends StatelessWidget {
-  const _OverallRow({required this.scores, required this.overallAccuracy});
-
-  final List<ChannelScore> scores;
-  final double overallAccuracy;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l = AppLocalizations.of(context);
-    final totalHits = scores.fold<int>(0, (a, s) => a + s.hits);
-    final totalEngaged = scores.fold<int>(
-      0,
-      (a, s) => a + s.hits + s.misses + s.falseAlarms,
-    );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              l.statisticsSessionOverallLabel,
-              style: theme.textTheme.bodyMedium,
-            ),
-            Text(
-              l.statisticsSessionOverallValue(
-                totalHits,
-                totalEngaged,
-                (overallAccuracy * 100).round(),
-              ),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Text(
-          l.statisticsSessionOverallFormulaHint,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ],
-    );
   }
 }
 

@@ -56,11 +56,11 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get infoMetricFalseAlarms =>
-      'False + (ложная тревога) — ты нажал «совпадение», но на самом деле его не было.';
+      'False+ (ложная тревога) — ты нажал «совпадение», но на самом деле его не было.';
 
   @override
   String get infoMetricCorrectRejections =>
-      'Correct − (правильный пропуск) — совпадения не было, и ты правильно не стал нажимать.';
+      'Correct− (правильный пропуск) — совпадения не было, и ты правильно не стал нажимать.';
 
   @override
   String get infoMetricAccuracy =>
@@ -215,10 +215,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get statMisses => 'misses';
 
   @override
-  String get statFalseAlarms => 'false +';
+  String get statFalseAlarms => 'false+';
 
   @override
-  String get statCorrectRejections => 'correct -';
+  String get statCorrectRejections => 'correct-';
 
   @override
   String get statDPrime => 'd\'';
@@ -518,6 +518,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Активный пресет и глобальные настройки вернутся к значениям по умолчанию. Остальные пресеты сохранятся.';
 
   @override
+  String get settingsResetGroupContent =>
+      'К значениям по умолчанию вернётся только эта группа. Остальные настройки сохранятся.';
+
+  @override
   String get commonCancel => 'Отмена';
 
   @override
@@ -764,7 +768,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get statisticsSessionOverallFormulaHint =>
-      '= сумма hits по всем каналам / сумма engaged по всем каналам (engaged = hits + misses + false +; correct − не учитывается)';
+      '= сумма hits по всем каналам / сумма engaged по всем каналам.\nEngaged = hits + misses + false+; correct− не учитывается';
 
   @override
   String get statisticsSessionAdaptiveChangeLabel => 'Адаптация N:';

@@ -56,11 +56,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get infoMetricFalseAlarms =>
-      'False + (false alarm) — you pressed Match, but there wasn\'t actually one.';
+      'False+ (false alarm) — you pressed Match, but there wasn\'t actually one.';
 
   @override
   String get infoMetricCorrectRejections =>
-      'Correct − (correct rejection) — there was no match, and you correctly didn\'t press.';
+      'Correct− (correct rejection) — there was no match, and you correctly didn\'t press.';
 
   @override
   String get infoMetricAccuracy =>
@@ -215,10 +215,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statMisses => 'misses';
 
   @override
-  String get statFalseAlarms => 'false +';
+  String get statFalseAlarms => 'false+';
 
   @override
-  String get statCorrectRejections => 'correct -';
+  String get statCorrectRejections => 'correct-';
 
   @override
   String get statDPrime => 'd\'';
@@ -514,6 +514,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsResetContent =>
       'The active preset and global settings will revert to defaults. Other presets are kept.';
+
+  @override
+  String get settingsResetGroupContent =>
+      'Only this group will revert to defaults. Other settings are kept.';
 
   @override
   String get commonCancel => 'Cancel';
