@@ -65,6 +65,15 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   final Map<int, ExpansibleController> _expandControllers = {};
   final Map<int, GlobalKey> _tileKeys = {};
 
+  @override
+  void initState() {
+    super.initState();
+    // Pre-select the last-played training profile so the screen opens on
+    // the data the user just trained on. Falls back to "all profiles" in
+    // the build method if this id isn't present in the history.
+    _profileFilterId = ref.read(settingsProvider).activePresetId;
+  }
+
   void _setPeriod(StatsPeriod p) {
     setState(() {
       _period = p;
@@ -282,11 +291,23 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           final restDays = ref.watch(
             settingsProvider.select((s) => s.restDays),
           );
+          // Earliest session in the (profile-filtered) history — the
+          // daily-goal denominator is clamped to this day so calendar days
+          // before the user started training don't count as missed goals.
+          DateTime? firstActiveDay;
+          for (final s in sessions) {
+            final d = s.session.startedAt;
+            final day = DateTime(d.year, d.month, d.day);
+            if (firstActiveDay == null || day.isBefore(firstActiveDay)) {
+              firstActiveDay = day;
+            }
+          }
           final summary = summarize(
             range,
             inRange,
             dailyGoal,
             restDays: restDays,
+            firstActiveDay: firstActiveDay,
           );
 
           return Column(
