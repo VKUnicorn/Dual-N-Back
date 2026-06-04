@@ -113,7 +113,11 @@ class _SessionResultViewState extends ConsumerState<SessionResultView> {
     return Stack(
       children: [
         Padding(
-          padding: const EdgeInsets.all(24),
+          // Horizontal padding matches the statistics screen (16) rather
+          // than 24 so the per-channel breakdown card gets the same usable
+          // width — the signal-detection counters fit on one line there and
+          // were wrapping here purely from the 16px-narrower content box.
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -158,7 +162,7 @@ class _SessionResultViewState extends ConsumerState<SessionResultView> {
                     Card(
                       margin: const EdgeInsets.only(bottom: 12),
                       child: Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(12),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
