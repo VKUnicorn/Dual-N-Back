@@ -173,6 +173,7 @@ PeriodSummary summarize(
   List<SavedSession> inRange,
   int dailyGoal, {
   Set<int> restDays = const <int>{},
+  DateTime? firstActiveDay,
 }) {
   SavedSession? best;
   var bestAcc = -1.0;
@@ -251,9 +252,18 @@ PeriodSummary summarize(
   final today = DateTime(now.year, now.month, now.day);
   final tomorrow = today.add(const Duration(days: 1));
   final endExclusive = range.end.isAfter(tomorrow) ? tomorrow : range.end;
+  // Days before the user's very first session aren't counted as missed
+  // goals — they predate any usage of the app. Clamp the window start to
+  // the first-active day so e.g. the "Year" tab on a mid-year start shows
+  // "9/9" instead of "9/111". `firstActiveDay` is already day-truncated by
+  // the caller; null (no history) leaves the start untouched.
+  var start = range.start;
+  if (firstActiveDay != null && firstActiveDay.isAfter(start)) {
+    start = firstActiveDay;
+  }
   var totalDays = 0;
   var achieved = 0;
-  var cursor = range.start;
+  var cursor = start;
   while (cursor.isBefore(endExclusive)) {
     if (!restDays.contains(cursor.weekday)) {
       totalDays += 1;
