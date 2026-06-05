@@ -42,7 +42,13 @@ class EstimatedDurationTile extends StatelessWidget {
         children: [
           Text(
             l.settingsEstimatedDuration,
-            style: theme.textTheme.bodyLarge?.copyWith(color: mutedColor),
+            // Slightly smaller than the value so this longer label takes
+            // less horizontal room (it's the widest text on both the
+            // settings and start-view rows).
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: mutedColor,
+              fontSize: (theme.textTheme.bodyLarge?.fontSize ?? 16) - 1.5,
+            ),
           ),
           Text(
             value,
