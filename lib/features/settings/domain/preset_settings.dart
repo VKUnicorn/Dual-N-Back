@@ -1,6 +1,7 @@
 import 'package:dual_n_back/core/constants/audio_voice.dart';
 import 'package:dual_n_back/core/constants/grid_style.dart';
 import 'package:dual_n_back/core/constants/nback_defaults.dart';
+import 'package:dual_n_back/features/game/domain/adaptive_n.dart';
 import 'package:dual_n_back/features/game/domain/stimulus.dart';
 import 'package:dual_n_back/features/settings/domain/settings_model.dart';
 import 'package:meta/meta.dart';
@@ -27,6 +28,7 @@ class PresetSettings {
     required this.matchProbability,
     required this.matchProbabilityJitter,
     required this.adaptiveMode,
+    required this.adaptiveCriterion,
     required this.advanceThreshold,
     required this.regressThreshold,
     required this.volume,
@@ -59,6 +61,7 @@ class PresetSettings {
         matchProbability: NBackDefaults.matchProbability,
         matchProbabilityJitter: NBackDefaults.matchProbabilityJitter,
         adaptiveMode: false,
+        adaptiveCriterion: AdaptiveCriterion.minAccuracy,
         advanceThreshold: NBackDefaults.advanceThreshold,
         regressThreshold: NBackDefaults.regressThreshold,
         volume: 1,
@@ -89,6 +92,7 @@ class PresetSettings {
         matchProbability: s.matchProbability,
         matchProbabilityJitter: s.matchProbabilityJitter,
         adaptiveMode: s.adaptiveMode,
+        adaptiveCriterion: s.adaptiveCriterion,
         advanceThreshold: s.advanceThreshold,
         regressThreshold: s.regressThreshold,
         volume: s.volume,
@@ -131,6 +135,9 @@ class PresetSettings {
       matchProbabilityJitter: _asDouble(json['matchProbabilityJitter']) ??
           d.matchProbabilityJitter,
       adaptiveMode: _asBool(json['adaptiveMode']) ?? d.adaptiveMode,
+      adaptiveCriterion:
+          _parseEnum(AdaptiveCriterion.values, json['adaptiveCriterion']) ??
+              d.adaptiveCriterion,
       advanceThreshold:
           _asDouble(json['advanceThreshold']) ?? d.advanceThreshold,
       regressThreshold:
@@ -171,6 +178,7 @@ class PresetSettings {
   final double matchProbability;
   final double matchProbabilityJitter;
   final bool adaptiveMode;
+  final AdaptiveCriterion adaptiveCriterion;
   final double advanceThreshold;
   final double regressThreshold;
   final double volume;
@@ -199,6 +207,7 @@ class PresetSettings {
         'matchProbability': matchProbability,
         'matchProbabilityJitter': matchProbabilityJitter,
         'adaptiveMode': adaptiveMode,
+        'adaptiveCriterion': adaptiveCriterion.name,
         'advanceThreshold': advanceThreshold,
         'regressThreshold': regressThreshold,
         'volume': volume,

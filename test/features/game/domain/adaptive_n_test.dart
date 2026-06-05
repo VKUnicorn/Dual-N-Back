@@ -105,11 +105,14 @@ void main() {
     test('user-reported: 65% overall holds at 60% regress rail', () {
       // Reproduces a bug report where a dual session showed 65% overall
       // accuracy on the result screen but the adaptive rule still
-      // regressed. Under the legacy min-accuracy logic this happened
-      // whenever one channel dragged the minimum below the rail —
-      // pooled accuracy is what the user sees on screen, so it must be
-      // what the adaptive rule reads.
-      const adaptive = AdaptiveN(regressThreshold: 0.6);
+      // regressed. Under the min-accuracy criterion this happens
+      // whenever one channel drags the minimum below the rail — pooled
+      // accuracy is what the user sees on screen, so the overall
+      // criterion must read it.
+      const adaptive = AdaptiveN(
+        regressThreshold: 0.6,
+        criterion: AdaptiveCriterion.overallAccuracy,
+      );
       // position: 18 hits / 2 misses, 0 fa → 18/20 = 90%
       // audio:    8 hits / 8 misses, 4 fa → 8/20 = 40%
       // overall = 26 / 40 = 65% → above 60% rail → HOLD
@@ -135,12 +138,12 @@ void main() {
       expect(result.adjustment, NAdjustment.hold);
     });
 
-    test('uses overall (pooled) accuracy, not worst per-channel', () {
-      // Regression test for the user-reported issue: a dual session with
-      // position 90% / audio 68% pools to ~79% — above the 70% regress
-      // rail and below the 90% advance rail → must hold. The legacy
-      // min-accuracy rule would have regressed on the 68% channel.
-      const adaptive = AdaptiveN();
+    test('overall criterion uses pooled accuracy, not worst per-channel', () {
+      // A dual session with position 90% / audio 68% pools to ~79% —
+      // above the 70% regress rail and below the 90% advance rail → must
+      // hold under the overall criterion. The min-accuracy criterion
+      // would regress on the 68% channel.
+      const adaptive = AdaptiveN(criterion: AdaptiveCriterion.overallAccuracy);
       // 9 hits / 1 miss on position = 90% (10 engaged).
       // 6 hits / 3 misses + 1 false alarm on audio ≈ 60% (10 engaged).
       // Overall = 15 / 20 = 75% → strictly between 70 and 90 → hold.
@@ -159,13 +162,39 @@ void main() {
         ),
       });
       // Sanity: the worst per-channel accuracy is below the regress
-      // rail, so this would have regressed under the legacy rule.
+      // rail, so this would regress under the min-accuracy criterion.
       expect(score.minAccuracy, lessThanOrEqualTo(0.7));
       expect(score.overallAccuracy, closeTo(0.75, 0.001));
 
       final result = adaptive.next(currentN: 3, score: score);
       expect(result.n, 3);
       expect(result.adjustment, NAdjustment.hold);
+    });
+
+    test('default criterion is min-accuracy (Jaeggi)', () {
+      // Same fixture as above, but with the default criterion: the
+      // worst channel (~60%) is at/below the 70% regress rail, so the
+      // default (min-accuracy) regresses where the overall criterion held.
+      const adaptive = AdaptiveN();
+      const score = SessionScore({
+        ChannelType.position: ChannelScore(
+          hits: 9,
+          misses: 1,
+          falseAlarms: 0,
+          correctRejections: 10,
+        ),
+        ChannelType.audio: ChannelScore(
+          hits: 6,
+          misses: 3,
+          falseAlarms: 1,
+          correctRejections: 10,
+        ),
+      });
+      expect(adaptive.criterion, AdaptiveCriterion.minAccuracy);
+
+      final result = adaptive.next(currentN: 3, score: score);
+      expect(result.n, 2);
+      expect(result.adjustment, NAdjustment.regress);
     });
   });
 }

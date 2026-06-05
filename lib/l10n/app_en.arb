@@ -113,10 +113,18 @@
     "placeholders": {"min": {"type": "int"}, "max": {"type": "int"}}
   },
   "settingsAdaptive": "Adaptive mode",
-  "settingsAdaptiveSubtitle": "Increase N at ≥{advance}% accuracy, decrease at ≤{regress}%",
-  "@settingsAdaptiveSubtitle": {
+  "settingsAdaptiveSubtitleMin": "Increase N at ≥{advance}% minimal accuracy, decrease at ≤{regress}%",
+  "@settingsAdaptiveSubtitleMin": {
     "placeholders": {"advance": {"type": "int"}, "regress": {"type": "int"}}
   },
+  "settingsAdaptiveSubtitleAvg": "Increase N at ≥{advance}% average accuracy, decrease at ≤{regress}%",
+  "@settingsAdaptiveSubtitleAvg": {
+    "placeholders": {"advance": {"type": "int"}, "regress": {"type": "int"}}
+  },
+  "settingsAdaptiveCriterion": "Adaptive accuracy criterion",
+  "settingsAdaptiveCriterionMin": "Minimal",
+  "settingsAdaptiveCriterionAvg": "Average",
+  "settingsAdaptiveCriterionHint": "The original Jaeggi test uses minimal accuracy by default to decide the N change in adaptive mode.",
   "settingsAdaptiveThresholds": "Accuracy thresholds",
   "settingsAdaptiveThresholdsValue": "{regress}% / {advance}%",
   "@settingsAdaptiveThresholdsValue": {

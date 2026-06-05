@@ -5,6 +5,7 @@ import 'package:dual_n_back/core/constants/app_theme_mode.dart';
 import 'package:dual_n_back/core/constants/audio_voice.dart';
 import 'package:dual_n_back/core/constants/grid_style.dart';
 import 'package:dual_n_back/core/constants/nback_defaults.dart';
+import 'package:dual_n_back/features/game/domain/adaptive_n.dart';
 import 'package:dual_n_back/features/game/domain/stimulus_generator.dart';
 import 'package:dual_n_back/features/settings/application/settings_notifier.dart';
 import 'package:dual_n_back/features/settings/domain/settings_model.dart';
@@ -167,6 +168,7 @@ class SettingsScreen extends ConsumerWidget {
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   child: SegmentedButton<GridStyle>(
                     expandedInsets: EdgeInsets.zero,
+                    showSelectedIcon: false,
                     segments: [
                       ButtonSegment(
                         value: GridStyle.classic,
@@ -234,6 +236,7 @@ class SettingsScreen extends ConsumerWidget {
                       const SizedBox(height: 8),
                       SegmentedButton<AudioVoice>(
                         expandedInsets: EdgeInsets.zero,
+                        showSelectedIcon: false,
                         segments: [
                           ButtonSegment(
                             value: AudioVoice.female,
@@ -407,14 +410,26 @@ class SettingsScreen extends ConsumerWidget {
                 SwitchListTile(
                   title: Text(l.settingsAdaptive),
                   subtitle: Text(
-                    l.settingsAdaptiveSubtitle(
-                      (settings.advanceThreshold * 100).round(),
-                      (settings.regressThreshold * 100).round(),
-                    ),
+                    settings.adaptiveCriterion ==
+                            AdaptiveCriterion.minAccuracy
+                        ? l.settingsAdaptiveSubtitleMin(
+                            (settings.advanceThreshold * 100).round(),
+                            (settings.regressThreshold * 100).round(),
+                          )
+                        : l.settingsAdaptiveSubtitleAvg(
+                            (settings.advanceThreshold * 100).round(),
+                            (settings.regressThreshold * 100).round(),
+                          ),
                   ),
                   value: settings.adaptiveMode,
                   onChanged: (v) =>
                       notifier.updateAdaptiveMode(enabled: v),
+                ),
+                _AdaptiveCriterionTile(
+                  criterion: settings.adaptiveCriterion,
+                  enabled: settings.adaptiveMode,
+                  onChanged: (c) =>
+                      unawaited(notifier.updateAdaptiveCriterion(c)),
                 ),
                 _RangeSliderTile(
                   label: l.settingsAdaptiveThresholds,
@@ -781,6 +796,67 @@ class _SliderTile extends StatelessWidget {
             max: max,
             divisions: divisions,
             onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Adaptive-mode criterion selector: which accuracy figure (worst
+/// per-channel vs overall pooled) drives the N adjustment. Greyed out and
+/// non-interactive when [enabled] is false (adaptive mode off), mirroring
+/// the threshold slider's disabled treatment. A hint below clarifies the
+/// Jaeggi default.
+class _AdaptiveCriterionTile extends StatelessWidget {
+  const _AdaptiveCriterionTile({
+    required this.criterion,
+    required this.enabled,
+    required this.onChanged,
+  });
+
+  final AdaptiveCriterion criterion;
+  final bool enabled;
+  final ValueChanged<AdaptiveCriterion> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
+    final mutedLabel = theme.textTheme.bodyLarge?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+    );
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            l.settingsAdaptiveCriterion,
+            style: enabled ? theme.textTheme.bodyLarge : mutedLabel,
+          ),
+          const SizedBox(height: 8),
+          SegmentedButton<AdaptiveCriterion>(
+            expandedInsets: EdgeInsets.zero,
+            showSelectedIcon: false,
+            segments: [
+              ButtonSegment(
+                value: AdaptiveCriterion.minAccuracy,
+                label: Text(l.settingsAdaptiveCriterionMin),
+              ),
+              ButtonSegment(
+                value: AdaptiveCriterion.overallAccuracy,
+                label: Text(l.settingsAdaptiveCriterionAvg),
+              ),
+            ],
+            selected: {criterion},
+            onSelectionChanged:
+                enabled ? (next) => onChanged(next.first) : null,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l.settingsAdaptiveCriterionHint,
+            style: theme.textTheme.bodySmall,
           ),
         ],
       ),

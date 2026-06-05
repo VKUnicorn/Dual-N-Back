@@ -21,6 +21,7 @@ void main() {
       expect(p.matchProbability, s.matchProbability);
       expect(p.matchProbabilityJitter, s.matchProbabilityJitter);
       expect(p.adaptiveMode, s.adaptiveMode);
+      expect(p.adaptiveCriterion, s.adaptiveCriterion);
       expect(p.advanceThreshold, s.advanceThreshold);
       expect(p.regressThreshold, s.regressThreshold);
       expect(p.volume, s.volume);

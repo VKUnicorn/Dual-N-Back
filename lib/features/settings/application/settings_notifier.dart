@@ -4,6 +4,7 @@ import 'package:dual_n_back/core/constants/app_theme_mode.dart';
 import 'package:dual_n_back/core/constants/audio_voice.dart';
 import 'package:dual_n_back/core/constants/grid_style.dart';
 import 'package:dual_n_back/core/constants/nback_defaults.dart';
+import 'package:dual_n_back/features/game/domain/adaptive_n.dart';
 import 'package:dual_n_back/features/game/domain/stimulus.dart';
 import 'package:dual_n_back/features/settings/data/settings_repository.dart';
 import 'package:dual_n_back/features/settings/domain/preset.dart';
@@ -205,6 +206,10 @@ class SettingsNotifier extends Notifier<SettingsModel> {
 
   Future<void> updateAdaptiveMode({required bool enabled}) async {
     await _commitScoped(state.copyWith(adaptiveMode: enabled));
+  }
+
+  Future<void> updateAdaptiveCriterion(AdaptiveCriterion criterion) async {
+    await _commitScoped(state.copyWith(adaptiveCriterion: criterion));
   }
 
   /// Updates the per-channel accuracy thresholds used by adaptive mode.
@@ -413,6 +418,7 @@ class SettingsNotifier extends Notifier<SettingsModel> {
         matchProbability: NBackDefaults.matchProbability,
         matchProbabilityJitter: NBackDefaults.matchProbabilityJitter,
         adaptiveMode: false,
+        adaptiveCriterion: AdaptiveCriterion.minAccuracy,
         advanceThreshold: NBackDefaults.advanceThreshold,
         regressThreshold: NBackDefaults.regressThreshold,
       ),

@@ -265,9 +265,28 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsAdaptive => 'Адаптивный режим';
 
   @override
-  String settingsAdaptiveSubtitle(int advance, int regress) {
-    return 'Повышать N при ≥$advance% точности, понижать при ≤$regress%';
+  String settingsAdaptiveSubtitleMin(int advance, int regress) {
+    return 'Повышать N при ≥$advance% минимальной точности, понижать при ≤$regress%';
   }
+
+  @override
+  String settingsAdaptiveSubtitleAvg(int advance, int regress) {
+    return 'Повышать N при ≥$advance% средней точности, понижать при ≤$regress%';
+  }
+
+  @override
+  String get settingsAdaptiveCriterion =>
+      'Критерий точности адаптивного режима';
+
+  @override
+  String get settingsAdaptiveCriterionMin => 'Минимальная';
+
+  @override
+  String get settingsAdaptiveCriterionAvg => 'Средняя';
+
+  @override
+  String get settingsAdaptiveCriterionHint =>
+      'В оригинальном тесте Jaeggi по умолчанию используется минимальная точность для определения изменения N в адаптивном режиме.';
 
   @override
   String get settingsAdaptiveThresholds => 'Пороги точности';

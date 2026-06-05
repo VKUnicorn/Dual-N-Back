@@ -2,6 +2,7 @@ import 'package:dual_n_back/core/constants/app_theme_mode.dart';
 import 'package:dual_n_back/core/constants/audio_voice.dart';
 import 'package:dual_n_back/core/constants/grid_style.dart';
 import 'package:dual_n_back/core/constants/nback_defaults.dart';
+import 'package:dual_n_back/features/game/domain/adaptive_n.dart';
 import 'package:dual_n_back/features/game/domain/stimulus.dart';
 import 'package:dual_n_back/features/settings/domain/preset.dart';
 import 'package:dual_n_back/features/settings/domain/preset_settings.dart';
@@ -26,6 +27,7 @@ class SettingsModel {
     required this.matchProbability,
     required this.matchProbabilityJitter,
     required this.adaptiveMode,
+    required this.adaptiveCriterion,
     required this.advanceThreshold,
     required this.regressThreshold,
     required this.volume,
@@ -64,6 +66,7 @@ class SettingsModel {
         matchProbability: NBackDefaults.matchProbability,
         matchProbabilityJitter: NBackDefaults.matchProbabilityJitter,
         adaptiveMode: false,
+        adaptiveCriterion: AdaptiveCriterion.minAccuracy,
         advanceThreshold: NBackDefaults.advanceThreshold,
         regressThreshold: NBackDefaults.regressThreshold,
         volume: 1,
@@ -185,6 +188,12 @@ class SettingsModel {
   /// Whether N auto-adjusts after each session (Jaeggi protocol).
   final bool adaptiveMode;
 
+  /// Which accuracy figure adaptive mode judges a session by — the
+  /// original Jaeggi worst-per-channel ([AdaptiveCriterion.minAccuracy],
+  /// the default) or overall pooled accuracy. Only consulted when
+  /// [adaptiveMode] is true.
+  final AdaptiveCriterion adaptiveCriterion;
+
   /// Per-channel min accuracy at which N goes up after a session.
   /// Stored as a fraction in `[0, 1]`; default is
   /// [NBackDefaults.advanceThreshold] (0.80, Jaeggi protocol). Only
@@ -293,6 +302,7 @@ class SettingsModel {
         matchProbability: p.matchProbability,
         matchProbabilityJitter: p.matchProbabilityJitter,
         adaptiveMode: p.adaptiveMode,
+        adaptiveCriterion: p.adaptiveCriterion,
         advanceThreshold: p.advanceThreshold,
         regressThreshold: p.regressThreshold,
         volume: p.volume,
@@ -345,6 +355,7 @@ class SettingsModel {
     double? matchProbability,
     double? matchProbabilityJitter,
     bool? adaptiveMode,
+    AdaptiveCriterion? adaptiveCriterion,
     double? advanceThreshold,
     double? regressThreshold,
     double? volume,
@@ -382,6 +393,7 @@ class SettingsModel {
       matchProbabilityJitter:
           matchProbabilityJitter ?? this.matchProbabilityJitter,
       adaptiveMode: adaptiveMode ?? this.adaptiveMode,
+      adaptiveCriterion: adaptiveCriterion ?? this.adaptiveCriterion,
       advanceThreshold: advanceThreshold ?? this.advanceThreshold,
       regressThreshold: regressThreshold ?? this.regressThreshold,
       volume: volume ?? this.volume,

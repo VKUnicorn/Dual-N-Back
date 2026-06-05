@@ -264,9 +264,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAdaptive => 'Adaptive mode';
 
   @override
-  String settingsAdaptiveSubtitle(int advance, int regress) {
-    return 'Increase N at ≥$advance% accuracy, decrease at ≤$regress%';
+  String settingsAdaptiveSubtitleMin(int advance, int regress) {
+    return 'Increase N at ≥$advance% minimal accuracy, decrease at ≤$regress%';
   }
+
+  @override
+  String settingsAdaptiveSubtitleAvg(int advance, int regress) {
+    return 'Increase N at ≥$advance% average accuracy, decrease at ≤$regress%';
+  }
+
+  @override
+  String get settingsAdaptiveCriterion => 'Adaptive accuracy criterion';
+
+  @override
+  String get settingsAdaptiveCriterionMin => 'Minimal';
+
+  @override
+  String get settingsAdaptiveCriterionAvg => 'Average';
+
+  @override
+  String get settingsAdaptiveCriterionHint =>
+      'The original Jaeggi test uses minimal accuracy by default to decide the N change in adaptive mode.';
 
   @override
   String get settingsAdaptiveThresholds => 'Accuracy thresholds';

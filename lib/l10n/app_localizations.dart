@@ -542,11 +542,41 @@ abstract class AppLocalizations {
   /// **'Adaptive mode'**
   String get settingsAdaptive;
 
-  /// No description provided for @settingsAdaptiveSubtitle.
+  /// No description provided for @settingsAdaptiveSubtitleMin.
   ///
   /// In en, this message translates to:
-  /// **'Increase N at ≥{advance}% accuracy, decrease at ≤{regress}%'**
-  String settingsAdaptiveSubtitle(int advance, int regress);
+  /// **'Increase N at ≥{advance}% minimal accuracy, decrease at ≤{regress}%'**
+  String settingsAdaptiveSubtitleMin(int advance, int regress);
+
+  /// No description provided for @settingsAdaptiveSubtitleAvg.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase N at ≥{advance}% average accuracy, decrease at ≤{regress}%'**
+  String settingsAdaptiveSubtitleAvg(int advance, int regress);
+
+  /// No description provided for @settingsAdaptiveCriterion.
+  ///
+  /// In en, this message translates to:
+  /// **'Adaptive accuracy criterion'**
+  String get settingsAdaptiveCriterion;
+
+  /// No description provided for @settingsAdaptiveCriterionMin.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimal'**
+  String get settingsAdaptiveCriterionMin;
+
+  /// No description provided for @settingsAdaptiveCriterionAvg.
+  ///
+  /// In en, this message translates to:
+  /// **'Average'**
+  String get settingsAdaptiveCriterionAvg;
+
+  /// No description provided for @settingsAdaptiveCriterionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The original Jaeggi test uses minimal accuracy by default to decide the N change in adaptive mode.'**
+  String get settingsAdaptiveCriterionHint;
 
   /// No description provided for @settingsAdaptiveThresholds.
   ///

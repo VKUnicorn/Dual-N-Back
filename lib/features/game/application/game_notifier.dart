@@ -98,6 +98,7 @@ class GameNotifier extends Notifier<GameSession> {
           maxN: s.maxN,
           advanceThreshold: s.advanceThreshold,
           regressThreshold: s.regressThreshold,
+          criterion: s.adaptiveCriterion,
         ),
       );
     } on Object {

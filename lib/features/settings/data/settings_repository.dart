@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dual_n_back/core/constants/app_theme_mode.dart';
 import 'package:dual_n_back/core/constants/audio_voice.dart';
 import 'package:dual_n_back/core/constants/grid_style.dart';
+import 'package:dual_n_back/features/game/domain/adaptive_n.dart';
 import 'package:dual_n_back/features/game/domain/stimulus.dart';
 import 'package:dual_n_back/features/settings/domain/preset.dart';
 import 'package:dual_n_back/features/settings/domain/settings_model.dart';
@@ -29,6 +30,7 @@ class SettingsRepository {
   static const _kMatchProbability = 'settings.matchProbability';
   static const _kMatchProbabilityJitter = 'settings.matchProbabilityJitter';
   static const _kAdaptive = 'settings.adaptiveMode';
+  static const _kAdaptiveCriterion = 'settings.adaptiveCriterion';
   static const _kAdvanceThreshold = 'settings.advanceThreshold';
   static const _kRegressThreshold = 'settings.regressThreshold';
   static const _kVolume = 'settings.volume';
@@ -76,6 +78,8 @@ class SettingsRepository {
           _prefs.getDouble(_kMatchProbabilityJitter) ??
               defaults.matchProbabilityJitter,
       adaptiveMode: _prefs.getBool(_kAdaptive) ?? defaults.adaptiveMode,
+      adaptiveCriterion:
+          _loadAdaptiveCriterion() ?? defaults.adaptiveCriterion,
       advanceThreshold: _prefs.getDouble(_kAdvanceThreshold) ??
           defaults.advanceThreshold,
       regressThreshold: _prefs.getDouble(_kRegressThreshold) ??
@@ -135,6 +139,7 @@ class SettingsRepository {
         model.matchProbabilityJitter,
       ),
       _prefs.setBool(_kAdaptive, model.adaptiveMode),
+      _prefs.setString(_kAdaptiveCriterion, model.adaptiveCriterion.name),
       _prefs.setDouble(_kAdvanceThreshold, model.advanceThreshold),
       _prefs.setDouble(_kRegressThreshold, model.regressThreshold),
       _prefs.setDouble(_kVolume, model.volume),
@@ -250,6 +255,7 @@ class SettingsRepository {
       _prefs.remove(_kMatchProbability),
       _prefs.remove(_kMatchProbabilityJitter),
       _prefs.remove(_kAdaptive),
+      _prefs.remove(_kAdaptiveCriterion),
       _prefs.remove(_kAdvanceThreshold),
       _prefs.remove(_kRegressThreshold),
       _prefs.remove(_kVolume),
@@ -375,6 +381,15 @@ class SettingsRepository {
     if (name == null) return null;
     for (final voice in AudioVoice.values) {
       if (voice.name == name) return voice;
+    }
+    return null;
+  }
+
+  AdaptiveCriterion? _loadAdaptiveCriterion() {
+    final name = _prefs.getString(_kAdaptiveCriterion);
+    if (name == null) return null;
+    for (final c in AdaptiveCriterion.values) {
+      if (c.name == name) return c;
     }
     return null;
   }
