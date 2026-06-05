@@ -45,6 +45,7 @@ class SettingsModel {
     required this.feedbackAudioOnPress,
     required this.feedbackVisualOnMiss,
     required this.feedbackAudioOnMiss,
+    required this.showSessionProgress,
     this.presets = const [PresetRef(id: Preset.defaultPresetId, name: '')],
     this.activePresetId = Preset.defaultPresetId,
     this.localeCode,
@@ -82,6 +83,7 @@ class SettingsModel {
         feedbackAudioOnPress: true,
         feedbackVisualOnMiss: true,
         feedbackAudioOnMiss: true,
+        showSessionProgress: true,
       );
 
   /// Bounds and default for the daily-goal slider on the settings screen.
@@ -305,6 +307,7 @@ class SettingsModel {
         feedbackAudioOnPress: p.feedbackAudioOnPress,
         feedbackVisualOnMiss: p.feedbackVisualOnMiss,
         feedbackAudioOnMiss: p.feedbackAudioOnMiss,
+        showSessionProgress: p.showSessionProgress,
       );
 
   /// When true, the match button briefly flashes green on a correct press
@@ -323,6 +326,12 @@ class SettingsModel {
   /// When true, `missed.mp3` is played when the trial advances and a
   /// signal was present but no press was made. Default true.
   final bool feedbackAudioOnMiss;
+
+  /// When true, the in-game HUD shows the trial counter (`12 / 24`) and
+  /// the progress bar during a session. When false both are hidden (the
+  /// `N = …` label stays), without shifting any other element. Default
+  /// true.
+  final bool showSessionProgress;
 
   SettingsModel copyWith({
     Set<ChannelType>? defaultChannels,
@@ -355,6 +364,7 @@ class SettingsModel {
     bool? feedbackAudioOnPress,
     bool? feedbackVisualOnMiss,
     bool? feedbackAudioOnMiss,
+    bool? showSessionProgress,
     List<PresetRef>? presets,
     String? activePresetId,
     String? Function()? localeCode,
@@ -397,6 +407,8 @@ class SettingsModel {
           feedbackVisualOnMiss ?? this.feedbackVisualOnMiss,
       feedbackAudioOnMiss:
           feedbackAudioOnMiss ?? this.feedbackAudioOnMiss,
+      showSessionProgress:
+          showSessionProgress ?? this.showSessionProgress,
       presets: presets ?? this.presets,
       activePresetId: activePresetId ?? this.activePresetId,
       localeCode: localeCode != null ? localeCode() : this.localeCode,

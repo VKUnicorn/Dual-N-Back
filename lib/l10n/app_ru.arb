@@ -130,6 +130,7 @@
   "settingsFeedbackAudioPress": "Звуковая отдача цвета кнопок при ошибке совпадения",
   "settingsFeedbackVisualMiss": "Визуальная отдача цвета кнопок при ошибочном пропуске совпадения",
   "settingsFeedbackAudioMiss": "Звуковая отдача при ошибочном пропуске совпадения",
+  "settingsFeedbackShowProgress": "Отображать прогресс сессии",
   "settingsSectionDailyGoal": "Дневная цель сессий",
   "settingsDailyGoal": "Сессий в день",
   "settingsSectionNotifications": "Уведомления",

@@ -35,6 +35,7 @@ void main() {
       expect(p.feedbackAudioOnPress, s.feedbackAudioOnPress);
       expect(p.feedbackVisualOnMiss, s.feedbackVisualOnMiss);
       expect(p.feedbackAudioOnMiss, s.feedbackAudioOnMiss);
+      expect(p.showSessionProgress, s.showSessionProgress);
     });
 
     test('fromSettings / applyPreset round-trip', () {

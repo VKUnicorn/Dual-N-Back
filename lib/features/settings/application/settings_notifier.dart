@@ -373,6 +373,10 @@ class SettingsNotifier extends Notifier<SettingsModel> {
     await _commitScoped(state.copyWith(feedbackAudioOnMiss: enabled));
   }
 
+  Future<void> updateShowSessionProgress({required bool enabled}) async {
+    await _commitScoped(state.copyWith(showSessionProgress: enabled));
+  }
+
   /// Resets the *active* preset's scoped settings to defaults AND the
   /// global settings to defaults. Other presets are left untouched.
   Future<void> resetToDefaults() async {

@@ -756,6 +756,12 @@ abstract class AppLocalizations {
   /// **'Audio feedback on missed match'**
   String get settingsFeedbackAudioMiss;
 
+  /// No description provided for @settingsFeedbackShowProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Show session progress'**
+  String get settingsFeedbackShowProgress;
+
   /// No description provided for @settingsSectionDailyGoal.
   ///
   /// In en, this message translates to:

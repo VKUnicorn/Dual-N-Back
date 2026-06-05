@@ -398,6 +398,9 @@ class AppLocalizationsRu extends AppLocalizations {
       'Звуковая отдача при ошибочном пропуске совпадения';
 
   @override
+  String get settingsFeedbackShowProgress => 'Отображать прогресс сессии';
+
+  @override
   String get settingsSectionDailyGoal => 'Дневная цель сессий';
 
   @override

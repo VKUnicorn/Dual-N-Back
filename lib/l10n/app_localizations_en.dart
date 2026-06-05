@@ -396,6 +396,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsFeedbackAudioMiss => 'Audio feedback on missed match';
 
   @override
+  String get settingsFeedbackShowProgress => 'Show session progress';
+
+  @override
   String get settingsSectionDailyGoal => 'Daily session goal';
 
   @override

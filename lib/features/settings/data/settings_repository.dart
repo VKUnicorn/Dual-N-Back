@@ -50,6 +50,7 @@ class SettingsRepository {
   static const _kFeedbackAudioOnPress = 'settings.feedbackAudioOnPress';
   static const _kFeedbackVisualOnMiss = 'settings.feedbackVisualOnMiss';
   static const _kFeedbackAudioOnMiss = 'settings.feedbackAudioOnMiss';
+  static const _kShowSessionProgress = 'settings.showSessionProgress';
 
   /// Presets are stored as a single JSON-encoded list (each entry is a
   /// [Preset.toJson]) rather than per-field, since the count is dynamic.
@@ -106,6 +107,8 @@ class SettingsRepository {
           defaults.feedbackVisualOnMiss,
       feedbackAudioOnMiss: _prefs.getBool(_kFeedbackAudioOnMiss) ??
           defaults.feedbackAudioOnMiss,
+      showSessionProgress: _prefs.getBool(_kShowSessionProgress) ??
+          defaults.showSessionProgress,
       localeCode: _prefs.getString(_kLocale),
     );
   }
@@ -165,6 +168,7 @@ class SettingsRepository {
       _prefs.setBool(_kFeedbackAudioOnPress, model.feedbackAudioOnPress),
       _prefs.setBool(_kFeedbackVisualOnMiss, model.feedbackVisualOnMiss),
       _prefs.setBool(_kFeedbackAudioOnMiss, model.feedbackAudioOnMiss),
+      _prefs.setBool(_kShowSessionProgress, model.showSessionProgress),
       if (model.localeCode != null)
         _prefs.setString(_kLocale, model.localeCode!)
       else
@@ -265,6 +269,7 @@ class SettingsRepository {
       _prefs.remove(_kFeedbackAudioOnPress),
       _prefs.remove(_kFeedbackVisualOnMiss),
       _prefs.remove(_kFeedbackAudioOnMiss),
+      _prefs.remove(_kShowSessionProgress),
       _prefs.remove(_kLocale),
       _prefs.remove(_kPresetPayloads),
       _prefs.remove(_kActivePresetId),

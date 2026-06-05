@@ -414,7 +414,11 @@ class _RunningView extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _Hud(session: session),
+          _Hud(
+            session: session,
+            showProgress:
+                ref.watch(settingsProvider.select((s) => s.showSessionProgress)),
+          ),
           const SizedBox(height: 16),
           _GridStage(
             session: session,
@@ -585,9 +589,15 @@ class _CountdownOverlay extends StatelessWidget {
 }
 
 class _Hud extends StatelessWidget {
-  const _Hud({required this.session});
+  const _Hud({required this.session, this.showProgress = true});
 
   final GameSession session;
+
+  /// When false, the trial counter and progress bar are hidden but still
+  /// occupy their full space (via [Visibility.maintainSize]) so the grid
+  /// and everything below stay pinned in exactly the same place. The
+  /// `N = …` label is always shown.
+  final bool showProgress;
 
   @override
   Widget build(BuildContext context) {
@@ -602,17 +612,29 @@ class _Hud extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('N = ${session.n}', style: theme.textTheme.titleLarge),
-            Text(
-              '${session.displayedTrialNumber} / ${session.totalTrials}',
-              style: theme.textTheme.titleMedium,
+            Visibility(
+              visible: showProgress,
+              maintainSize: true,
+              maintainAnimation: true,
+              maintainState: true,
+              child: Text(
+                '${session.displayedTrialNumber} / ${session.totalTrials}',
+                style: theme.textTheme.titleMedium,
+              ),
             ),
           ],
         ),
         const SizedBox(height: 8),
-        LinearProgressIndicator(
-          value: progress,
-          minHeight: 6,
-          borderRadius: BorderRadius.circular(3),
+        Visibility(
+          visible: showProgress,
+          maintainSize: true,
+          maintainAnimation: true,
+          maintainState: true,
+          child: LinearProgressIndicator(
+            value: progress,
+            minHeight: 6,
+            borderRadius: BorderRadius.circular(3),
+          ),
         ),
       ],
     );

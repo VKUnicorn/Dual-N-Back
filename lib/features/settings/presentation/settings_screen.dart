@@ -533,6 +533,13 @@ class SettingsScreen extends ConsumerWidget {
                     notifier.updateFeedbackAudioOnMiss(enabled: v),
                   ),
                 ),
+                SwitchListTile(
+                  title: Text(l.settingsFeedbackShowProgress),
+                  value: settings.showSessionProgress,
+                  onChanged: (v) => unawaited(
+                    notifier.updateShowSessionProgress(enabled: v),
+                  ),
+                ),
               ],
             ),
           ),

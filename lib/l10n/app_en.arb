@@ -172,6 +172,7 @@
   "settingsFeedbackAudioPress": "Audio feedback on incorrect match press",
   "settingsFeedbackVisualMiss": "Visual button-colour feedback on missed matches",
   "settingsFeedbackAudioMiss": "Audio feedback on missed match",
+  "settingsFeedbackShowProgress": "Show session progress",
   "settingsSectionDailyGoal": "Daily session goal",
   "settingsDailyGoal": "Sessions per day",
   "settingsSectionNotifications": "Notifications",

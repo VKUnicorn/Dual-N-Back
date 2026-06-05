@@ -41,6 +41,7 @@ class PresetSettings {
     required this.feedbackAudioOnPress,
     required this.feedbackVisualOnMiss,
     required this.feedbackAudioOnMiss,
+    required this.showSessionProgress,
   });
 
   /// Defaults for a fresh preset — kept in lock-step with
@@ -72,6 +73,7 @@ class PresetSettings {
         feedbackAudioOnPress: true,
         feedbackVisualOnMiss: true,
         feedbackAudioOnMiss: true,
+        showSessionProgress: true,
       );
 
   /// Extracts the preset-scoped fields from a flat [SettingsModel].
@@ -101,6 +103,7 @@ class PresetSettings {
         feedbackAudioOnPress: s.feedbackAudioOnPress,
         feedbackVisualOnMiss: s.feedbackVisualOnMiss,
         feedbackAudioOnMiss: s.feedbackAudioOnMiss,
+        showSessionProgress: s.showSessionProgress,
       );
 
   /// Rebuilds a payload from persisted JSON, replicating the same
@@ -152,6 +155,8 @@ class PresetSettings {
           _asBool(json['feedbackVisualOnMiss']) ?? d.feedbackVisualOnMiss,
       feedbackAudioOnMiss:
           _asBool(json['feedbackAudioOnMiss']) ?? d.feedbackAudioOnMiss,
+      showSessionProgress:
+          _asBool(json['showSessionProgress']) ?? d.showSessionProgress,
     );
   }
 
@@ -180,6 +185,7 @@ class PresetSettings {
   final bool feedbackAudioOnPress;
   final bool feedbackVisualOnMiss;
   final bool feedbackAudioOnMiss;
+  final bool showSessionProgress;
 
   Map<String, dynamic> toJson() => {
         'defaultChannels': [for (final c in defaultChannels) c.name],
@@ -209,6 +215,7 @@ class PresetSettings {
         'feedbackAudioOnPress': feedbackAudioOnPress,
         'feedbackVisualOnMiss': feedbackVisualOnMiss,
         'feedbackAudioOnMiss': feedbackAudioOnMiss,
+        'showSessionProgress': showSessionProgress,
       };
 
   static int? _asInt(Object? v) => v is int ? v : (v is num ? v.toInt() : null);
