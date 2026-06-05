@@ -19,6 +19,7 @@ class HeatmapCard extends StatefulWidget {
     required this.period,
     required this.range,
     required this.sessions,
+    this.firstActiveDay,
     this.onDrillDown,
     this.onDaySessionTap,
     super.key,
@@ -27,6 +28,12 @@ class HeatmapCard extends StatefulWidget {
   final StatsPeriod period;
   final StatsRange range;
   final List<SavedSession> sessions;
+
+  /// Day of the user's first-ever session (day-truncated). Calendar days
+  /// strictly before it are rendered with a dash — the same "inactive"
+  /// treatment as future days — since no training existed yet. `null`
+  /// (no history) disables the before-first dash.
+  final DateTime? firstActiveDay;
 
   /// Called when the user taps a cell in week / month / year mode to
   /// drill down into a smaller period. Day mode never invokes this
@@ -202,16 +209,20 @@ class _HeatmapCardState extends State<HeatmapCard> {
     // Future days: render a dash instead of "0" so it's obvious those
     // buckets aren't a flatlining streak — they just haven't happened
     // yet. `today` is used as the cutoff (so today itself is "now",
-    // not future).
+    // not future). Days before the user's first-ever session get the
+    // same dash — there was no training to flatline on yet.
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final isFuture = day.isAfter(today);
-    final countLabel = isFuture ? '—' : '$count';
+    final beforeFirst = widget.firstActiveDay != null &&
+        day.isBefore(widget.firstActiveDay!);
+    final isInactive = isFuture || beforeFirst;
+    final countLabel = isInactive ? '—' : '$count';
     // High-contrast text on "hot" cells, muted otherwise. Threshold of
-    // 60% mirrors the year-month cells. Future-dash cells get an even
+    // 60% mirrors the year-month cells. Inactive-dash cells get an even
     // more muted grey so they read as inactive.
     final hot = maxCount > 0 && count / maxCount > 0.6;
-    final fg = isFuture
+    final fg = isInactive
         ? theme.colorScheme.outline
         : hot
             ? theme.colorScheme.onPrimary
@@ -401,22 +412,34 @@ class _HeatmapCardState extends State<HeatmapCard> {
 
         final now = DateTime.now();
         final thisMonth = DateTime(now.year, now.month);
+        // Month containing the user's first-ever session — months strictly
+        // before it predate any training and get the inactive dash.
+        final firstMonth = widget.firstActiveDay == null
+            ? null
+            : DateTime(
+                widget.firstActiveDay!.year,
+                widget.firstActiveDay!.month,
+              );
 
         Widget monthCell(int monthIndex) {
           final monthDate = DateTime(widget.range.start.year, monthIndex + 1);
           final count = perMonth[monthIndex];
           // Months whose 1st falls strictly after the current month are
           // "future" — show a dash instead of "0". The current month
-          // itself shows the running count.
+          // itself shows the running count. Months before the first-ever
+          // session get the same dash.
           final isFuture = monthDate.isAfter(thisMonth);
-          final countLabel = isFuture ? '—' : '$count';
+          final beforeFirst =
+              firstMonth != null && monthDate.isBefore(firstMonth);
+          final isInactive = isFuture || beforeFirst;
+          final countLabel = isInactive ? '—' : '$count';
           // Reuse the per-day colour scale, but feed it month totals.
           final color = _cellColor(theme, count, monthMax);
           // White-on-primary readability: when the cell is "hot", flip
-          // text to onPrimary so the count stays legible. Future-dash
+          // text to onPrimary so the count stays legible. Inactive-dash
           // cells use a muted grey for an inactive look.
           final hot = monthMax > 0 && count / monthMax > 0.6;
-          final textColor = isFuture
+          final textColor = isInactive
               ? theme.colorScheme.outline
               : (hot
                   ? theme.colorScheme.onPrimary

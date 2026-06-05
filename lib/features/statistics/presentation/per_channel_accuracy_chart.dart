@@ -19,6 +19,7 @@ class PerChannelAccuracyChart extends StatefulWidget {
     required this.sessions,
     required this.activeChannels,
     required this.priorValues,
+    this.nLevel,
     super.key,
   });
 
@@ -27,6 +28,10 @@ class PerChannelAccuracyChart extends StatefulWidget {
   final List<SavedSession> sessions;
   final List<ChannelType> activeChannels;
   final Map<ChannelType, double> priorValues;
+
+  /// When set, the selected N is appended to the card title (e.g.
+  /// `Accuracy by channel, % - N4`) so the chart's N scope is visible.
+  final int? nLevel;
 
   @override
   State<PerChannelAccuracyChart> createState() =>
@@ -102,7 +107,9 @@ class _PerChannelAccuracyChartState extends State<PerChannelAccuracyChart> {
     ];
 
     return ChartCard(
-      title: l.statisticsChartChannelAccuracy,
+      title: widget.nLevel == null
+          ? l.statisticsChartChannelAccuracy
+          : '${l.statisticsChartChannelAccuracy} - N${widget.nLevel}',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

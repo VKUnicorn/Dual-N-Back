@@ -73,6 +73,16 @@ class SettingsNotifier extends Notifier<SettingsModel> {
   List<PresetRef> _refs() =>
       [for (final p in _presets) PresetRef(id: p.id, name: p.name)];
 
+  /// Configured starting N (`initialN`) for the preset [id], or `null` if
+  /// no preset with that id currently exists. Reads the full preset
+  /// payload — the flat [state] only mirrors the *active* preset's N.
+  int? initialNForPreset(String id) {
+    for (final p in _presets) {
+      if (p.id == id) return p.settings.initialN;
+    }
+    return null;
+  }
+
   /// Mirrors the just-mutated preset-scoped [next] back into the active
   /// preset payload and persists the preset list. Used by every
   /// preset-scoped update method.

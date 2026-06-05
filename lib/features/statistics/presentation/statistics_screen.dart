@@ -54,6 +54,13 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   /// clear / import).
   String? _profileFilterId;
 
+  /// N-level filter for the accuracy / d′ / per-channel charts (all
+  /// periods except Day). `null` = use the derived default (the selected
+  /// profile's configured N, falling back to the last-played profile's).
+  /// Reset to `null` whenever the profile filter changes so the default
+  /// re-derives for the new profile.
+  int? _selectedN;
+
   /// One [ExpansibleController] + [GlobalKey] per session id, lazily
   /// allocated on first focus. The controller lets us call `.expand()`
   /// programmatically; the key gives us a BuildContext under the
@@ -233,29 +240,59 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                 StatsPeriodMath.rangeFor(_period, DateTime.now()).start,
               );
 
-          // Most recent session strictly before the visible range — used
-          // by the accuracy / max-N / d′ charts to seed their forward-fill
-          // so empty leading buckets carry the player's last real value
-          // rather than 0. `sessions` is sorted newest-first by the
-          // repository, so this finds it in O(n) without sorting.
+          // N-level filter for the accuracy / d′ / per-channel charts.
+          // Default N: the selected profile's configured N if that profile
+          // still has settings, otherwise the last-played profile's N (the
+          // active preset, which always exists). `_selectedN` (the slider
+          // override) wins when set, and is reset on profile change.
+          final lastPlayedN =
+              ref.watch(settingsProvider.select((s) => s.initialN));
+          final selectedProfileN = selectedProfileId == null
+              ? null
+              : ref
+                  .read(settingsProvider.notifier)
+                  .initialNForPreset(selectedProfileId);
+          final defaultN = selectedProfileN ?? lastPlayedN;
+          // N values present across the profile-filtered history (full
+          // history, not just this period) so the slider's range stays
+          // stable while navigating between periods.
+          final availableNs =
+              sessions.map((s) => s.session.n).toSet().toList()..sort();
+          final minN = availableNs.isEmpty ? defaultN : availableNs.first;
+          final maxN = availableNs.isEmpty ? defaultN : availableNs.last;
+          final effectiveN = (_selectedN ?? defaultN).clamp(minN, maxN);
+          // The three N-scoped charts only see sessions at the selected N.
+          final nInRange = [
+            for (final s in inRange)
+              if (s.session.n == effectiveN) s,
+          ];
+
+          // Most recent session strictly before the visible range — seeds
+          // the forward-fill so empty leading buckets carry the player's
+          // last real value rather than 0. `sessions` is newest-first, so
+          // this finds it in O(n). The max-N chart uses the all-N prior;
+          // the N-scoped charts use the prior restricted to the selected N.
           SavedSession? prior;
+          SavedSession? nPrior;
           for (final s in sessions) {
-            if (s.session.startedAt.isBefore(range.start)) {
-              prior = s;
-              break;
-            }
+            if (!s.session.startedAt.isBefore(range.start)) continue;
+            prior ??= s;
+            if (nPrior == null && s.session.n == effectiveN) nPrior = s;
+            // `prior` is always set by now (any before-range, N-matching
+            // session is also a before-range session), so gating on
+            // `nPrior` alone is enough to stop early.
+            if (nPrior != null) break;
           }
-          final priorAcc = prior == null
-              ? 0.0
-              : overallAccuracy(prior.scores) * 100;
+          final priorAcc =
+              nPrior == null ? 0.0 : overallAccuracy(nPrior.scores) * 100;
           final priorMaxN = prior?.session.n.toDouble() ?? 0;
           // Prior d′: weighted mean across the prior session's channels —
           // matches the per-bucket pooling the chart uses.
           var priorDp = 0.0;
-          if (prior != null) {
+          if (nPrior != null) {
             var sum = 0.0;
             var w = 0;
-            for (final score in prior.scores) {
+            for (final score in nPrior.scores) {
               final tw = engagedTotal(score);
               if (tw == 0) continue;
               sum += score.dPrime * tw;
@@ -264,14 +301,15 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             priorDp = w == 0 ? 0 : sum / w;
           }
           // Prior per-channel accuracy: from the most recent session
-          // *containing that channel*, not necessarily the same session
-          // for every channel. Walking newest-first and stopping when
-          // every active channel has a value catches all of them in one
-          // pass.
-          final activeChannelsList = activeChannels(inRange).toList()
+          // *containing that channel* at the selected N, not necessarily
+          // the same session for every channel. Walking newest-first and
+          // stopping when every active channel has a value catches all of
+          // them in one pass.
+          final activeChannelsList = activeChannels(nInRange).toList()
             ..sort((a, b) => a.index.compareTo(b.index));
           final priorChannelAcc = <ChannelType, double>{};
           for (final s in sessions) {
+            if (s.session.n != effectiveN) continue;
             if (!s.session.startedAt.isBefore(range.start)) continue;
             for (final score in s.scores) {
               for (final c in ChannelType.values) {
@@ -323,7 +361,11 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                 _ProfileFilterBar(
                   profiles: profiles,
                   selectedId: selectedProfileId,
-                  onChanged: (id) => setState(() => _profileFilterId = id),
+                  onChanged: (id) => setState(() {
+                    _profileFilterId = id;
+                    // Re-derive the default N for the newly selected profile.
+                    _selectedN = null;
+                  }),
                 ),
               const Divider(height: 1),
               Expanded(
@@ -349,6 +391,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                       period: _period,
                       range: range,
                       sessions: inRange,
+                      firstActiveDay: firstActiveDay,
                       onDaySessionTap: _focusDaySession,
                       onDrillDown: (period, anchor) {
                         setState(() {
@@ -362,28 +405,43 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                     // summary card instead, so the line charts are
                     // hidden here.
                     if (_period != StatsPeriod.day) ...[
+                      // N-level filter for the three charts below. Only
+                      // shown when the profile's history spans more than one
+                      // N (a single-N slider would be inert).
+                      if (availableNs.length >= 2) ...[
+                        const SizedBox(height: 8),
+                        _NFilterBar(
+                          min: minN,
+                          max: maxN,
+                          value: effectiveN,
+                          onChanged: (n) => setState(() => _selectedN = n),
+                        ),
+                      ],
                       const SizedBox(height: 16),
                       AvgAccuracyChart(
                         period: _period,
                         range: range,
-                        sessions: inRange,
+                        sessions: nInRange,
                         priorValue: priorAcc,
+                        nLevel: effectiveN,
                       ),
                       const SizedBox(height: 16),
                       DprimeChart(
                         period: _period,
                         range: range,
-                        sessions: inRange,
+                        sessions: nInRange,
                         priorValue: priorDp,
+                        nLevel: effectiveN,
                       ),
                       if (activeChannelsList.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         PerChannelAccuracyChart(
                           period: _period,
                           range: range,
-                          sessions: inRange,
+                          sessions: nInRange,
                           activeChannels: activeChannelsList,
                           priorValues: priorChannelAcc,
+                          nLevel: effectiveN,
                         ),
                       ],
                       const SizedBox(height: 16),
@@ -662,6 +720,50 @@ class _ProfileFilterBar extends StatelessWidget {
             DropdownMenuEntry(value: p.id, label: p.name),
         ],
         onSelected: (v) => onChanged(v == null || v.isEmpty ? null : v),
+      ),
+    );
+  }
+}
+
+/// Slider that scopes the accuracy / d′ / per-channel charts to a single
+/// N level. Range is the span of N values present in the (profile-filtered)
+/// history; the label shows the current `N{n}`.
+class _NFilterBar extends StatelessWidget {
+  const _NFilterBar({
+    required this.min,
+    required this.max,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final int min;
+  final int max;
+  final int value;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Row(
+        children: [
+          Text(
+            '${l.statisticsChartN}: $value',
+            style: theme.textTheme.bodyMedium,
+          ),
+          Expanded(
+            child: Slider(
+              min: min.toDouble(),
+              max: max.toDouble(),
+              divisions: max - min,
+              value: value.toDouble(),
+              label: 'N$value',
+              onChanged: (v) => onChanged(v.round()),
+            ),
+          ),
+        ],
       ),
     );
   }

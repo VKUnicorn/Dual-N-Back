@@ -34,7 +34,7 @@ void main() {
         yearRange,
         noSessions,
         1,
-        firstActiveDay: DateTime(2023, 6, 1),
+        firstActiveDay: DateTime(2023, 6, 15),
       );
       expect(summary.totalDays, 366);
     });

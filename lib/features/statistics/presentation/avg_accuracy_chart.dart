@@ -13,6 +13,7 @@ class AvgAccuracyChart extends StatefulWidget {
     required this.range,
     required this.sessions,
     required this.priorValue,
+    this.nLevel,
     super.key,
   });
 
@@ -24,6 +25,10 @@ class AvgAccuracyChart extends StatefulWidget {
   /// or 0 when there isn't one. Seeds the forward-fill so empty leading
   /// buckets show the player's last real value instead of dropping to 0.
   final double priorValue;
+
+  /// When set, the selected N is appended to the card title (e.g.
+  /// `Average accuracy, % - N4`) so the chart's N scope is visible.
+  final int? nLevel;
 
   @override
   State<AvgAccuracyChart> createState() => _AvgAccuracyChartState();
@@ -81,7 +86,9 @@ class _AvgAccuracyChartState extends State<AvgAccuracyChart> {
     );
 
     return ChartCard(
-      title: l.statisticsChartAvgAccuracy,
+      title: widget.nLevel == null
+          ? l.statisticsChartAvgAccuracy
+          : '${l.statisticsChartAvgAccuracy} - N${widget.nLevel}',
       child: SizedBox(
         height: 200,
         child: LineChart(

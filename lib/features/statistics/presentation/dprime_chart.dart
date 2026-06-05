@@ -18,6 +18,7 @@ class DprimeChart extends StatefulWidget {
     required this.range,
     required this.sessions,
     required this.priorValue,
+    this.nLevel,
     super.key,
   });
 
@@ -25,6 +26,10 @@ class DprimeChart extends StatefulWidget {
   final StatsRange range;
   final List<SavedSession> sessions;
   final double priorValue;
+
+  /// When set, the selected N is appended to the card title (e.g.
+  /// `Average d′ - N4`) so the chart's N scope is visible at a glance.
+  final int? nLevel;
 
   @override
   State<DprimeChart> createState() => _DprimeChartState();
@@ -77,7 +82,9 @@ class _DprimeChartState extends State<DprimeChart> {
     );
 
     return ChartCard(
-      title: l.statisticsChartDprime,
+      title: widget.nLevel == null
+          ? l.statisticsChartDprime
+          : '${l.statisticsChartDprime} - N${widget.nLevel}',
       child: SizedBox(
         height: 200,
         child: LineChart(
