@@ -30,6 +30,7 @@ void main() {
       expect(p.colors, s.colors);
       expect(p.gridStyle, s.gridStyle);
       expect(p.showFixationCross, s.showFixationCross);
+      expect(p.fixationCrossOpacity, s.fixationCrossOpacity);
       expect(p.allowCenterPosition, s.allowCenterPosition);
       expect(p.stimulusFadeMs, s.stimulusFadeMs);
       expect(p.feedbackVisualOnPress, s.feedbackVisualOnPress);
@@ -88,6 +89,7 @@ void main() {
           ],
           initialN: 6,
           adaptiveMode: true,
+          fixationCrossOpacity: 0.7,
         ),
       );
       final restored = PresetSettings.fromJson(original.toJson());
@@ -100,6 +102,7 @@ void main() {
       expect(restored.colors, original.colors);
       expect(restored.initialN, original.initialN);
       expect(restored.adaptiveMode, original.adaptiveMode);
+      expect(restored.fixationCrossOpacity, original.fixationCrossOpacity);
     });
 
     group('fromJson validation falls back to defaults', () {

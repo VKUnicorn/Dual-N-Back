@@ -292,6 +292,19 @@ class SettingsNotifier extends Notifier<SettingsModel> {
     await _commitScoped(state.copyWith(showFixationCross: enabled));
   }
 
+  /// Updates the fixation-cross opacity. Clamped to the allowed range and
+  /// snapped to the configured step so the slider only persists values
+  /// the UI offers.
+  Future<void> updateFixationCrossOpacity(double opacity) async {
+    final clamped = opacity.clamp(
+      SettingsModel.minFixationCrossOpacity,
+      SettingsModel.maxFixationCrossOpacity,
+    );
+    const step = SettingsModel.fixationCrossOpacityStep;
+    final snapped = (clamped / step).round() * step;
+    await _commitScoped(state.copyWith(fixationCrossOpacity: snapped));
+  }
+
   Future<void> updateAllowCenterPosition({required bool enabled}) async {
     await _commitScoped(state.copyWith(allowCenterPosition: enabled));
   }

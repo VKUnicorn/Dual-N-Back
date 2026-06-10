@@ -191,6 +191,21 @@ class SettingsScreen extends ConsumerWidget {
                     notifier.updateShowFixationCross(enabled: v),
                   ),
                 ),
+                _SliderTile(
+                  label: l.settingsFixationCrossOpacity,
+                  enabled: settings.showFixationCross,
+                  value: settings.fixationCrossOpacity,
+                  min: SettingsModel.minFixationCrossOpacity,
+                  max: SettingsModel.maxFixationCrossOpacity,
+                  divisions: ((SettingsModel.maxFixationCrossOpacity -
+                              SettingsModel.minFixationCrossOpacity) /
+                          SettingsModel.fixationCrossOpacityStep)
+                      .round(),
+                  display: l.settingsPercent(
+                    (settings.fixationCrossOpacity * 100).round(),
+                  ),
+                  onChanged: notifier.updateFixationCrossOpacity,
+                ),
                 SwitchListTile(
                   title: Text(l.settingsAllowCenterPosition),
                   value: settings.allowCenterPosition,
@@ -759,6 +774,7 @@ class _SliderTile extends StatelessWidget {
     required this.divisions,
     required this.display,
     required this.onChanged,
+    this.enabled = true,
   });
 
   final String label;
@@ -769,9 +785,16 @@ class _SliderTile extends StatelessWidget {
   final String display;
   final ValueChanged<double> onChanged;
 
+  /// When false the tile is greyed out and the slider is non-interactive,
+  /// mirroring [_AdaptiveCriterionTile].
+  final bool enabled;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final mutedLabel = theme.textTheme.bodyLarge?.copyWith(
+      color: theme.disabledColor,
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Column(
@@ -780,11 +803,16 @@ class _SliderTile extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label, style: theme.textTheme.bodyLarge),
+              Text(
+                label,
+                style: enabled ? theme.textTheme.bodyLarge : mutedLabel,
+              ),
               Text(
                 display,
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.primary,
+                  color: enabled
+                      ? theme.colorScheme.primary
+                      : theme.disabledColor,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -795,7 +823,7 @@ class _SliderTile extends StatelessWidget {
             min: min,
             max: max,
             divisions: divisions,
-            onChanged: onChanged,
+            onChanged: enabled ? onChanged : null,
           ),
         ],
       ),

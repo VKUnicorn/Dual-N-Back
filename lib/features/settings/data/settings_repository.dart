@@ -39,6 +39,7 @@ class SettingsRepository {
   static const _kColors = 'settings.colors';
   static const _kGridStyle = 'settings.gridStyle';
   static const _kShowFixationCross = 'settings.showFixationCross';
+  static const _kFixationCrossOpacity = 'settings.fixationCrossOpacity';
   static const _kAllowCenterPosition = 'settings.allowCenterPosition';
   static const _kDailyGoal = 'settings.dailyGoalSessions';
   static const _kRestDays = 'settings.restDays';
@@ -91,6 +92,8 @@ class SettingsRepository {
       gridStyle: _loadGridStyle() ?? defaults.gridStyle,
       showFixationCross:
           _prefs.getBool(_kShowFixationCross) ?? defaults.showFixationCross,
+      fixationCrossOpacity: _prefs.getDouble(_kFixationCrossOpacity) ??
+          defaults.fixationCrossOpacity,
       allowCenterPosition: _prefs.getBool(_kAllowCenterPosition) ??
           defaults.allowCenterPosition,
       dailyGoalSessions:
@@ -153,6 +156,7 @@ class SettingsRepository {
       ),
       _prefs.setString(_kGridStyle, model.gridStyle.name),
       _prefs.setBool(_kShowFixationCross, model.showFixationCross),
+      _prefs.setDouble(_kFixationCrossOpacity, model.fixationCrossOpacity),
       _prefs.setBool(_kAllowCenterPosition, model.allowCenterPosition),
       _prefs.setInt(_kDailyGoal, model.dailyGoalSessions),
       _prefs.setStringList(
@@ -264,6 +268,7 @@ class SettingsRepository {
       _prefs.remove(_kColors),
       _prefs.remove(_kGridStyle),
       _prefs.remove(_kShowFixationCross),
+      _prefs.remove(_kFixationCrossOpacity),
       _prefs.remove(_kAllowCenterPosition),
       _prefs.remove(_kDailyGoal),
       _prefs.remove(_kRestDays),

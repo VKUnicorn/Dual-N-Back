@@ -37,6 +37,7 @@ class PresetSettings {
     required this.colors,
     required this.gridStyle,
     required this.showFixationCross,
+    required this.fixationCrossOpacity,
     required this.allowCenterPosition,
     required this.stimulusFadeMs,
     required this.feedbackVisualOnPress,
@@ -70,6 +71,7 @@ class PresetSettings {
         colors: NBackDefaults.colorPalette,
         gridStyle: GridStyle.classic,
         showFixationCross: true,
+        fixationCrossOpacity: SettingsModel.defaultFixationCrossOpacity,
         allowCenterPosition: false,
         stimulusFadeMs: SettingsModel.defaultStimulusFadeMs,
         feedbackVisualOnPress: true,
@@ -101,6 +103,7 @@ class PresetSettings {
         colors: s.colors,
         gridStyle: s.gridStyle,
         showFixationCross: s.showFixationCross,
+        fixationCrossOpacity: s.fixationCrossOpacity,
         allowCenterPosition: s.allowCenterPosition,
         stimulusFadeMs: s.stimulusFadeMs,
         feedbackVisualOnPress: s.feedbackVisualOnPress,
@@ -151,6 +154,8 @@ class PresetSettings {
           _parseEnum(GridStyle.values, json['gridStyle']) ?? d.gridStyle,
       showFixationCross:
           _asBool(json['showFixationCross']) ?? d.showFixationCross,
+      fixationCrossOpacity: _asDouble(json['fixationCrossOpacity']) ??
+          d.fixationCrossOpacity,
       allowCenterPosition:
           _asBool(json['allowCenterPosition']) ?? d.allowCenterPosition,
       stimulusFadeMs: _asInt(json['stimulusFadeMs']) ?? d.stimulusFadeMs,
@@ -187,6 +192,7 @@ class PresetSettings {
   final List<int> colors;
   final GridStyle gridStyle;
   final bool showFixationCross;
+  final double fixationCrossOpacity;
   final bool allowCenterPosition;
   final int stimulusFadeMs;
   final bool feedbackVisualOnPress;
@@ -218,6 +224,7 @@ class PresetSettings {
         'colors': [for (final c in colors) c.toRadixString(16).padLeft(8, '0')],
         'gridStyle': gridStyle.name,
         'showFixationCross': showFixationCross,
+        'fixationCrossOpacity': fixationCrossOpacity,
         'allowCenterPosition': allowCenterPosition,
         'stimulusFadeMs': stimulusFadeMs,
         'feedbackVisualOnPress': feedbackVisualOnPress,

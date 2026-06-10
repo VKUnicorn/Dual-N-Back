@@ -437,6 +437,8 @@ class _RunningView extends ConsumerWidget {
                         ref.watch(settingsProvider).showFixationCross &&
                             session.status != GameStatus.preparing &&
                             session.status != GameStatus.countdown,
+                    fixationOpacity:
+                        ref.watch(settingsProvider).fixationCrossOpacity,
                     centerIsPositionTarget: allowCenter,
                     palette: ref.watch(settingsProvider).colors,
                   )

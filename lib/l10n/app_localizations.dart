@@ -702,6 +702,12 @@ abstract class AppLocalizations {
   /// **'Show fixation cross in the center'**
   String get settingsShowFixationCross;
 
+  /// No description provided for @settingsFixationCrossOpacity.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixation cross opacity'**
+  String get settingsFixationCrossOpacity;
+
   /// No description provided for @settingsAllowCenterPosition.
   ///
   /// In en, this message translates to:

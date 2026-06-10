@@ -155,6 +155,7 @@ class NBackGrid extends StatelessWidget {
     required this.fadeDuration,
     this.style = GridStyle.tile,
     this.showFixation = true,
+    this.fixationOpacity = 0.35,
     this.centerIsPositionTarget = false,
     this.palette,
     super.key,
@@ -188,6 +189,10 @@ class NBackGrid extends StatelessWidget {
   /// pre-session states (Play button visible, countdown) so it doesn't
   /// compete with the overlay.
   final bool showFixation;
+
+  /// Alpha the central fixation "+" is drawn with (0..1). Only consulted
+  /// when [showFixation] is true.
+  final double fixationOpacity;
 
   /// When true, the center cell is a valid position-channel target —
   /// stops the grid from special-casing it (no transparent shortcut in
@@ -246,7 +251,7 @@ class NBackGrid extends StatelessWidget {
                     '+',
                     style: TextStyle(
                       color: scheme.onSurfaceVariant
-                          .withValues(alpha: 0.35),
+                          .withValues(alpha: fixationOpacity),
                       fontWeight: FontWeight.w300,
                     ),
                   ),
@@ -298,8 +303,8 @@ class NBackGrid extends StatelessWidget {
                   child: Text(
                     '+',
                     style: TextStyle(
-                      color:
-                          scheme.onSurfaceVariant.withValues(alpha: 0.35),
+                      color: scheme.onSurfaceVariant
+                          .withValues(alpha: fixationOpacity),
                       fontWeight: FontWeight.w300,
                     ),
                   ),
@@ -366,7 +371,7 @@ class NBackGrid extends StatelessWidget {
                           '+',
                           style: TextStyle(
                             color: scheme.onSurfaceVariant
-                                .withValues(alpha: 0.35),
+                                .withValues(alpha: fixationOpacity),
                             fontWeight: FontWeight.w300,
                           ),
                         ),

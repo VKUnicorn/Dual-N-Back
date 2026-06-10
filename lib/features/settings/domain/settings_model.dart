@@ -36,6 +36,7 @@ class SettingsModel {
     required this.colors,
     required this.gridStyle,
     required this.showFixationCross,
+    required this.fixationCrossOpacity,
     required this.allowCenterPosition,
     required this.dailyGoalSessions,
     required this.restDays,
@@ -75,6 +76,7 @@ class SettingsModel {
         colors: NBackDefaults.colorPalette,
         gridStyle: GridStyle.classic,
         showFixationCross: true,
+        fixationCrossOpacity: defaultFixationCrossOpacity,
         allowCenterPosition: false,
         dailyGoalSessions: defaultDailyGoalSessions,
         restDays: <int>{},
@@ -107,6 +109,16 @@ class SettingsModel {
   static const int maxStimulusFadeMs = 200;
   static const int stimulusFadeStepMs = 10;
   static const int defaultStimulusFadeMs = 50;
+
+  /// Bounds, step and default for the fixation-cross opacity slider. The
+  /// value is the alpha the central "+" is drawn with (0 = invisible,
+  /// 1 = fully opaque). Default [defaultFixationCrossOpacity] (0.35)
+  /// preserves the historical look. Only consulted when
+  /// [showFixationCross] is true.
+  static const double minFixationCrossOpacity = 0;
+  static const double maxFixationCrossOpacity = 1;
+  static const double fixationCrossOpacityStep = 0.05;
+  static const double defaultFixationCrossOpacity = 0.35;
 
   /// Bounds for the adaptive-mode accuracy thresholds (per-channel
   /// min-accuracy at which N moves up or down after a session). Both
@@ -237,6 +249,11 @@ class SettingsModel {
   /// 3-2-1 countdown regardless of this flag.
   final bool showFixationCross;
 
+  /// Alpha the central "+" fixation marker is drawn with, in
+  /// `[minFixationCrossOpacity, maxFixationCrossOpacity]`. Only has a
+  /// visible effect when [showFixationCross] is true.
+  final double fixationCrossOpacity;
+
   /// When true, the position channel may target the center cell of the
   /// 3×3 grid as a 9th option (vs. Jaeggi's 8 non-center locations).
   /// Slightly bumps the difficulty of the position channel — opt-in.
@@ -311,6 +328,7 @@ class SettingsModel {
         colors: p.colors,
         gridStyle: p.gridStyle,
         showFixationCross: p.showFixationCross,
+        fixationCrossOpacity: p.fixationCrossOpacity,
         allowCenterPosition: p.allowCenterPosition,
         stimulusFadeMs: p.stimulusFadeMs,
         feedbackVisualOnPress: p.feedbackVisualOnPress,
@@ -364,6 +382,7 @@ class SettingsModel {
     List<int>? colors,
     GridStyle? gridStyle,
     bool? showFixationCross,
+    double? fixationCrossOpacity,
     bool? allowCenterPosition,
     int? dailyGoalSessions,
     Set<int>? restDays,
@@ -402,6 +421,8 @@ class SettingsModel {
       colors: colors ?? this.colors,
       gridStyle: gridStyle ?? this.gridStyle,
       showFixationCross: showFixationCross ?? this.showFixationCross,
+      fixationCrossOpacity:
+          fixationCrossOpacity ?? this.fixationCrossOpacity,
       allowCenterPosition: allowCenterPosition ?? this.allowCenterPosition,
       dailyGoalSessions: dailyGoalSessions ?? this.dailyGoalSessions,
       restDays: restDays ?? this.restDays,

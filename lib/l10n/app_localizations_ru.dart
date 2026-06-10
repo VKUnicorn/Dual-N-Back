@@ -368,6 +368,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsShowFixationCross => 'Показывать крест фиксации в центре';
 
   @override
+  String get settingsFixationCrossOpacity => 'Непрозрачность креста фиксации';
+
+  @override
   String get settingsAllowCenterPosition =>
       'Добавить девятый вариант стимула позиции в центре сетки';
 

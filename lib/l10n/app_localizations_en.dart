@@ -366,6 +366,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsShowFixationCross => 'Show fixation cross in the center';
 
   @override
+  String get settingsFixationCrossOpacity => 'Fixation cross opacity';
+
+  @override
   String get settingsAllowCenterPosition =>
       'Add a ninth position-stimulus variant in the center of the grid';
 
