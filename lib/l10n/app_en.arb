@@ -307,6 +307,7 @@
   "@statisticsSummaryBestSessionValueShort": {
     "placeholders": {"label": {"type": "String"}, "percent": {"type": "int"}}
   },
+  "statisticsSummaryAvgAccuracy": "Average accuracy",
   "statisticsSummaryTotalTrials": "Total trials",
   "statisticsSummaryTrainingTime": "Training time",
   "statisticsSummaryDailyGoal": "Daily goal",

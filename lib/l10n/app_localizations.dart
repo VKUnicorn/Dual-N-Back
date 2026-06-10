@@ -1282,6 +1282,12 @@ abstract class AppLocalizations {
   /// **'{label} · {percent}%'**
   String statisticsSummaryBestSessionValueShort(String label, int percent);
 
+  /// No description provided for @statisticsSummaryAvgAccuracy.
+  ///
+  /// In en, this message translates to:
+  /// **'Average accuracy'**
+  String get statisticsSummaryAvgAccuracy;
+
   /// No description provided for @statisticsSummaryTotalTrials.
   ///
   /// In en, this message translates to:

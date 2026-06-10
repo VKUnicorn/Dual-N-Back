@@ -743,6 +743,9 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get statisticsSummaryAvgAccuracy => 'Средняя точность';
+
+  @override
   String get statisticsSummaryTotalTrials => 'Всего trial\'ов';
 
   @override

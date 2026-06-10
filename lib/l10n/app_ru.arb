@@ -223,6 +223,7 @@
   "statisticsSummaryBestSession": "Лучшая сессия",
   "statisticsSummaryBestSessionValue": "{label} · {percent}% · {date}",
   "statisticsSummaryBestSessionValueShort": "{label} · {percent}%",
+  "statisticsSummaryAvgAccuracy": "Средняя точность",
   "statisticsSummaryTotalTrials": "Всего trial'ов",
   "statisticsSummaryTrainingTime": "Время тренировки",
   "statisticsSummaryDailyGoal": "Дневная цель",

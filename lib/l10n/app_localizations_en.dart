@@ -730,6 +730,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get statisticsSummaryAvgAccuracy => 'Average accuracy';
+
+  @override
   String get statisticsSummaryTotalTrials => 'Total trials';
 
   @override

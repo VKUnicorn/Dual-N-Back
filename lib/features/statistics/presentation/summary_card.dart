@@ -93,7 +93,7 @@ class SummaryCard extends StatelessWidget {
         // (Per-channel accuracy and average d′ are intentionally
         // omitted — they were too noisy to read at this granularity.)
         SummaryTile(
-          label: l.statisticsChartAvgAccuracy,
+          label: l.statisticsSummaryAvgAccuracy,
           value: summary.sessionsInPeriod == 0
               ? l.statisticsSummaryNone
               : '${(summary.averageAccuracy * 100).round()}%',
